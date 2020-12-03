@@ -1,0 +1,3 @@
+package debug // import "github.com/skeptycal/util"
+
+type Session struct{ ... }

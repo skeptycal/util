@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
-	"ideas/googlesearch/http"
 	"os"
 	"strings"
+
+	"github.com/skeptycal/util/scargo/http"
 )
 
 const googleSearchStringPrefix = "http://www.google.com/search?q="

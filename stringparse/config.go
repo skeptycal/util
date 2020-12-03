@@ -24,8 +24,9 @@ func Configure(fileName string, v interface{}) (err error) {
 	if configType.Kind() != reflect.Ptr || configType.Elem().Kind() != reflect.Struct {
 		return fmt.Errorf("v must be a pointer to a struct type, got: %v", configType)
 	}
-
-	return LoadJSON(fileName, v)
+	return nil
+	// todo
+	// return LoadJSON(fileName, v)
 }
 
 // ConfigFileName - returns the name of the json config file matching the go file name

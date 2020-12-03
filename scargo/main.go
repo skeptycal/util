@@ -2,8 +2,8 @@ package main
 
 import (
 	"flag"
-	scargo "ideas/scargo/http"
 	"log"
+	"scargo/getpage"
 )
 
 func main() {
@@ -13,7 +13,7 @@ func main() {
 
 	println("url: ", *urlPtr)
 
-	page, err := scargo.GetPage(*urlPtr)
+	page, err := getpage.GetPage(*urlPtr)
 	if err != nil {
 		log.Fatalln(err)
 	}

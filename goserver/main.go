@@ -97,6 +97,5 @@ func htmlServer() {
 func main() {
 	fmt.Printf("Server is active at: %s\n", url)
 	fmt.Println("   (Press <ctrl>-C to stop server.)")
-	basicServer()
 
 }
