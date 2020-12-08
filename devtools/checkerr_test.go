@@ -1,4 +1,4 @@
-package errorutils
+package devtools
 
 import (
 	"bytes"
