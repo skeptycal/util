@@ -1,0 +1,18 @@
+package zsh // import "github.com/skeptycal/zsh"
+
+var DefaultContext = context.TODO()
+func CmdPrep(command string, ctx context.Context) *exec.Cmd
+func CmdPrepNoCtx(command string) *exec.Cmd
+func Exists(file string) bool
+func FileExists(file string) bool
+func GetEnv(key string, defValue string) (string, error)
+func IsExecutable(file string) error
+func OpenTrunc(name string) (*os.File, error)
+func Replace([string]string) *io.Replacer
+func Sh(command string) string
+func Source() string
+func Status(command string) error
+func ToString(value interface{}) string
+func Which(file string) (string, error)
+func WriteFile(fileName string, data string) error
+type Optional interface{}

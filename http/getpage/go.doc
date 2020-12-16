@@ -1,0 +1,3 @@
+package getpage // import "github.com/skeptycal/util/scargo/getpage"
+
+func GetPage(url string) (*bytes.Buffer, error)

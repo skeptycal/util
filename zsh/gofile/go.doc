@@ -1,0 +1,7 @@
+package file // import "github.com/skeptycal/util/file"
+
+func ReadAll(r io.Reader) ([]byte, error)
+type BytesFileReader interface{ ... }
+type FileReader struct{ ... }
+    func NewFileReader(file string) (*FileReader, error)
+type JSON interface{ ... }

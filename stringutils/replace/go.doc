@@ -1,0 +1,23 @@
+package replace // import "github.com/skeptycal/util/replace"
+
+const DefaultDelimiter delimiter = iota ...
+var LOG = log.New(os.Stdout, "DEBUG mutex", log.Lmicroseconds)
+func Find(template []byte) (places []int)
+func FindAndReplace(template []byte, wr io.Writer, replacements map[string]io.ReadSeeker)
+func FindAndReplaceBytes(template []byte, wr io.Writer, replacements map[string][]byte)
+func FindAndReplaceMapper(template []byte, bf Buffer, mapper Mapper)
+func FindAndReplaceString(template []byte, bf Buffer, replacements map[string]string)
+func Replace(template []byte, wr io.Writer, places []int, ...)
+func ReplaceBytes(template []byte, wr io.Writer, places []int, replacements map[string][]byte)
+func ReplaceMapper(template []byte, bf Buffer, places []int, mapper Mapper)
+func ReplaceString(template []byte, bf Buffer, places []int, replacements map[string]string)
+type Buffer interface{ ... }
+type Mapper interface{ ... }
+type Mutex interface{ ... }
+    func NewMutex(name string, debug bool) Mutex
+type RWMutex interface{ ... }
+    func NewRWMutex(name string, debug bool) RWMutex
+type Replacer struct{ ... }
+    func New() Replacer
+type Template struct{ ... }
+    func NewTemplate(t []byte) *Template
