@@ -6,13 +6,11 @@ import (
 	"log"
 	"os"
 	"strings"
-
-	file "github.com/skeptycal/util/file"
 )
 
 func NewGitIgnore(force bool, skip bool) (*os.File, error) {
 
-	ok := file.Exists(".gitignore")
+	ok := util.file.Exists(".gitignore")
 	gitFileFlag := os.O_RDWR
 	if force {
 		gitFileFlag |= os.O_CREATE
