@@ -107,7 +107,7 @@ func Test_checkPanic(t *testing.T) {
 				}
 			}
 			if (err != nil) && !tt.wantErr {
-				t.Fail(fmt.Errorf("YourFunc() error = %v, wantErr %v", err, tt.wantErr))
+				t.Errorf("YourFunc() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if err != tt.want {

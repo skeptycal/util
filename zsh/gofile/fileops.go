@@ -31,7 +31,7 @@ import (
 
 // GetFileSize returns the size of the file using os.Stat. If an error occurred
 // while reading the file, the function will return -1.
-func GetFileInfo(filename string) (*os.FileInfo, error) {
+func GetFileInfo(filename string) (os.FileInfo, error) {
 	fi, err := os.Stat(filename)
 	if err != nil {
 		return nil, err
@@ -39,7 +39,7 @@ func GetFileInfo(filename string) (*os.FileInfo, error) {
 	if !fi.Mode().IsRegular() {
 		return nil, os.ErrNotExist
 	}
-	return &fi, err
+	return fi, err
 }
 
 // chunkMultiple returns a multiple of chunk size closest to but greater than size.
@@ -49,9 +49,9 @@ func chunkMultiple(size int64, chunk int64) int64 {
 
 // initialCapacity returns the multiple of 'chunk' one more than needed to
 // accomodate the given capacity.
-func initialCapacity(capacity int64) int64 {
+func initialCapacity(capacity int64) int {
 	if capacity == -1 {
 		return defaultBufSize
 	}
-	return (capacity/chunk + 1) * chunk
+	return int((capacity/chunk + 1) * chunk)
 }

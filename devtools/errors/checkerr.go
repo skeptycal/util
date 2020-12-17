@@ -2,14 +2,15 @@ package errors
 
 import (
 	"fmt"
+
+	log "github.com/sirupsen/logrus"
 )
 
-func die(err error) error {
+// Die panics if err is not nil
+func Die(err error) {
 	if err != nil {
-		err = fmt.Errorf("a fatal error occurred: %v", err)
-		panic(err)
+		log.Panicf("a fatal error occurred: %v", err)
 	}
-	return err
 }
 
 // TryExceptPass - a mock implementation of the infamous python error

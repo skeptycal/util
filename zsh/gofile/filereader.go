@@ -4,33 +4,34 @@ import (
 	"bufio"
 	"bytes"
 	"io"
+	"io/ioutil"
 	"os"
 )
 
-// FileReader implements buffering for an io.Reader object to read from a file
-type FileReader struct {
+// BufferedFileReader implements buffering for an io.Reader object to read from a file
+type BufferedFileReader struct {
 	r  *bufio.Reader
 	f  *os.File
 	fi os.FileInfo
 }
 
 // Reader implements buffering for an io.Reader object.
-type Reader bufio.Reader
+// type Reader bufio.Reader
 
 // BytesFileReader represents a buffered io.Reader optimized for file reads.
-// type FileReader interface {
-// 	Close() error
-// 	Read(p []byte) (int, error)
-// 	ReadBytes(delim byte) ([]byte, error)
-// 	ReadString(delim byte) (string, error)
-// 	Reset(r io.Reader)
-// 	Open()
-// }
+type FileReader interface {
+	Close() error
+	Read(p []byte) (int, error)
+	ReadBytes(delim byte) ([]byte, error)
+	ReadString(delim byte) (string, error)
+	Reset(r io.Reader)
+	Open()
+}
 
 // NewBufferedReader returns a new Reader whose buffer has at least the size of
 // the specified file. If the argument io.Reader is already a Reader with large enough
 // size, it returns the underlying Reader.
-func NewBufferedReader(filename string) (r *FileReader, err error) {
+func NewBufferedReader(filename string) (rd *BufferedFileReader, err error) {
 
 	// panic recover:
 	// If the buffer overflows, we will get bytes.ErrTooLarge.
@@ -62,80 +63,57 @@ func NewBufferedReader(filename string) (r *FileReader, err error) {
 		return nil, err
 	}
 
-	r.fi = *fi
-
-	cap := initialCapacity(r.fi.Size())
+	cap := initialCapacity(fi.Size())
 
 	f, err := os.Open(filename)
 	if err != nil {
 		return nil, err
 	}
-	r = NewBufferedReaderSize(f, int(cap))
+
+	r := bufio.NewReaderSize(f, cap)
+
+	rd = new(BufferedFileReader)
+	rd.r = r
+	rd.fi = fi
+	rd.f = f
 
 	defer f.Close()
 
-	return r, nil
-}
-
-// NewReaderSize returns a new Reader whose buffer has at least the specified
-// size. If the argument io.Reader is already a Reader with large enough
-// size, it returns the underlying Reader.
-func NewBufferedReaderSize(rd io.Reader, size int) *FileReader {
-
-	r = bufio.NewReaderSize(rd, size)
-	fr := &FileReader{
-		r: r,
-	}
-}
-
-// Close closes the underlying file and frees any resources
-func (fr *FileReader) Close() error {
-	defer fr.r.Reset(fr.f)
-	return fr.f.Close()
-}
-
-// Reset discards any buffered data, resets all state, and switches
-// the buffered reader to read from r.
-func (fr *FileReader) Reset() {
-	fr.r.Reset(fr.f)
-}
-
-// todo - stuff
-
-func (fr *FileReader) Size() {
-	return fr.r.Size()
-}
-
-// readAll reads from r until an error or EOF and returns the data it read
-// from the internal buffer allocated with a specified capacity.
-func (fr *FileReader) readAll(b []byte, err error) {
-
-	// If the buffer overflows, we will get bytes.ErrTooLarge.
-	// Return that as an error. Any other panic remains.
-	defer func() {
-		e := recover()
-		if e == nil {
-			return
-		}
-		if panicErr, ok := e.(error); ok && panicErr == bytes.ErrTooLarge {
-			err = panicErr
-		} else {
-			panic(e)
-		}
-	}()
-	if int64(int(f.r.Size())) == capacity {
-		buf.Grow(int(capacity))
-	}
-	_, err = buf.ReadFrom(r)
-	return buf.Bytes(), err
-
+	return rd, nil
 }
 
 // ReadAll reads from r until an error or EOF and returns the data it read.
 // A successful call returns err == nil, not err == EOF. Because ReadAll is
 // defined to read from src until EOF, it does not treat an EOF from Read
 // as an error to be reported.
-func ReadAll(fr *FileReader) ([]byte, error) {
-	n, err := fr.r.Read(p)
+func (fr *BufferedFileReader) ReadAll() ([]byte, error) {
+	return ioutil.ReadAll(fr.r)
+}
 
+// Close closes the underlying file and frees any resources.
+func (fr *BufferedFileReader) Close() error {
+	defer fr.r.Reset(fr.f)
+	return fr.f.Close()
+}
+
+// Reset discards any buffered data, resets all state, and switches
+// the buffered reader to read from r.
+func (fr *BufferedFileReader) Reset() {
+	fr.r.Reset(fr.f)
+}
+
+func (fr *BufferedFileReader) Size() int {
+	return fr.r.Size()
+}
+
+func (fr *BufferedFileReader) FileSize() int {
+	return int(fr.fi.Size())
+}
+
+func (fr *BufferedFileReader) FileName() string {
+	return fr.fi.Name()
+}
+
+func (fr *BufferedFileReader) FileInfo() *os.FileInfo {
+	return &fr.fi
 }
