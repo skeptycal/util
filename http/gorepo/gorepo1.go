@@ -1,18 +1,19 @@
-package gogit
+package gorepo
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"path"
 	"path/filepath"
 	"runtime"
 	"strings"
+
+	log "github.com/sirupsen/logrus"
 )
 
 const (
 	defaultGitignoreItems = "macos linux windows ssh vscode go zsh node vue nuxt python django"
-	sep                   = os.PathSeparator
+	sep                   = string(os.PathSeparator)
 )
 
 type GitHubRepo struct {
@@ -54,7 +55,7 @@ func PWD() string {
 //      	path = path[0 : len(path)-1]
 //      }
 func DirName(path string) string {
-	i := strings.LastIndex(path, os.PathSeparator)
+	i := strings.LastIndex(path, sep)
 	return path[i+1:]
 }
 
@@ -89,7 +90,8 @@ func Base(path string) string {
 }
 
 func NewGitHubRepo(name string, dir string) (*GitHubRepo, error) {
-	if dir == "" {
+	wd := dir
+	if wd == "" {
 		wd, _ = os.Getwd()
 
 	}
@@ -103,23 +105,28 @@ func NewGitHubRepo(name string, dir string) (*GitHubRepo, error) {
 		return nil, err
 	}
 
-	wd, _ := os.Getwd()
+	wd, _ = os.Getwd()
 	pwd, _ := filepath.Abs(wd)
 	default_path, default_name := path.Split(pwd)
 
 	r := new(GitHubRepo)
 	r.name = default_name
 	r.url = default_path
+	return r, nil
 }
 
 // GitHubRepoSetup initializes the repo, creates files, prompts as needed, creates the
 // github.com repository, and pushes the initial commit.
-func GitHubRepoSetup() error {
-	err := GitRepoSetup()
-	err := CreateAutomatedFiles()
-	if err != nil {
-		log.Fatalf("CreateAutomatedFiles failed with %v", err)
+func GitHubRepoSetup() (err error) {
+	if GitRepoSetup() != nil {
+		log.Info("GitRepoSetup failed with %v", err)
+		return
 	}
+	if CreateAutomatedFiles() != nil {
+		log.Info("CreateAutomatedFiles failed with %v", err)
+		return
+	}
+	return nil
 }
 
 // GitRepoSetup initializes the repo, prompts as needed, creates the

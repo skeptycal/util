@@ -1,3 +1,0 @@
-package matrix // import "github.com/skeptycal/matrix"
-
-func Check()

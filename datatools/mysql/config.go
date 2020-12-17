@@ -17,7 +17,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/go-sql-driver/mysql"
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -35,12 +34,25 @@ const (
 	mySqlDriverName = "mysql"
 )
 
-type mConfig struct {
-	mysql.Config
+// MySQL defines the interface to the MySQL database connection
+type MySQL interface {
+	DSN(database string) string
+	Load(file string) error
+	Open(dbname string) (*sql.DB, error)
+	// Query(query string) (sql.Result, error)
+	Save(file string) error
 }
 
 // NewDBConfig returns a new MySQL database connection configuration object.
-func NewMySQL() (MySQL, error) {
+//
+// The username and password are required and are automatically read in from
+// environment variables.
+//
+// The logging option must be supplied and is either true or false.
+// The host, port, and protocol are optional and are often set to the defaults.
+// These options cannot be changed once the connection is established. A new
+// connection must be created in place of the old one.
+func NewDBConfig(host, port, protocol string, logging bool) (MySQL, error) {
 	username := os.Getenv(mySqlUserNameEnvVar)
 	if username == "" {
 		return nil, fmt.Errorf("environment variable %s for MySQL username not found", mySqlUserNameEnvVar)
@@ -49,22 +61,27 @@ func NewMySQL() (MySQL, error) {
 	if password == "" {
 		return nil, fmt.Errorf("environment variable %s for MySQL password not found", mySqlPasswordEnvVar)
 	}
-	d := new(mySQL)
-	d.username = username
-	d.password = password
+	if host == "" {
+		host = defaultMySQLHost
+	}
+	if port == "" {
+		port = defaultMySQLPort
+	}
+	if protocol == "" {
+		protocol = defaultProtocol
+	}
 
-	return d, nil
+	return &dbConfig{
+		username: username,
+		password: password,
+		protocol: protocol,
+		host:     host,
+		port:     port,
+		logging:  logging,
+	}, nil
 }
 
-// MySQL defines the interface to the MySQL database connection
-type MySQL interface {
-	DSN(database string) string
-	Open(dbname string) (*sql.DB, error)
-	Load(file string) error
-	Save(file string) error
-}
-
-type mySQL struct {
+type dbConfig struct {
 	username string
 	password string
 	protocol string `default:"tcp"`
@@ -73,10 +90,10 @@ type mySQL struct {
 	logging  bool   `default:"false"`
 }
 
-func (db mySQL) Query(query string) (sql.Result, error) {
-	// todo - stuff
-	return nil, nil
-}
+// func (db *dbConfig) Query(query string) (sql.Result, error) {
+// 	// todo - stuff
+// 	return nil, nil
+// }
 
 // Open opens a database specified by its database driver name and a driver-specific data source name, usually consisting of at least a database name and connection information.
 //
@@ -93,7 +110,7 @@ func (db mySQL) Query(query string) (sql.Result, error) {
 // Open may just validate its arguments without creating a connection to the database. To verify that the data source name is valid, call Ping.
 //
 // The returned DB is safe for concurrent use by multiple goroutines and maintains its own pool of idle connections. Thus, the Open function should be called just once. It is rarely necessary to close a DB.
-func (db mySQL) Open(dbname string) (*sql.DB, error) {
+func (db *dbConfig) Open(dbname string) (*sql.DB, error) {
 
 	dbconnection, err := sql.Open(mySqlDriverName, db.DSN(dbname))
 	if err != nil {
@@ -112,39 +129,29 @@ func (db mySQL) Open(dbname string) (*sql.DB, error) {
 	return dbconnection, nil
 }
 
-// DSN returns the entire DSN authentication string including a database name.
-// Using "" for the database name will return a generic connection to the server
-// that allows listing and choosing different database names.
-// DSN format:
-//      [username[:password]@][defaultProtocol[(address)]]/dbname[?param1=value1&...&paramN=valueN]
-// A DSN in its fullest form:
-//      username:password@defaultProtocol(address)/dbname?param=value
-
-// DSN (Data Source Name)
-// The Data Source Name has a common format, like e.g. PEAR DB uses it, but without type-prefix (optional parts marked by squared brackets):
-
-// [username[:password]@][protocol[(address)]]/dbname[?param1=value1&...&paramN=valueN]
-// A DSN in its fullest form:
-//
-// username:password@protocol(address)/dbname?param=value
+// DSN Format:
 // Except for the databasename, all values are optional. So the minimal DSN is:
 //
 //      /dbname
-// If you do not want to preselect a database, leave dbname empty:
+// If you do not want to preselect a database, leave dbname empty.
 //
-//      /
-// This has the same effect as an empty DSN string:
+// DSN format:
+//      [username[:password]@][defaultProtocol[(address)]]/dbname[?param1=value1&...&paramN=valueN]
 //
-// Alternatively, Config.FormatDSN can be used to create a DSN string by filling a struct.
-func (db mySQL) DSN(database string) string {
+// A DSN in its fullest form:
+//      username:password@defaultProtocol(address)/dbname?param=value
+
+// DSN returns the entire DSN authentication string including a database name.
+// This allows the selection of the current database to act upon.
+func (db *dbConfig) DSN(dbname string) string {
 	// "%s:%s@%s(%s:%s)/%s"
-	return fmt.Sprintf("%s:%s@%s(%s:%s/%s)", db.username, db.password, db.protocol, db.host, db.port, database)
+	return fmt.Sprintf("%s:%s@%s(%s:%s/%s)", db.username, db.password, db.protocol, db.host, db.port, dbname)
 }
 
 // Load loads the database configuration from a json file
 //
 // Not Implemented
-func (db mySQL) Load(file string) error {
+func (db *dbConfig) Load(file string) error {
 	// load json config file
 	return MySqlNotImplemented
 }
@@ -152,7 +159,7 @@ func (db mySQL) Load(file string) error {
 // Load saves the database configuration to a json file
 //
 // Not Implemented
-func (db mySQL) Save(file string) error {
+func (db *dbConfig) Save(file string) error {
 	// save json config file
 	return MySqlNotImplemented
 }

@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"fmt"
 
-	"github.com/skeptycal/util/replace"
+	"github.com/skeptycal/util/stringutils/replace"
 )
 
 func main() {
