@@ -4,7 +4,6 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/sirupsen/logrus v1.7.0 h1:ShrD1U9pZB12TX0cVy0DtePoCH97K8EtX+mg7ZARUtM=
 github.com/sirupsen/logrus v1.7.0/go.mod h1:yWOB1SBYBC5VeMP7gHvWumXLIWorT60ONWic61uBYv0=
-github.com/skeptycal/util v0.0.0-20201202203118-5e3fcccec15f h1:PP48JM5hMnD8Icz28fBFzXBCtsGpQUrSc2OJqiuysuo=
 github.com/skeptycal/zsh v0.0.0-20201207033132-c00d09bd93bc h1:2k+X8rsX6gvCfr2K7YugX61Df/P9gK/MGVG8sIF5UTA=
 github.com/skeptycal/zsh v0.0.0-20201207033132-c00d09bd93bc/go.mod h1:RORfLURVyIlH/7IolzrOOE6feu/d96h6uWVR3cgH9HE=
 github.com/stretchr/testify v1.2.2 h1:bSDNvY7ZPG5RlJ8otE/7V6gMiyenm9RtJ7IUVIAoJ1w=
