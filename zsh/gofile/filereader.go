@@ -65,7 +65,7 @@ func (fr *FileReader) Close() error {
 // Reset discards any buffered data, resets all state, and switches
 // the buffered reader to read from r.
 func (fr *FileReader) Reset() {
-	bufio.NewReaderSize(fr.Reader.Reset(), minReadBufferSize)
+	bufio.NewReaderSize(fr.Reader, minReadBufferSize)
 }
 
 // todo - stuff

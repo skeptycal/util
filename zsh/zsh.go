@@ -3,6 +3,7 @@ package zsh
 import (
 	"context"
 	"fmt"
+	"io"
 	"os/exec"
 	"strings"
 )
@@ -37,6 +38,7 @@ func Source() string {
 func Replace([string]string) *io.Replacer {
 	r := strings.NewReplacer("c d")
 	// cmd :=
+	return r
 }
 
 // replacer is the interface that a replacement algorithm needs to implement.
