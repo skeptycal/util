@@ -4,22 +4,22 @@ import (
 	"bufio"
 	"bytes"
 	"io"
+	"io/ioutil"
 	"os"
 )
 
-// This file contains the portions of code that are largely modified variations of the original standard library code (from Go 1.15.5)
+// BufferedFileReader implements buffering for an io.Reader object to read from a file
+type BufferedFileReader struct {
+	r  *bufio.Reader
+	f  *os.File
+	fi os.FileInfo
+}
 
-const (
-	minReadBufferSize        = 16
-	smallBufferSize          = 64
-	defaultBufSize           = 4096
-	maxConsecutiveEmptyReads = 100
-	maxInt                   = int(^uint(0) >> 1)
-	chunk                    = bytes.MinRead
-)
+// Reader implements buffering for an io.Reader object.
+// type Reader bufio.Reader
 
 // BytesFileReader represents a buffered io.Reader optimized for file reads.
-type BytesFileReader interface {
+type FileReader interface {
 	Close() error
 	Read(p []byte) (int, error)
 	ReadBytes(delim byte) ([]byte, error)
@@ -28,53 +28,12 @@ type BytesFileReader interface {
 	Open()
 }
 
-// FileReader defines a Reader that reads from a file
-// type aFileReader struct {
-// 	rd *bufio.Reader
-// 	f  *os.File
-// }
-
-// FileReader implements buffering for an io.Reader object to read from a file
-// buf          []byte
-// rd           io.Reader // reader provided by the client
-// r, w         int       // buf read and write positions
-// err          error
-// lastByte     int // last byte read for UnreadByte; -1 means invalid
-// lastRuneSize int // size of last rune read for UnreadRune; -1       means invalid
-type FileReader struct {
-	*os.File
-	*bufio.Reader
-}
-
-// NewFileReader returns a new Reader whose buffer has at least the size of the specified file. If the argument io.Reader is already a Reader with large enough
+// NewBufferedReader returns a new Reader whose buffer has at least the size of
+// the specified file. If the argument io.Reader is already a Reader with large enough
 // size, it returns the underlying Reader.
-func NewFileReader(file string) (*FileReader, error) {
-	fi, err := os.Stat(file)
-	if err != nil {
-		return nil, err
-	}
+func NewBufferedReader(filename string) (rd *BufferedFileReader, err error) {
 
-}
-
-// Close closes the underlying file and frees any resources
-func (fr *FileReader) Close() error {
-	defer fr.Reset()
-	return fr.Close()
-}
-
-// Reset discards any buffered data, resets all state, and switches
-// the buffered reader to read from r.
-func (fr *FileReader) Reset() {
-	bufio.NewReaderSize(fr.Reader.Reset(), minReadBufferSize)
-}
-
-// todo - stuff
-
-// readAll reads from r until an error or EOF and returns the data it read
-// from the internal buffer allocated with a specified capacity.
-func readAll(r io.Reader, capacity int64) (b []byte, err error) {
-	var buf bytes.Buffer
-
+	// panic recover:
 	// If the buffer overflows, we will get bytes.ErrTooLarge.
 	// Return that as an error. Any other panic remains.
 	defer func() {
@@ -88,36 +47,73 @@ func readAll(r io.Reader, capacity int64) (b []byte, err error) {
 			panic(e)
 		}
 	}()
-	if int64(int(capacity)) == capacity {
-		buf.Grow(int(capacity))
+
+	// It's a good but not certain bet that FileInfo will tell us exactly how much to
+	// read, so let's try it but be prepared for the answer to be wrong.
+
+	// As initial capacity for readAll, use Size + a little extra in case Size
+	// is zero, and to avoid another allocation after Read has filled the
+	// buffer. The readAll call will read into its allocated internal buffer
+	// cheaply. If the size was wrong, we'll either waste some space off the end
+	// or reallocate as needed, but in the overwhelmingly common case we'll get
+	// it just right.
+
+	fi, err := GetFileInfo(filename)
+	if err != nil {
+		return nil, err
 	}
-	_, err = buf.ReadFrom(r)
-	return buf.Bytes(), err
+
+	cap := initialCapacity(fi.Size())
+
+	f, err := os.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+
+	r := bufio.NewReaderSize(f, cap)
+
+	rd = new(BufferedFileReader)
+	rd.r = r
+	rd.fi = fi
+	rd.f = f
+
+	defer f.Close()
+
+	return rd, nil
 }
 
 // ReadAll reads from r until an error or EOF and returns the data it read.
 // A successful call returns err == nil, not err == EOF. Because ReadAll is
 // defined to read from src until EOF, it does not treat an EOF from Read
 // as an error to be reported.
-func ReadAll(r io.Reader) ([]byte, error) {
-	return readAll(r, bytes.MinRead)
+func (fr *BufferedFileReader) ReadAll() ([]byte, error) {
+	return ioutil.ReadAll(fr.r)
 }
 
-// The readOp constants describe the last action performed on
-// the buffer, so that UnreadRune and UnreadByte can check for
-// invalid usage. opReadRuneX constants are chosen such that
-// converted to int they correspond to the rune size that was read.
-// (from Go 1.15.5 bytes/buffer.go)
-type readOp int8
+// Close closes the underlying file and frees any resources.
+func (fr *BufferedFileReader) Close() error {
+	defer fr.r.Reset(fr.f)
+	return fr.f.Close()
+}
 
-// Don't use iota for these, as the values need to correspond with the
-// names and comments, which is easier to see when being explicit.
-// (from Go 1.15.5 bytes/buffer.go)
-const (
-	opRead      readOp = -1 // Any other read operation.
-	opInvalid   readOp = 0  // Non-read operation.
-	opReadRune1 readOp = 1  // Read rune of size 1.
-	opReadRune2 readOp = 2  // Read rune of size 2.
-	opReadRune3 readOp = 3  // Read rune of size 3.
-	opReadRune4 readOp = 4  // Read rune of size 4.
-)
+// Reset discards any buffered data, resets all state, and switches
+// the buffered reader to read from r.
+func (fr *BufferedFileReader) Reset() {
+	fr.r.Reset(fr.f)
+}
+
+func (fr *BufferedFileReader) Size() int {
+	return fr.r.Size()
+}
+
+func (fr *BufferedFileReader) FileSize() int {
+	return int(fr.fi.Size())
+}
+
+func (fr *BufferedFileReader) FileName() string {
+	return fr.fi.Name()
+}
+
+func (fr *BufferedFileReader) FileInfo() *os.FileInfo {
+	return &fr.fi
+}

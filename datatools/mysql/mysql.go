@@ -8,10 +8,10 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func dbConnect(dbconfig dbConfig, database string) (*sql.DB, error) {
+func dbConnect(dbconfig MySQL, database string) (*sql.DB, error) {
 
 	// mysqlConnectionString, err := getEnvConnectionString(mySqlUserVariable)
-	mysqlConnectionString := dbconfig.Auth()
+	mysqlConnectionString := dbconfig.DSN(database)
 
 	//!   INSECURE TODO  ------------------------------------> INSECURE ------>> REMOVE
 	log.Info("mysql username: ", mysqlConnectionString)
@@ -31,7 +31,7 @@ func dbConnect(dbconfig dbConfig, database string) (*sql.DB, error) {
 
 // Check performs a connection check on the mysql database connection
 func Check() error {
-	dbconfig, err := NewDBConfig()
+	dbconfig, err := NewDBConfig("", "", "", false)
 	if err != nil {
 		return err
 	}

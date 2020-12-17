@@ -2,7 +2,6 @@ package http
 
 import (
 	"fmt"
-	"ideas/scargo/errorutils"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -11,9 +10,9 @@ import (
 // Fetch - get response from url and check for standard common errors
 func Fetch(url string) (resp *http.Response, err error) {
 	resp, err = http.Get(url)
-	if errorutils.Errf(err, "error obtaining response from server: %v") {
-		return nil, err
-	}
+	// if errorutils.Errf(err, "error obtaining response from server: %v") {
+	// 	return nil, err
+	// }
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
 		// Exit if rate limited ...
@@ -29,9 +28,9 @@ func Fetch(url string) (resp *http.Response, err error) {
 // ReadAllURL reads all available bytes from response using a buffer
 func ReadAllURL(url string) (string, error) {
 	resp, err := http.Get(url)
-	if errorutils.Errf(err, "error obtaining response from server: %v") {
-		return "", err
-	}
+	// if errorutils.Errf(err, "error obtaining response from server: %v") {
+	// 	return "", err
+	// }
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
 		// Exit if rate limited ...
@@ -43,9 +42,9 @@ func ReadAllURL(url string) (string, error) {
 	}
 
 	bytes, err := ioutil.ReadAll(resp.Body)
-	if errorutils.Errf(err, "error obtaining response from server: %v") {
-		return "", err
-	}
+	// if errorutils.Errf(err, "error obtaining response from server: %v") {
+	// 	return "", err
+	// }
 
 	return string(bytes), nil
 }

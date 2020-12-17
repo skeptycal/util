@@ -8,17 +8,9 @@ import (
 	"strings"
 )
 
-type giFile struct {
-	bufio.ReadWriter
-	filename string
-	flag     int
-	file     *os.File
-	force    bool
-	skip     bool
-}
-
 func NewGitIgnore(force bool, skip bool) (*os.File, error) {
 
+	ok := util.file.Exists(".gitignore")
 	gitFileFlag := os.O_RDWR
 	if force {
 		gitFileFlag |= os.O_CREATE
@@ -29,19 +21,15 @@ func NewGitIgnore(force bool, skip bool) (*os.File, error) {
 		return nil, err
 	}
 
-	return &giFile{
-		filename: ".gitignore",
-		force:    force,
-		skip:     skip,
-	}, nil
+	return file, nil
 }
 
 func main() {
 
 	// https://www.toptal.com/developers/gitignore/api/macos,linux,windows,ssh,vscode,go,zsh
 
-	flagForced := flag.Bool("force", false, "force overwrite of previous .gitignore file (if it exists)")
-	flagSkip := flag.Bool("skip", false, "skip download of .gitignore items from toptal")
+	flagForced := flag.Bool("f", false, "force overwrite of previous .gitignore file (if it exists)")
+	flagSkip := flag.Bool("s", false, "skip download of .gitignore items from gitignore.io")
 
 	flag.Parse()
 

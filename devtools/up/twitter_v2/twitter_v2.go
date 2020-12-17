@@ -2,7 +2,7 @@
 
 package twitter_v2
 
-func flags() *flag.FlagSet {
+func flags() {
 
 }
 

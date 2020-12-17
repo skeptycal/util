@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/skeptycal/util/scargo/http"
+	"github.com/skeptycal/util/http/http"
 )
 
 const googleSearchStringPrefix = "http://www.google.com/search?q="

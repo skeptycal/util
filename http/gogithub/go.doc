@@ -1,9 +1,0 @@
-package gogithub // import "github.com/skeptycal/github"
-
-const MinRepositoryCountGoal ...
-var DefaultContext context.Context ...
-func AuthClient(ctx context.Context) (*http.Client, error)
-func GetEnvToken() (oauth2.TokenSource, error)
-func Input(prompt string) (string, error)
-func NewGitHubClient(ctx context.Context) (*github.Client, error)
-func PW(prompt string) (string, error)

@@ -1,8 +1,6 @@
 package mysql
 
 import (
-	"fmt"
-	"strings"
 	"time"
 )
 
@@ -28,35 +26,32 @@ type (
 	DOUBLE  float64 // always signed
 	DECIMAL float64 // always signed
 
-	DATE string
+	DATE = string
 )
 
-func Values(value interface{}){
- switch value := columnPointers[i].(type) {
-case string:
-   // value has type string and contains the string value
-   return
-case int64:
-   // value has type int64 and contains the value as int64
-case float64:
-  ...
-}
-}
-func NewDATE(date string) DATE {
-	d := new(DATE)
-	t, _ := time.
-	d = new(DATE(t.Format(layoutISO)))
+// func Values(value interface{}) {
+// 	switch value := columnPointers[i].(type) {
+// 	case string:
+// 		// value has type string and contains the string value
+// 		return
+// 	case int64:
+// 		// value has type int64 and contains the value as int64
+// 	case float64:
+// 		// value has type float64 and contains the value as float64
+// 	}
+// }
 
-	return d
+func NewDATE(date string) string {
+	return time.Now().Format(layoutISO)
 }
 
-func create(name string, args ...string) error {
-	arglist := strings.Join(args, ", ")
-	query := fmt.Sprintf(`CREATE TABLE %s(%s);`, name, arglist)
+// func create(name string, args ...string) error {
+// 	arglist := strings.Join(args, ", ")
+// 	query := fmt.Sprintf(`CREATE TABLE %s(%s);`, name, arglist)
 
-	Db.Exec(query)
-	// id INT PRIMARY KEY AUTO_INCREMENT, name VARCHAR(255), population INT
-}
+// 	Db.Exec(query)
+// 	// id INT PRIMARY KEY AUTO_INCREMENT, name VARCHAR(255), population INT
+// }
 
 const (
 	USE = `USE %s;`

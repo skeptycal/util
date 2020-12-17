@@ -1,7 +1,6 @@
 package http
 
 import (
-	"ideas/scargo/fileutils"
 	"io"
 	"net/http"
 )
@@ -14,7 +13,7 @@ func DownloadURL(url, filename string) error {
 	}
 	defer resp.Body.Close()
 
-	f, err := fileutils.CreateFileTruncate(filename)
+	// f, err := fileutils.CreateFileTruncate(filename)
 
 	_, err = io.Copy(f, resp.Body)
 	return nil

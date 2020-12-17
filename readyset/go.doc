@@ -1,5 +1,0 @@
-package readyset // import "github.com/skeptycal/util/readyset"
-
-var Lang language.Tag
-func NewReadySettings() (*readySettings, error)
-type ENV struct{ ... }
