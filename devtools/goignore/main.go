@@ -3,14 +3,27 @@ package main
 import (
 	"bufio"
 	"flag"
+	"fmt"
 	"log"
 	"os"
 	"strings"
+
+	"github.com/skeptycal/util/zsh/gofile"
+)
+
+const (
+	defaultGitignoreItems = "macos linux windows ssh vscode go zsh node vue nuxt python django"
 )
 
 func NewGitIgnore(force bool, skip bool) (*os.File, error) {
 
-	ok := util.file.Exists(".gitignore")
+	ok := gofile.Exists(".gitignore")
+	if ok {
+		if !force {
+			return nil, fmt.Errorf(".gitignore already exists; use force option to overwrite")
+		}
+	}
+
 	gitFileFlag := os.O_RDWR
 	if force {
 		gitFileFlag |= os.O_CREATE
@@ -37,7 +50,8 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	rw := bufio.NewReadWriter(giFile)
+
+	w := bufio.NewWriter(giFile)
 
 }
 
@@ -50,7 +64,7 @@ func main() {
 func gi(args string) string {
 
 	if len(args) == 0 {
-		args = []string{"macos linux windows ssh vscode go zsh node vue nuxt python django"}
+		args = defaultGitignoreItems
 	}
 
 	command := "curl -fLw '\n' https://www.gitignore.io/api/\"${(j:,:)@}\" "

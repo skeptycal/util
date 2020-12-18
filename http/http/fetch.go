@@ -10,10 +10,12 @@ import (
 // Fetch - get response from url and check for standard common errors
 func Fetch(url string) (resp *http.Response, err error) {
 	resp, err = http.Get(url)
-	// if errorutils.Errf(err, "error obtaining response from server: %v") {
-	// 	return nil, err
-	// }
+	if err != nil {
+		return nil, err
+	}
+
 	defer resp.Body.Close()
+
 	if resp.StatusCode != http.StatusOK {
 		// Exit if rate limited ...
 		if resp.StatusCode == http.StatusTooManyRequests {
@@ -28,9 +30,10 @@ func Fetch(url string) (resp *http.Response, err error) {
 // ReadAllURL reads all available bytes from response using a buffer
 func ReadAllURL(url string) (string, error) {
 	resp, err := http.Get(url)
-	// if errorutils.Errf(err, "error obtaining response from server: %v") {
-	// 	return "", err
-	// }
+	if err != nil {
+		return "", err
+	}
+
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
 		// Exit if rate limited ...
@@ -42,9 +45,9 @@ func ReadAllURL(url string) (string, error) {
 	}
 
 	bytes, err := ioutil.ReadAll(resp.Body)
-	// if errorutils.Errf(err, "error obtaining response from server: %v") {
-	// 	return "", err
-	// }
+	if err != nil {
+		return "", err
+	}
 
 	return string(bytes), nil
 }

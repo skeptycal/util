@@ -36,14 +36,14 @@ func Source() string {
 }
 
 // Replace creates a new Replacer and reads from a list of old, new string pairs. Replacements are performed in the order they appear in the target string, without overlapping matches. The old string comparisons are done in argument order.
-func Replace([]string) *Replacer {
+func Replace([]string) *strings.Replacer {
 	r := strings.NewReplacer("c d")
 	// cmd :=
 	return r
 }
 
 // replacer is the interface that a replacement algorithm needs to implement.
-type replacer interface {
+type Replacer interface {
 	Replace(s string) string
 	WriteString(w io.Writer, s string) (n int, err error)
 }

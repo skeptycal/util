@@ -40,6 +40,7 @@ func getConfigFileName() (string, error) {
 	if err == nil {
 		return repoJsonFileName, nil
 	}
+
 	if err != os.ErrNotExist {
 		return "", err
 	}
@@ -49,8 +50,9 @@ func getConfigFileName() (string, error) {
 
 	fi, err := os.Stat(repoJsonFileName)
 	if err == nil {
-		return filepath.Abs(fi.Name()), nil
+		return filepath.Abs(fi.Name())
 	}
+
 	if err != nil {
 		if err == os.ErrNotExist {
 			configFileName := configFileDefaultName
@@ -62,6 +64,7 @@ func getConfigFileName() (string, error) {
 			}
 		}
 	}
+
 	return "", errors.New("no configuration file found")
 
 }

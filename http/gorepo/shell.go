@@ -53,11 +53,12 @@ func WriteFile(fileName string, data string) error {
 func gi(args string) string {
 
 	if len(args) == 0 {
-		args = []string{"macos linux windows ssh vscode go zsh node vue nuxt python django"}
+		args = defaultGitignoreItems
 	}
 
-	command := "curl -fLw '\n' https://www.gitignore.io/api/\"${(j:,:)@}\" "
-	command += strings.Join(args, " ")
+	args = strings.Join(strings.Split(args, " "), " ")
+
+	command := "curl -fLw '\n' https://www.gitignore.io/api/\"${(j:,:)@}\" " + args
 
 	return Shell(command)
 }

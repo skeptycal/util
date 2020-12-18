@@ -1,4 +1,4 @@
-package zsh
+package gofile
 
 import (
 	"encoding/hex"

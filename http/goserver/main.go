@@ -51,11 +51,11 @@ type basicServer struct {
 //
 // Except for reading the body, handlers should not modify the
 // provided Request.
-func (b *basicServer) SimpleHandler() *mux.Route {
-	func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Hello Medium, you've requested: %s\n", r.URL.Path)
-	}
-}
+// func (b *basicServer) SimpleHandler() *mux.Route {
+// 	func(w http.ResponseWriter, r *http.Request) {
+// 		fmt.Fprintf(w, "Hello Medium, you've requested: %s\n", r.URL.Path)
+// 	}
+// }
 
 func startBasicServer() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -66,7 +66,7 @@ func startBasicServer() {
 	http.ListenAndServe(":8080", nil)
 }
 
-func routeServer() {
+func routeServer() error {
 
 	fs := http.FileServer(http.Dir("static/"))
 
@@ -79,19 +79,28 @@ func routeServer() {
 
 	}).Methods("GET")
 
-	http.ListenAndServe(":80", r)
+	err := http.ListenAndServe(":80", r)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func htmlServer() {
+func htmlServer() error {
 	tmpl := template.Must(template.ParseFiles("layout.html"))
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		tmpl.Execute(w, "")
+		err := tmpl.Execute(w, "")
+		if err != nil {
+			return err
+		}
 	})
 
-	http.ListenAndServe(":80", nil)
-	fmt.Println("htmlServer")
-
+	err := http.ListenAndServe(":80", nil)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func main() {
