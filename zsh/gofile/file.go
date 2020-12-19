@@ -109,6 +109,6 @@ func OpenTrunc(name string) (*os.File, error) {
 	return os.OpenFile(name, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
 }
 
-func RedLogger(s string) error {
-	log.Info()
+func RedLogger(args ...interface{}) {
+	log.Infof("%s%s", red, args)
 }
