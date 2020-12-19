@@ -21,15 +21,6 @@ func getParentFolderName() string {
 	return filepath.Base(file)
 }
 
-func exists(file string) bool {
-	fi, err := os.Stat(file)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return false
-		}
-	}
-}
-
 func getConfigFileName() (string, error) {
 
 	// check for default file name
@@ -48,7 +39,7 @@ func getConfigFileName() (string, error) {
 	repoJsonFileName = getParentFolderName() + ".json"
 	log.Info(repoJsonFileName)
 
-	fi, err := os.Stat(repoJsonFileName)
+	fi, err = os.Stat(repoJsonFileName)
 	if err == nil {
 		return filepath.Abs(fi.Name())
 	}
@@ -59,7 +50,7 @@ func getConfigFileName() (string, error) {
 			fi, err = os.Stat(configFileName)
 			if err != nil {
 				if err == os.ErrNotExist {
-					return nil, fmt.Errorf("config file %s not found.", configFileName)
+					return "", fmt.Errorf("config file %s not found.", configFileName)
 				}
 			}
 		}

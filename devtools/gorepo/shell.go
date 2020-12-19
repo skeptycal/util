@@ -44,25 +44,6 @@ func WriteFile(fileName string, data string) error {
 // 	err    error
 // }
 
-// gi returns a string response from the www.gitignore.io API containing
-// standard .gitignore items for the args given.
-//
-//      default: "macos linux windows ssh vscode go zsh node vue nuxt python django"
-//
-// using: https://www.toptal.com/developers/gitignore/api/macos,linux,windows,ssh,vscode,go,zsh,node,vue,nuxt,python,django
-func gi(args string) string {
-
-	if len(args) == 0 {
-		args = defaultGitignoreItems
-	}
-
-	args = strings.Join(strings.Split(args, " "), " ")
-
-	command := "curl -fLw '\n' https://www.gitignore.io/api/\"${(j:,:)@}\" " + args
-
-	return Shell(command)
-}
-
 // Shell executes a command line string and returns the result.
 func Shell(command string) string {
 

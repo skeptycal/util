@@ -351,7 +351,7 @@ func GitCommit(message string) error {
 // GitInit initializes the Git environment
 func gitInit() error {
 	if !fileExists(".gitignore") {
-		gitIgnore("")
+		gitIgnore("", "")
 	}
 
 	Shell("git init")
