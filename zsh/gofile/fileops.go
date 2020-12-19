@@ -47,10 +47,10 @@ func chunkMultiple(size int64, chunk int64) int64 {
 	return (size/chunk + 1) * chunk
 }
 
-// initialCapacity returns the multiple of 'chunk' one more than needed to
+// InitialCapacity returns the multiple of 'chunk' one more than needed to
 // accomodate the given capacity.
-func initialCapacity(capacity int64) int {
-	if capacity == -1 {
+func InitialCapacity(capacity int64) int {
+	if capacity < defaultBufSize {
 		return defaultBufSize
 	}
 	return int((capacity/chunk + 1) * chunk)

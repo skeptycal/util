@@ -1,24 +1,15 @@
 package http
 
 import (
-	"bytes"
+	"bufio"
+	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
+	"strings"
+
+	"github.com/skeptycal/util/zsh/gofile"
 )
-
-type rheaders struct {
-	AcceptEncoding string `json: Accept-Encoding`
-	Host           string
-	UserAgent      string `json: User-Agent`
-	XAmznTraceID   string `json: X-Amzn-Trace-Id`
-}
-
-type resp struct {
-	args map[string]string
-	rheaders
-	origin string
-	url    string
-}
 
 // sample response from test sent to http://httpbin.org
 // {
@@ -34,17 +25,41 @@ type resp struct {
 // }
 
 // GetPage - return result from url
-func GetPage(url string) (*bytes.Buffer, error) {
+func GetPage(url string) (string, error) {
 	resp, err := http.Get(url)
 	if err != nil {
-		return nil, err
+		return "", err
+	}
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("server returned error code: %v", resp.Status)
+	}
+	defer resp.Body.Close()
+
+	b, err := ioutil.ReadAll(bufio.NewReaderSize(resp.Body, gofile.InitialCapacity(resp.ContentLength)))
+	if err != nil {
+		return "", err
+	}
+
+	return string(b), nil
+}
+
+// GetPage - return result from url
+func BuffPage(sb *strings.Builder, url string) error {
+	resp, err := http.Get(url)
+	if err != nil {
+		return err
+	}
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("server returned error code: %v", resp.Status)
 	}
 
 	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	_, err = io.Copy(sb, resp.Body)
+
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return bytes.NewBuffer(body), nil
+
+	return nil
 }

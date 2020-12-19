@@ -63,7 +63,7 @@ func NewBufferedReader(filename string) (rd *BufferedFileReader, err error) {
 		return nil, err
 	}
 
-	cap := initialCapacity(fi.Size())
+	cap := InitialCapacity(fi.Size())
 
 	f, err := os.Open(filename)
 	if err != nil {
