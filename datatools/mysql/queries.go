@@ -1,33 +1,29 @@
 package mysql
 
-import (
-	"time"
-)
-
 const (
 	layoutISO = "2006-01-02"
 )
 
 // these are not exact conversions, but should eliminate most confusion
-type (
-	UINT      uint32 // unsigned
-	UTINYINT  uint8  //unsigned
-	USMALLINT uint16 //unsigned
-	// UMEDIUMIN = uint24 //unsigned
-	UBIGINT uint64 // unsigned
+// type (
+// 	UINT      uint32 // unsigned
+// 	UTINYINT  uint8  //unsigned
+// 	USMALLINT uint16 //unsigned
+// 	// UMEDIUMIN = uint24 //unsigned
+// 	UBIGINT uint64 // unsigned
 
-	INT      int32 // signed
-	TINYINT  int8  // signed
-	SMALLINT int16 // signed
-	// MEDIUMIN = int24 // signed
-	BIGINT int64 // signed
+// 	INT      int32 // signed
+// 	TINYINT  int8  // signed
+// 	SMALLINT int16 // signed
+// 	// MEDIUMIN = int24 // signed
+// 	BIGINT int64 // signed
 
-	FLOAT   float32 // always signed
-	DOUBLE  float64 // always signed
-	DECIMAL float64 // always signed
+// 	FLOAT   float32 // always signed
+// 	DOUBLE  float64 // always signed
+// 	DECIMAL float64 // always signed
 
-	DATE = string
-)
+// 	DATE = string
+// )
 
 // func Values(value interface{}) {
 // 	switch value := columnPointers[i].(type) {
@@ -41,9 +37,9 @@ type (
 // 	}
 // }
 
-func NewDATE(date string) string {
-	return time.Now().Format(layoutISO)
-}
+// func NewDATE(date string) string {
+// 	return time.Now().Format(layoutISO)
+// }
 
 // func create(name string, args ...string) error {
 // 	arglist := strings.Join(args, ", ")
@@ -53,7 +49,8 @@ func NewDATE(date string) string {
 // 	// id INT PRIMARY KEY AUTO_INCREMENT, name VARCHAR(255), population INT
 // }
 
-const (
-	USE = `USE %s;`
-	DIE = `DROP TABLE IF EXISTS %s;`
-)
+// queries
+// const (
+// 	USE = `USE %s;`
+// 	DIE = `DROP TABLE IF EXISTS %s;`
+// )

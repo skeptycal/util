@@ -5,19 +5,40 @@ import (
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
-	log "github.com/sirupsen/logrus"
 )
 
-func dbConnect(dbconfig MySQL, database string) (*sql.DB, error) {
-
-	// mysqlConnectionString, err := getEnvConnectionString(mySqlUserVariable)
-	mysqlConnectionString := dbconfig.DSN(database)
-
-	//!   INSECURE TODO  ------------------------------------> INSECURE ------>> REMOVE
-	log.Info("mysql username: ", mysqlConnectionString)
+// DbConnect returns a new database connection pool (DB) given a
+// configuration object and a database name.
+// DB is a database handle representing a pool of zero or more
+// underlying connections. It's safe for concurrent use by multiple
+// goroutines.
+//
+// The database name is optional and is used to create a connection string (DSN).
+// Important settings included in the configuration object are applied to
+// the open pool before it is returned. These are the defaults:
+//
+//      DB.SetConnMaxLifetime(time.Minute * 3)
+//      DB.SetMaxOpenConns(10)
+//      DB.SetMaxIdleConns(10)
+//
+// It is rare to Close a DB, as the DB handle is meant to be
+// long-lived and shared between many goroutines, however DB.Close is
+// available to close the database and prevent new queries from starting.
+// Close then waits for all queries that have started processing on the server
+// to finish.
+//
+// The sql package creates and frees connections automatically; it
+// also maintains a free pool of idle connections. If the database has
+// a concept of per-connection state, such state can be reliably observed
+// within a transaction (Tx) or connection (Conn). Once DB.Begin is called, the
+// returned Tx is bound to a single connection. Once Commit or
+// Rollback is called on the transaction, that transaction's
+// connection is returned to DB's idle connection pool. The pool size
+// can be controlled with SetMaxIdleConns.
+func NewDbConnect(dbconfig DbConfig, database string) (*sql.DB, error) {
 
 	// Open database connection.
-	db, err := sql.Open("mysql", mysqlConnectionString)
+	db, err := sql.Open("mysql", dbconfig.dsn(database))
 	if err != nil {
 		return nil, err
 	}
@@ -28,46 +49,3 @@ func dbConnect(dbconfig MySQL, database string) (*sql.DB, error) {
 	db.SetMaxIdleConns(10)
 	return db, nil
 }
-
-// Check performs a connection check on the mysql database connection
-func Check() error {
-	dbconfig, err := NewDBConfig("", "", "", false)
-	if err != nil {
-		return err
-	}
-
-	// err = dbconfig.Save()
-	// if err != nil {
-	// 	return err
-	// }
-
-	db, err := dbConnect(dbconfig, "")
-	if err != nil {
-		return err
-	}
-
-	// defer the close until  the main function is done
-	// This is not normal in a running application. It is rare to Close a DB, as the DB handle is meant to be long-lived and shared between many goroutines.
-	defer db.Close()
-
-	// perform query test
-	response, err := db.Query("SHOW DATABASES;")
-	if err != nil {
-		return err
-	}
-
-	log.Info("MySQL query response: ", response)
-	return nil
-
-}
-
-// const (
-// 	username = "root"
-// 	password = "password"
-// 	hostname = "127.0.0.1:3306"
-// 	dbname   = "test"
-// )
-
-// Notes: DSN (Data Source Name)
-/* The Data Source Name has a common format, like e.g. PEAR DB uses it, but without type-prefix (optional parts marked by squared brackets):
- */

@@ -8,4 +8,4 @@ package mysql
 
 */
 
-var columnPointers []interface{}
+// var columnPointers []interface{}
