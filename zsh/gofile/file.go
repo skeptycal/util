@@ -3,41 +3,51 @@ package gofile
 import (
 	"encoding/hex"
 	"fmt"
-	"log"
+	"io"
 	"os"
 	"os/exec"
+
+	log "github.com/sirupsen/logrus"
 )
+
+type StringWriterCloser interface {
+	io.StringWriter
+	io.Closer
+}
 
 var (
 	redb, _        = hex.DecodeString("1b5b33316d0a") // byte code for ANSI red
 	red     string = string(redb)                     // ANSI red
 )
 
-// Exists returns true if the file exists and is executable.
+// Exists returns true if the file exists and is a regular file.
 // Does not differentiate between path, file, or permission errors.
 func Exists(file string) bool {
 	d, err := os.Stat(file)
 	if err != nil {
 		return false
 	}
-	if m := d.Mode(); !m.IsDir() && m&0111 != 0 {
+	if m := d.Mode(); m.Perm().IsRegular() {
 		return true
 	}
 	return false
 }
 
-// IsExecutable returns nil if the file exists and is executable
-// If the permissions are incorrect, os.ErrPermission is returned;
-// otherwise, error will be of type *PathError.
-func IsExecutable(file string) error {
+// IsExecutable returns 0 if the file exists and is executable.
+// Returns 1 if the file does not exist, -1 for all other errors.
+//
+func IsExecutable(file string) int {
 	d, err := os.Stat(file)
 	if err != nil {
-		return err
+		if err == os.ErrNotExist {
+			return 1
+		}
+		return -1
 	}
 	if m := d.Mode(); !m.IsDir() && m&0111 != 0 {
-		return nil
+		return 0
 	}
-	return os.ErrPermission
+	return -1
 }
 
 // FileExists checks if file exists in the current directory
@@ -60,25 +70,29 @@ func Which(file string) (string, error) {
 	return exec.LookPath(file)
 }
 
-// WriteFile creates the file 'fileName' and writes 'data' to it.
-// It returns any error encountered. If the file already exists, it
-// will be TRUNCATED and OVERWRITTEN.
+// WriteFile creates the file fileName, writes data to it, and closes the files.
+//
+// This will force fileName to be created or truncated.
+// It returns any error encountered.
+//
+// Again ... If the file already exists, it will be TRUNCATED and OVERWRITTEN.
 func WriteFile(fileName string, data string) error {
 	dataFile, err := OpenTrunc(fileName)
 	if err != nil {
-		log.Println(err)
 		return err
 	}
-	defer dataFile.Close()
+	w := StringWriterCloser(dataFile)
+	defer w.Close()
 
-	n, err := dataFile.WriteString(data)
+	n, err := w.WriteString(data)
+
 	if err != nil {
-		log.Println(err)
 		return err
 	}
+
 	if n != len(data) {
-		log.Printf("incorrect string length written (wanted %d): %d\n", len(data), n)
-		return fmt.Errorf("incorrect string length written (wanted %d): %d", len(data), n)
+		// log.Printf("incorrect string length written (wanted %d), returned %d\n", len(data), n)
+		return fmt.Errorf("incorrect string length written: wanted %d, wrote %d", len(data), n)
 	}
 	return nil
 }
@@ -92,5 +106,9 @@ func WriteFile(fileName string, data string) error {
 //
 // If there is an error, it will be of type *PathError.
 func OpenTrunc(name string) (*os.File, error) {
-	return os.OpenFile(name, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 644)
+	return os.OpenFile(name, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+}
+
+func RedLogger(s string) error {
+	log.Info()
 }

@@ -5,4 +5,4 @@
 // Full documentation <https://www.gnu.org/software/coreutils/du>
 // or available locally via: info '(coreutils) du invocation'
 
-package main
+package coreutils

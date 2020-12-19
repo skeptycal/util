@@ -18,6 +18,7 @@ const (
 func NewGitIgnore(force bool, skip bool) (*os.File, error) {
 
 	ok := gofile.Exists(".gitignore")
+
 	if ok {
 		if !force {
 			return nil, fmt.Errorf(".gitignore already exists; use force option to overwrite")
@@ -52,6 +53,8 @@ func main() {
 	}
 
 	w := bufio.NewWriter(giFile)
+
+	w = w // todo - finish up ...
 
 }
 
