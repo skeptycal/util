@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	log "github.com/sirupsen/logrus"
-	gorepo "github.com/skeptycal/util/http/gorepo"
+	gorepo "github.com/skeptycal/util/devtools/gorepo"
 )
 
 func main() {

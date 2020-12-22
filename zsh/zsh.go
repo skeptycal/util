@@ -1,3 +1,15 @@
+/*
+Package zsh contains command line utilities designed for use with
+zsh on macOS. Other environments may be supported, but are not exhaustively
+tested.
+
+List of utilities available:
+    `binit` creates links to command line tools in ~/bin to provide path access
+    `tree` creates a visual tree of directories and files
+    `gofind` searches for files and directories matching a pattern
+    `ls` lists files and directories in a directory
+
+*/
 package zsh
 
 import (
@@ -31,13 +43,18 @@ func Sh(command string) string {
 	return string(stdout)
 }
 
+// Source is a placeholder // TODO
 func Source() string {
 	return ""
 }
 
 // Replace creates a new Replacer and reads from a list of old, new string pairs. Replacements are performed in the order they appear in the target string, without overlapping matches. The old string comparisons are done in argument order.
-func Replace([]string) *strings.Replacer {
-	r := strings.NewReplacer("c d")
+// todo - not implemented
+func Replace(oldnew []string) *strings.Replacer {
+	if len(oldnew)%2 != 0 {
+		return nil
+	}
+	r := strings.NewReplacer(oldnew)
 	// cmd :=
 	return r
 }

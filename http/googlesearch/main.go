@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
-	"strings"
 
+	"github.com/prometheus/common/log"
 	"github.com/skeptycal/util/http/http"
 )
 
@@ -20,47 +21,48 @@ func main() {
 	url := http.MakeQueryURL(args, urlPrefix, searchStringSep)
 	fmt.Println("The google search string is: ", url)
 
-	// fetchExample(url)
-	// readAllExample(url)
-	urls := []string{url}
+	s := GetURL(url)
 
-	tokenizerExample(urls)
-	//
-	// -----------------------------------------------------------
-	//
+	fmt.Println("\n", s)
 }
 
-// MakeQueryURL - join args into a google-style query string url e.g. <site><search terms>
-func MakeQueryURL(args []string, SearchStringPrefix string, SearchStringSep string) string {
-	// https://www.google.com/search?q=trump+biden
-	return SearchStringPrefix + strings.Join(args, SearchStringSep)
-}
-
-func tokenizerExample(urls []string) {
-	seedUrls := urls
-
-	// Kick off the crawl process (concurrently)
-	for _, url := range seedUrls {
-		go http.Crawl(url, "a", "href")
+func GetURL(url string) string {
+	r, err := http.GetURL(url)
+	if err != nil {
+		return ""
 	}
+	defer r.Close()
+	s, err := ioutil.ReadAll(r)
+	if err != nil {
+		return ""
+	}
+	return string(s)
+
 }
 
-func readAllExample(url string) {
+func checks() error {
+	url := `http://www.google.com/`
+	s := readAllExample(url)
+	log.Info(s)
+	err := fetchExample(url)
+	log.Info(err)
+	return nil
+}
+
+func readAllExample(url string) string {
 	data, err := http.ReadAllURL(url)
 	if err != nil {
-		fmt.Printf("error reading response from server: %v", err)
-		return
+		return fmt.Sprintf("error reading response from server: %v", err)
 	}
-	fmt.Println("HTML:\n\n", data)
+	return data
 }
 
-func fetchExample(url string) {
+func fetchExample(url string) error {
 	resp, err := http.Fetch(url)
-	defer resp.Body.Close()
 	if err != nil {
-		fmt.Printf("error obtaining response from server: %v", err)
-		return
+		return fmt.Errorf("error obtaining response from server: %v", err)
 	}
+	defer resp.Body.Close()
 
 	length := resp.ContentLength
 
@@ -68,18 +70,8 @@ func fetchExample(url string) {
 	fmt.Printf("The URL Scheme was: %v\n", resp.Request.URL.Scheme)
 	fmt.Println("")
 	fmt.Printf("body: %s\n\n", resp.Body)
+	return nil
 }
-
-const htm = `<!DOCTYPE html>
-<html>
-<head>
-    <title></title>
-</head>
-<body>
-    body content
-    <p>more content</p>
-</body>
-</html>`
 
 // Plan:
 // ----------------------------
