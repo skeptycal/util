@@ -1,25 +1,63 @@
 package gorepo
 
 import (
+	"bytes"
 	"fmt"
+	"io/ioutil"
+	"net/http"
 	"os"
 	"path"
 	"path/filepath"
-	"runtime"
 	"strings"
 
 	log "github.com/sirupsen/logrus"
+	"github.com/skeptycal/util/devtools/gogit"
+	"github.com/skeptycal/util/gofile"
 	"github.com/skeptycal/zsh"
 )
 
 const (
 	defaultGitignoreItems = "macos linux windows ssh vscode go zsh node vue nuxt python django"
-	sep                   = string(os.PathSeparator)
 )
 
 type GitHubRepo struct {
 	name string
 	url  string
+}
+
+// gitIgnore writes a .gitignore file, including default items followed by the response from
+// the www.gitignore.io API containing standard .gitignore items for the args given.
+//
+//      default: "macos linux windows ssh vscode go zsh node vue nuxt python django"
+//
+// using: https://www.toptal.com/developers/gitignore/api/macos,linux,windows,ssh,vscode,go,zsh,node,vue,nuxt,python,django
+func (g *GitHubRepo) gitIgnore(args string) error {
+	// notes - .gitignore header
+	/*
+	   # gorepo - .gitignore file
+
+	   # generic secure items:
+	   *private*
+	   *secret*
+	   *bak
+
+	   # repo specific items
+	   coverage.txt
+	   profile.out
+	*/
+
+	if args == "" {
+		args = defaultGitignoreItems
+	}
+
+	var sb strings.Builder
+	defer sb.Reset()
+
+	gifmt := fmt.Sprintf(giFormatString, g.name, gi(args))
+
+	sb.WriteString(gi(args))
+
+	return WriteFile(".gitignore", sb.String())
 }
 
 // Setup initializes the repo, creates files, prompts as needed, creates the
@@ -42,6 +80,9 @@ func Setup() error {
 // github.com repository, and pushes the initial commit.
 func gitRepoSetup() error {
 	err := gitInit()
+	if !gofile.Exists(".gitignore") {
+		gitIgnore("", "")
+	}
 	if err != nil {
 		return err
 	}
@@ -49,58 +90,47 @@ func gitRepoSetup() error {
 	return err
 }
 
-// CreateAutomatedFiles creates the automated files.
-func createAutomatedFiles() error {
-	zsh.Sh("touch main.go")
-	return nil
-}
-
-// gitIgnore writes a .gitignore file, including default items followed by the response from
-// the www.gitignore.io API containing standard .gitignore items for the args given.
+// gi returns a .gitignore file from the www.gitignore.io API containing
+// standard .gitignore items for the space delimited args given.
 //
 //      default: "macos linux windows ssh vscode go zsh node vue nuxt python django"
 //
-// using: https://www.toptal.com/developers/gitignore/api/macos,linux,windows,ssh,vscode,go,zsh,node,vue,nuxt,python,django
-func gitIgnore(args, repoName string) error {
-	// notes - .gitignore header
-	/*
-	   # gorepo - .gitignore file
+// using: https://www.toptal.com/developers/gitignore/api/
+func GetGitIgnore(args string) (string, error) {
 
-	   # generic secure items:
-	   *private*
-	   *secret*
-	   *bak
-
-	   # repo specific items
-	   coverage.txt
-	   profile.out
-	*/
-
-	if args == "" {
+	if len(args) == 0 {
 		args = defaultGitignoreItems
 	}
 
-	var sb strings.Builder
-	defer sb.Reset()
+	url := "https://www.gitignore.io/api/\"${(j:,:)@}\" " + args
+	// command := "curl -fLw '\n' https://www.gitignore.io/api/\"${(j:,:)@}\" " + args
 
-	sb.WriteString(fmt.Sprintf("# %s - .gitignore file\n\n", repoName))
-
-	sb.WriteString("# generic secure items:\n")
-	sb.WriteString("*private*\n*secret*\n*bak\n\n")
-
-	sb.WriteString("# repo specific items:\n")
-	sb.WriteString("coverage.txt\nprofile.out\n\n")
-
-	// add .gitignore contents from gitignore.io API
-	sb.WriteString(gi(args))
-
-	return WriteFile(".gitignore", sb.String())
+	buf, err := GetPageBody(url)
+	if err != nil {
+		return "", err
+	}
+	defer buf.Reset()
+	return buf.String(), nil
 }
 
-// GitCommit creates a commit with message
-func GitCommitAll(message string) error {
-	Shell("git add --all")
-	Shell("git commit -m '" + message + "'")
+// GetPageBody - returns the body of the page at url.
+func GetPageBody(url string) (*bytes.Buffer, error) {
+	resp, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	return bytes.NewBuffer(body), nil
+}
+
+// CreateAutomatedFiles creates the automated files.
+func createAutomatedFiles() error {
+	zsh.Sh("touch main.go")
 	return nil
 }
 
@@ -178,74 +208,6 @@ func CodeOfConduct() error {
 // License creates the initial LICENSE file.
 func License(license string) error {
 	return nil
-}
-
-// PWD returns the current working directory. It does not return any error, but instead
-// logs the error and returns the system default glob pattern for current working directory
-func PWD() string {
-	wd, err := os.Getwd()
-	if err != nil {
-		log.Println(err)
-		// this is a crutch for the extremely rare case where Getwd fails
-		if runtime.GOOS == "windows" || runtime.GOOS == "plan9" {
-			return ".\\"
-		}
-		return "."
-	}
-	return wd
-}
-
-// DirName returns the last element of a path.
-// similar to filepath.Base()
-//
-// todo  - btw filepath.Base() has an error (rather redundant check)
-//
-// (see below) if path is "" ... "." is returned ... so ...
-// the next line `len(path) > 0` is redundant ... it must be > 0
-// or it would have been returned in the first check ...
-// however, if one slash is removed ... and it is the only one ...
-// then this check would be valid ... but ... if the only thing in the path is
-// one slash ... it should be returned directly
-//	    if path == "" {
-//      	return "."
-//      }
-//      // Strip trailing slashes.
-//      for len(path) > 0 && os.IsPathSeparator(path[len(path)-1]) {
-//      	path = path[0 : len(path)-1]
-//      }
-func DirName(path string) string {
-	i := strings.LastIndex(path, sep)
-	return path[i+1:]
-}
-
-// Base returns the last element of path.
-// This is a convenience version modified from Go 1.15.6
-// (located at /src/path/filepath/path.go)
-//
-// Trailing path separators are removed before extracting the last element.
-// If the path is empty, Base returns ".".
-// If the path consists entirely of separators, Base returns a single separator.
-func Base(path string) string {
-	if path == "" {
-		return "."
-	}
-	// Strip trailing slashes.
-	path = strings.TrimRight(path, string(os.PathSeparator))
-
-	// Throw away volume name
-	path = path[len(filepath.VolumeName(path)):]
-	// Find the last element
-	i := len(path) - 1
-	for i >= 0 && !os.IsPathSeparator(path[i]) {
-		i--
-	}
-	if i >= 0 {
-		path = path[i+1:]
-	} else {
-		// If empty now, it had only slashes.
-		return string(os.PathSeparator)
-	}
-	return path
 }
 
 func NewGitHubRepo(name string, dir string) (*GitHubRepo, error) {
@@ -341,29 +303,33 @@ func MakeGitIgnore(args, repoName string) error {
 	return WriteFile(".gitignore", sb.String())
 }
 
-// GitCommit creates a commit with message
-func GitCommit(message string) error {
-	Shell("git add --all")
-	Shell("git commit -m '" + message + "'")
-	return nil
-}
-
-// GitInit initializes the Git environment
-func gitInit() error {
-	if !fileExists(".gitignore") {
-		gitIgnore("", "")
-	}
-
-	Shell("git init")
-	GitCommitAll("initial commit")
-	return nil
-}
-
 // GoMod creates and initializes the repo go.mod file.
 func GoMod() error {
 	Shell("go mod init")
 	Shell("go mod tidy")
 	Shell("go mod download")
-	GitCommit("go mod setup")
+	gogit.GitCommit("go mod setup")
 	return nil
 }
+
+const giFormatString = `# %s - .gitignore file
+
+# --> This file is automatically generated <--
+
+# personal preference items
+%s/
+
+# repo specific items:
+coverage.txt
+profile.out
+
+# generic secure items
+*token
+*private*
+*bak
+*secret*
+
+# .gitignore contents from gitignore.io API
+%s
+
+    `

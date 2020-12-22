@@ -1,26 +1,29 @@
-package gorepo
+package zsh
 
 import (
 	"encoding/hex"
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 	"strings"
+
+	log "github.com/sirupsen/logrus"
+	ansi "github.com/skeptycal/stringutils/ansi"
 )
 
 var (
 	redb, _        = hex.DecodeString("1b5b33316d0a") // byte code for ANSI red
 	red     string = string(redb)                     // ANSI red
+	a              = ansi.Ansi(10)
 )
 
-// WriteFile creates the file 'fileName' and writes 'data' to it.
+// WriteFile creates the file 'fileName' and writes all 'data' to it.
 // It returns any error encountered. If the file already exists, it
 // will be TRUNCATED and OVERWRITTEN.
 func WriteFile(fileName string, data string) error {
 	dataFile, err := OpenTrunc(fileName)
 	if err != nil {
-		log.Println(err)
+		log.Error(err)
 		return err
 	}
 	defer dataFile.Close()

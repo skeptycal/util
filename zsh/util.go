@@ -25,5 +25,5 @@ func GetEnv(key string, defValue string) (string, error) {
 
 // ToString - convert any value to string
 func ToString(value interface{}) string {
-	return fmt.Sprintf("%s", value)
+	return fmt.Sprintf("%v", value)
 }

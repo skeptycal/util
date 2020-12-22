@@ -321,8 +321,12 @@ github.com/sirupsen/logrus v1.7.0 h1:ShrD1U9pZB12TX0cVy0DtePoCH97K8EtX+mg7ZARUtM
 github.com/sirupsen/logrus v1.7.0/go.mod h1:yWOB1SBYBC5VeMP7gHvWumXLIWorT60ONWic61uBYv0=
 github.com/skeptycal/anansi v0.0.0-20201204204333-58aea8bdcd71 h1:9EGigHMCU2V41dHwqPqR+KR5jub691I0VHoyI7HMWgE=
 github.com/skeptycal/anansi v0.0.0-20201204204333-58aea8bdcd71/go.mod h1:0V6nnDM2MwEE3PoAQ4YIVED+j64rAa3Jh3lpptOcjfQ=
+github.com/skeptycal/devtools v1.13.6 h1:a7lSDaLEgwnFfK8ThPInwGUk1bdvT00pCQyvGRyH788=
+github.com/skeptycal/devtools v2.0.0+incompatible h1:ubupDyoZlffr3VqTxVlQBV0ZAi4z+yjbXEZQd+5iuBg=
 github.com/skeptycal/godebug v0.0.0-20201205112237-973e2e02ed9f h1:N7pvvCMZ30YHJcI67tjrxoUB2I684QE5FGtU9Bafo3o=
 github.com/skeptycal/godebug v0.0.0-20201205112237-973e2e02ed9f/go.mod h1:wAQQM4hd4JKjVW3q8EPYAkym5844+NrndcWRIEwB38M=
+github.com/skeptycal/gofile v0.0.0-20201203150210-3d33756834af h1:OFMGtevEMw31P1jBNkyEwY6Hs4Bq7+tYK6ndq48tBSY=
+github.com/skeptycal/gofile v0.0.0-20201203150210-3d33756834af/go.mod h1:GoVP0VdLOWhVtnW4RF/AMyPtLcXFuh4V2hHYSGdzNB8=
 github.com/skeptycal/matrix v0.0.0-20201210181152-fb921643425a h1:CVDbLcwppRezrY9nWslgJyAtw2AvPYwaNNETyOGpbpw=
 github.com/skeptycal/matrix v0.0.0-20201210181152-fb921643425a/go.mod h1:vk02TJ1r2wU0XEAP07oEj7FcwgSm9neH/352B6WJ9EQ=
 github.com/skeptycal/zsh v0.0.0-20201207033132-c00d09bd93bc h1:2k+X8rsX6gvCfr2K7YugX61Df/P9gK/MGVG8sIF5UTA=

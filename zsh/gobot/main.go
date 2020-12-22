@@ -3,19 +3,9 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"os"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/skeptycal/util/gofile"
 )
-
-type errorHandling int
-
-const (
-	continueOnError errorHandling = iota
-	exitOnError
-)
-
-const ErrHandling errorHandling = continueOnError
 
 type repo struct {
 	name    string
@@ -26,9 +16,13 @@ type repo struct {
 
 func (r *repo) Name() string {
 	if r.name == "" {
-		r.name = ParentDir()
+		r.name = gofile.ParentDir()
 	}
 	return r.name
+}
+
+func doOrDie(err error) error {
+	return gofile.DoOrDie(err)
 }
 
 func (r *repo) SetURL(url string) error {
@@ -41,16 +35,6 @@ func (r *repo) SetURL(url string) error {
 
 	r.url = url
 	return nil
-}
-
-func doOrDie(err error) error {
-	if err != nil {
-		log.Error(err)
-		if ErrHandling == exitOnError {
-			os.Exit(1)
-		}
-	}
-	return err
 }
 
 const (

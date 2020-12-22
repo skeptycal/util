@@ -11,16 +11,6 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// getParentFolderName returns name of immediate parent folder; used to create repo name
-func getParentFolderName() string {
-	file, err := os.Getwd()
-	if err != nil {
-		log.Errorf("getParentFolderName could not locate parent folder %v", err)
-		return ""
-	}
-	return filepath.Base(file)
-}
-
 func getConfigFileName() (string, error) {
 
 	// check for default file name
