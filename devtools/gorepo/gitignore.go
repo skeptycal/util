@@ -5,8 +5,8 @@ import (
 	"os"
 
 	"github.com/prometheus/common/log"
+	"github.com/skeptycal/util/gofile"
 	"github.com/skeptycal/util/http/http"
-	"github.com/skeptycal/util/zsh/gofile"
 )
 
 func NewGitIgnore(force bool, skip bool) (*os.File, error) {
