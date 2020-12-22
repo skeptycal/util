@@ -1,20 +1,17 @@
 package zsh
 
 import (
-	"encoding/hex"
 	"fmt"
 	"os"
 	"os/exec"
 	"strings"
 
 	log "github.com/sirupsen/logrus"
-	ansi "github.com/skeptycal/stringutils/ansi"
+	. "github.com/skeptycal/util/stringutils/ansi"
 )
 
 var (
-	redb, _        = hex.DecodeString("1b5b33316d0a") // byte code for ANSI red
-	red     string = string(redb)                     // ANSI red
-	a              = ansi.Ansi(10)
+	red Ansi = Ansi(Red)
 )
 
 // WriteFile creates the file 'fileName' and writes all 'data' to it.
@@ -81,13 +78,13 @@ func cmdPrep(command string) *exec.Cmd {
 }
 
 // fileExists checks if a file exists and is not a directory
-func fileExists(fileName string) bool {
-	info, err := os.Stat(fileName)
-	if os.IsNotExist(err) {
-		return false
-	}
-	return !info.IsDir()
-}
+// func fileExists(fileName string) bool {
+// 	info, err := os.Stat(fileName)
+// 	if os.IsNotExist(err) {
+// 		return false
+// 	}
+// 	return !info.IsDir()
+// }
 
 // Notes: Cmd struct summary:
 /*

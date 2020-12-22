@@ -24,7 +24,7 @@ var (
 	DefaultContext = context.TODO()
 )
 
-// Status executes a shell command and returns the exit status.
+// Status executes a shell command and returns the exit status as an error.
 func Status(command string) error {
 	cmd := CmdPrep(command, DefaultContext)
 	return cmd.Run()
@@ -36,6 +36,10 @@ func Sh(command string) string {
 	cmd := CmdPrep(command, DefaultContext)
 	stdout, err := cmd.Output()
 
+	if cmd.Stderr != nil {
+
+	}
+
 	if err != nil {
 		return fmt.Errorf("%Terror: %v", red, err).Error()
 	}
@@ -43,20 +47,15 @@ func Sh(command string) string {
 	return string(stdout)
 }
 
-// Source is a placeholder // TODO
-func Source() string {
-	return ""
-}
-
 // Replace creates a new Replacer and reads from a list of old, new string pairs. Replacements are performed in the order they appear in the target string, without overlapping matches. The old string comparisons are done in argument order.
 // todo - not implemented
-func Replace(oldnew []string) *strings.Replacer {
+func NewReplacer(oldnew ...string) (*strings.Replacer, error) {
 	if len(oldnew)%2 != 0 {
-		return nil
+		return nil, fmt.Errorf("NewReplacer requires an even number of arguments")
 	}
-	r := strings.NewReplacer(oldnew)
+	r := strings.NewReplacer(oldnew...)
 	// cmd :=
-	return r
+	return r, nil
 }
 
 // replacer is the interface that a replacement algorithm needs to implement.

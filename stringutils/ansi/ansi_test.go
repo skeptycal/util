@@ -53,7 +53,7 @@ func Test_itoa(t *testing.T) {
 func Test_ansi_String(t *testing.T) {
 	tests := []struct {
 		name string
-		a    ansi
+		a    Ansi
 		want string
 	}{
 		// TODO: Add test cases.
