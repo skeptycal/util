@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/skeptycal/util/zsh/gofile"
+	"github.com/skeptycal/util/gofile"
 )
 
 // sample response from test sent to http://httpbin.org
