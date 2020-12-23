@@ -1,6 +1,7 @@
 package gogit
 
 import (
+	"github.com/skeptycal/util/devtools/gorepo"
 	"github.com/skeptycal/util/gofile"
 	. "github.com/skeptycal/util/zsh"
 )
@@ -15,7 +16,7 @@ func GitCommit(message string) error {
 // GitCommit creates a commit with message
 func GitCommitAll(message string) error {
 	Shell("git add --all")
-	Shell("git commit -m '" + message + "'")
+	Shell("git commit -S -m '" + message + "'")
 	return nil
 }
 

@@ -57,7 +57,7 @@ func (g *GitHubRepo) gitIgnore(args string) error {
 
 	sb.WriteString(gi(args))
 
-	return WriteFile(".gitignore", sb.String())
+	return gofile.WriteFile(".gitignore", sb.String())
 }
 
 // Setup initializes the repo, creates files, prompts as needed, creates the
@@ -79,7 +79,7 @@ func Setup() error {
 // gitRepoSetup initializes the repo, prompts as needed, creates the
 // github.com repository, and pushes the initial commit.
 func gitRepoSetup() error {
-	err := gitInit()
+	err := gogit.gitInit()
 	if !gofile.Exists(".gitignore") {
 		gitIgnore("", "")
 	}
