@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	log "github.com/sirupsen/logrus"
 )
 
 const ()
@@ -51,11 +52,11 @@ type basicServer struct {
 //
 // Except for reading the body, handlers should not modify the
 // provided Request.
-// func (b *basicServer) SimpleHandler() *mux.Route {
-// 	func(w http.ResponseWriter, r *http.Request) {
-// 		fmt.Fprintf(w, "Hello Medium, you've requested: %s\n", r.URL.Path)
-// 	}
-// }
+func (b *basicServer) SimpleHandler() *mux.Route {
+	func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "Hello Medium, you've requested: %s\n", r.URL.Path)
+	}
+}
 
 func startBasicServer() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -88,11 +89,12 @@ func routeServer() error {
 
 func htmlServer() error {
 	tmpl := template.Must(template.ParseFiles("layout.html"))
+	// var t = template.Must(template.New("name").Parse("html"))
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		err := tmpl.Execute(w, "")
 		if err != nil {
-			return err
+			log.Error(err)
 		}
 	})
 
@@ -106,5 +108,8 @@ func htmlServer() error {
 func main() {
 	fmt.Printf("Server is active at: %s\n", url)
 	fmt.Println("   (Press <ctrl>-C to stop server.)")
-
+	err := routeServer()
+	if err != nil {
+		log.Panicln(err)
+	}
 }

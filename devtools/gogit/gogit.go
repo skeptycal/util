@@ -1,6 +1,7 @@
 package gogit
 
 import (
+	"github.com/skeptycal/util/gofile"
 	. "github.com/skeptycal/util/zsh"
 )
 
@@ -20,8 +21,8 @@ func GitCommitAll(message string) error {
 
 // GitInit initializes the Git environment
 func gitInit() error {
-	if !fileExists(".gitignore") {
-		gitIgnore("", "")
+	if !gofile.Exists(".gitignore") {
+		gorepo.GitIgnore("", "")
 	}
 
 	Shell("git init")

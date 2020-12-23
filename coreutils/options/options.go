@@ -67,6 +67,11 @@ type Option interface {
 	TypeOf() string
 }
 
+type value struct {
+	name  string
+	value interface{}
+}
+
 // Value is the interface to the dynamic value stored in a flag.
 // (The default value is represented as a string.)
 //
@@ -89,6 +94,19 @@ type Value interface {
 type Getter interface {
 	Value
 	Get() interface{}
+}
+
+func (v *value) String() string {
+	return fmt.Sprintf("%v", v)
+}
+
+func (v *value) Set(value string) error {
+	v.value = value
+	return nil
+}
+
+func (v *value) Get() interface{} {
+	return v.value
 }
 
 func typeof(v interface{}) string {

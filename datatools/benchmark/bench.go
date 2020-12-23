@@ -50,7 +50,7 @@ func NewMark(name string, f func()) *mark {
 
 func NewBenchmarkSet(name string, dur time.Duration, logfile io.Writer) *benchmarkSet {
 	if dur == 0 {
-		dur == defaultMaxDuration
+		dur = defaultMaxDuration
 	}
 	return &benchmarkSet{
 		name:        name,

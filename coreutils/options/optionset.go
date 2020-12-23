@@ -1,11 +1,20 @@
 package options
 
 import (
+	"flag"
+	"fmt"
 	"io"
 	"os"
+	"sort"
 )
 
 var CommandLine = NewFlagSet(os.Args[0], ExitOnError)
+
+func defaultUsage() {
+	fmt.Printf("%v\n", os.Args[0])
+	flag.Parse()
+
+}
 
 // NewOptionSet returns a new, empty option set with the specified
 // name and error handling property. The default name is the name
@@ -16,7 +25,7 @@ func NewFlagSet(name string, errorHandling ErrorHandling) *OptionSet {
 		name:          name,
 		errorHandling: errorHandling,
 	}
-	f.Usage = f.defaultUsage
+	f.Usage = defaultUsage
 	return f
 }
 
@@ -35,15 +44,15 @@ type OptionSet struct {
 
 	name          string
 	parsed        bool
-	option        map[string]*Option
-	formal        map[string]*Option
+	option        map[string]*cliOption
+	formal        map[string]*cliOption
 	args          []string // arguments after flags
 	errorHandling ErrorHandling
 	output        io.Writer // nil means stderr; use Output() accessor
 }
 
 func (o OptionSet) Get(key string) interface{} {
-	opt, ok := o[key]
+	opt, ok := o.option[key]
 	if !ok {
 		return nil
 	}
@@ -58,7 +67,7 @@ func NewOptionSet(name string, errorHandling ErrorHandling) *OptionSet {
 		name:          name,
 		errorHandling: errorHandling,
 	}
-	o.Usage = o.defaultUsage
+	o.Usage = defaultUsage
 	return o
 }
 
@@ -89,8 +98,30 @@ func (f *OptionSet) SetOutput(output io.Writer) {
 
 // VisitAll visits the flags in lexicographical order, calling fn for each.
 // It visits all flags, even those not set.
-func (f *OptionSet) VisitAll(fn func(*Option)) {
+func (f *OptionSet) VisitAll(fn func(*cliOption)) {
 	for _, flag := range sortFlags(f.formal) {
 		fn(flag)
 	}
+}
+
+// Visit visits the flags in lexicographical order, calling fn for each.
+// It visits only those flags that have been set.
+func (f *OptionSet) Visit(fn func(*cliOption)) {
+	for _, flag := range sortFlags(f.option) {
+		fn(flag)
+	}
+}
+
+// sortFlags returns the flags as a slice in lexicographical sorted order.
+func sortFlags(flags map[string]*cliOption) []*cliOption {
+	result := make([]*cliOption, len(flags))
+	i := 0
+	for _, f := range flags {
+		result[i] = f
+		i++
+	}
+	sort.Slice(result, func(i, j int) bool {
+		return result[i].Name < result[j].Name
+	})
+	return result
 }
