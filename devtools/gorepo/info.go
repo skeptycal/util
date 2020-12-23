@@ -9,6 +9,7 @@ import (
 	"time"
 
 	log "github.com/sirupsen/logrus"
+	"github.com/skeptycal/util/gofile"
 )
 
 func getConfigFileName() (string, error) {
@@ -26,7 +27,7 @@ func getConfigFileName() (string, error) {
 		return "", err
 	}
 
-	repoJsonFileName = getParentFolderName() + ".json"
+	repoJsonFileName = gofile.Parent(gofile.PWD()) + ".json"
 	log.Info(repoJsonFileName)
 
 	fi, err = os.Stat(repoJsonFileName)

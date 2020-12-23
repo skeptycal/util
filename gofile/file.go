@@ -241,7 +241,7 @@ func PWD() string {
 // Trailing path separators are removed before extracting the last element.
 // If the path is empty, Base returns ".".
 // If the path consists entirely of separators, Base returns a single separator.
-func Base(path string) string {
+func BaseGo(path string) string {
 
 	// Strip trailing slashes.
 	path = strings.TrimRight(path, SEP)
@@ -266,6 +266,31 @@ func Base(path string) string {
 
 }
 
+// Split splits path immediately following the final Separator,
+// separating it into a directory and file name component.
+// If there is no Separator in path, Split returns an empty dir
+// and file set to path.
+// The returned values have the property that path = dir+file.
+func Split(path string) (dir, file string) {
+	vol := filepath.VolumeName(path)
+	path = path[len(vol):]
+	i := len(path) - 1
+	for i >= len(vol) && !os.IsPathSeparator(path[i]) {
+		i--
+	}
+	return path[:i+1], path[i+1:]
+}
+
+func Parents(path string) []string {
+	clean := filepath.Clean(path)
+	return filepath.SplitList(clean)
+}
+
+func Base(path string) string {
+	_, file := filepath.Split(path)
+	return file
+}
+
 // SafeRename renames (moves) oldpath to newpath.
 // If oldpath is not found or newpath already exists, SafeRename
 // returns an error.
@@ -274,4 +299,16 @@ func SafeRename(oldpath string, newpath string) error {
 		return os.ErrExist
 	}
 	return os.Rename(oldpath, newpath)
+}
+
+// Parent returns the parent directory of path.
+func Parent(path string) string {
+	dir, _ := filepath.Split(filepath.Clean(path))
+	return dir
+}
+
+// BaseWD returns the basename of the current directory (PWD).
+func BaseWD(path string) string {
+	_, file := filepath.Split(filepath.Clean(path))
+	return file
 }
