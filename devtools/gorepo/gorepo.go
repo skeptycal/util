@@ -261,46 +261,18 @@ func CreateAutomatedFiles() error {
 	return nil
 }
 
-// gitIgnore writes a .gitignore file, including default items followed by the response from
+// GitIgnore writes a .gitignore file, including default items followed by the response from
 // the www.gitignore.io API containing standard .gitignore items for the args given.
 //
 //      default: "macos linux windows ssh vscode go zsh node vue nuxt python django"
 //
 // using: https://www.toptal.com/developers/gitignore/api/macos,linux,windows,ssh,vscode,go,zsh,node,vue,nuxt,python,django
-func MakeGitIgnore(args, repoName string) error {
-	// notes - .gitignore header
-	/*
-	   # gorepo - .gitignore file
-
-	   # generic secure items:
-	   *private*
-	   *secret*
-	   *bak
-
-	   # repo specific items
-	   coverage.txt
-	   profile.out
-	*/
-
-	if args == "" {
-		args = defaultGitignoreItems
+func GitIgnore() error {
+	f, err := os.Create(".gitignore")
+	if err != nil {
+		return err
 	}
 
-	var sb strings.Builder
-	defer sb.Reset()
-
-	sb.WriteString(fmt.Sprintf("# %s - .gitignore file\n\n", repoName))
-
-	sb.WriteString("# generic secure items:\n")
-	sb.WriteString("*private*\n*secret*\n*bak\n\n")
-
-	sb.WriteString("# repo specific items:\n")
-	sb.WriteString("coverage.txt\nprofile.out\n\n")
-
-	// add .gitignore contents from gitignore.io API
-	sb.WriteString(gi(args))
-
-	return WriteFile(".gitignore", sb.String())
 }
 
 // GoMod creates and initializes the repo go.mod file.
