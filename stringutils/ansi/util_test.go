@@ -76,7 +76,7 @@ func TestHexed(t *testing.T) {
 		{"1000000000", args{1000000000}, "3b9aca00"},
 		{"32767", args{32767}, "7fff"},
 		{"1e12", args{1e12}, "0x1.d1a94a2p+39"},
-		{"-0x1.23abcp+20", args{-0x1.23abcp+20}, "3"},
+		{"-0x1.23abcp+20", args{-0x1.23abcp+20}, "-0x1.23abcp+20"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

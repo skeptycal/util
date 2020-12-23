@@ -2,39 +2,121 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net/http"
+	"os"
 
 	"github.com/skeptycal/util/gofile"
 )
 
+const (
+	defaultAuthName   = "Michael Treanor"
+	defaultLicense    = "MIT"
+	defaultUserName   = "skeptycal"
+	defaultRepoPrefix = "https://github.com"
+)
+
+// NewRepo returns a new repo instance with default values initialized.
+func NewRepo(name, url, auth, username, license string) *repo {
+	if auth == "" {
+		auth = defaultAuthName
+	}
+	if username == "" {
+		username = defaultUserName
+	}
+	if license == "" {
+		license = defaultLicense
+	}
+	if name == "" {
+		name = gofile.Base(gofile.PWD())
+	}
+	if url == "" {
+		url = fmt.Sprintf("%s/%s/%s", defaultRepoPrefix, username, name)
+	}
+	return &repo{
+		name:     name,
+		url:      url,
+		author:   auth,
+		username: username,
+		license:  license,
+	}
+}
+
 type repo struct {
-	name    string
-	url     string
-	author  string
-	license string
+	name     string
+	url      string
+	author   string
+	username string
+	license  string
 }
 
 func (r *repo) Name() string {
 	if r.name == "" {
-		r.name = gofile.ParentDir()
+		r.name = gofile.Base(gofile.PWD())
 	}
 	return r.name
 }
-
-func doOrDie(err error) error {
-	return gofile.DoOrDie(err)
+func (r *repo) URL() string {
+	if r.url == "" {
+		url := r.DefaultURL()
+		err := r.CheckURL(r.DefaultURL())
+		if err != nil {
+			return ""
+		}
+		r.url = url
+	}
+	return r.url
+}
+func (r *repo) Author() string {
+	if r.author == "" {
+		r.author = defaultAuthName
+	}
+	return r.author
+}
+func (r *repo) User() string {
+	if r.username == "" {
+		r.username = defaultUserName
+	}
+	return r.username
+}
+func (r *repo) License() string {
+	if r.license == "" {
+		r.license = defaultLicense
+	}
+	return r.license
 }
 
-func (r *repo) SetURL(url string) error {
+func (r *repo) CheckURL(url string) error {
 	resp, err := http.Get(url)
-	doOrDie(err)
+	if doOrDie(err) != nil {
+		return err
+	}
 
 	if resp.StatusCode != http.StatusOK {
-		doOrDie(fmt.Errorf("error: server response %s", resp.Status))
+		_ = doOrDie(fmt.Errorf("error: server response %s", resp.Status))
 	}
 
 	r.url = url
 	return nil
+}
+func (r *repo) DefaultURL() string {
+	return fmt.Sprintf("%s/%s/%s", defaultRepoPrefix, r.User(), r.Name())
+}
+
+func (r *repo) ReadFile(path string) ([]byte, error) {
+	if gofile.Exists(path) {
+		return ioutil.ReadFile(path)
+	}
+	return nil, os.ErrNotExist
+}
+
+// WriteFile writes data to a file named by filename. If the file does not exist, WriteFile creates it; otherwise WriteFile truncates it before writing, without changing permissions.
+func (r *repo) WriteFile(path string, data []byte) error {
+	return ioutil.WriteFile(path, data, 0644)
+}
+
+func doOrDie(err error) error {
+	return gofile.DoOrDie(err)
 }
 
 const (
