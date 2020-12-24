@@ -3,8 +3,9 @@ package gorepo
 import (
 	"fmt"
 	"os"
+	"strings"
 
-	"github.com/prometheus/common/log"
+	log "github.com/sirupsen/logrus"
 	"github.com/skeptycal/util/gofile"
 	"github.com/skeptycal/util/http/http"
 )
@@ -32,52 +33,86 @@ func NewGitIgnore(force bool, skip bool) (*os.File, error) {
 	return file, nil
 }
 
+// gitignoreAPIList returns a list of available gitignore file languages parameters
+func gitIgnoreAPIList() []string {
+	// https://www.toptal.com/developers/gitignore/api/list
+
+	body, err := http.GetPage(urlGitIgnoreAPIList)
+	if err != nil {
+		log.Error(err)
+		return make([]string, 0)
+	}
+
+	list := strings.Split(string(body), " ")
+	return list
+}
+
 // gi returns a string response from the www.gitignore.io API containing
 // standard .gitignore items for the args given.
 //
 //      default: "macos linux windows ssh vscode go zsh node vue nuxt python django"
 //
 // using: https://www.toptal.com/developers/gitignore/api/macos,linux,windows,ssh,vscode,go,zsh,node,vue,nuxt,python,django
-func gi(args string) string {
+func gitIgnoreAPI(args string) string {
+
+	if len(args) == 0 {
+		args = defaultGitIgnoreItemsComma
+	}
+
+	url := urlGitIgnoreAPIPrefix + args
+
+	body, err := http.GetPage(url)
+	if err != nil {
+		log.Error(err)
+		return ""
+	}
+	return body
+}
+
+// gi returns a .gitignore file from the www.gitignore.io API containing
+// standard .gitignore items for the space delimited args given.
+//
+//      default: "macos linux windows ssh vscode go zsh node vue nuxt python django"
+//
+// using: https://www.toptal.com/developers/gitignore/api/
+func GetGitIgnore(args string) (string, error) {
 
 	if len(args) == 0 {
 		args = defaultGitIgnoreItems
 	}
 
-	url := `https://www.toptal.com/developers/gitignore/api/` + args
+	url := "https://www.gitignore.io/api/\"${(j:,:)@}\" " + args
+	// command := "curl -fLw '\n' https://www.gitignore.io/api/\"${(j:,:)@}\" " + args
 
-	body, err := http.GetPage(url)
+	buf, err := GetPageBody(url)
 	if err != nil {
-		log.Error(err)
+		return "", err
 	}
-	body = PersonalPreferenceItems + body
-	return body
+	defer buf.Reset()
+	return buf.String(), nil
 }
 
-const (
-	// defaultGitignoreItems is a list of personal prefernces to download from the www.gitignore.io API
-	defaultGitIgnoreItems = `macos,linux,windows,ssh,vscode,go,zsh,node,vue,nuxt,python,django`
+// GitIgnore writes a .gitignore file, including default items followed by the response from
+// the www.gitignore.io API containing standard .gitignore items for the args given.
+//
+//      default: "macos linux windows ssh vscode go zsh node vue nuxt python django"
+//
+// using: https://www.toptal.com/developers/gitignore/api/macos,linux,windows,ssh,vscode,go,zsh,node,vue,nuxt,python,django
+func GitIgnore(reponame, args string, personal string) error {
+	if args == "" {
+		args = defaultGitIgnoreItems
+	}
 
-	// personalPreferenceItems is a list of personal preferences in addition to the www.gitignore.io API
-	PersonalPreferenceItems = `# Personal Preference
-ideas
-notes.md
-*[Pp]rivate*
-*[Ss]ecret*
+	if personal == "" {
+		personal = defaultGitIgnorePersonalItems
+	}
 
-# used by go.test.sh
-coverage.txt
-profile.out
+	var sb strings.Builder
+	defer sb.Reset()
 
-# generic items
-**/*/node_modules/
-*[Bb]ak
-*temp
-bak/
-temp/
-*ssh*
-*history*
-*hst*
+	gifmt := fmt.Sprintf(giFormatString, reponame, gi(args))
 
-`
-)
+	sb.WriteString(gi(args))
+
+	return gofile.WriteFile(".gitignore", sb.String())
+}

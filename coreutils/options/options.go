@@ -97,7 +97,7 @@ type Getter interface {
 }
 
 func (v *value) String() string {
-	return fmt.Sprintf("%v", v)
+	return fmt.Sprintf("%v", v.value)
 }
 
 func (v *value) Set(value string) error {

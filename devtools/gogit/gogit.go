@@ -21,7 +21,7 @@ func GitCommitAll(message string) error {
 }
 
 // GitInit initializes the Git environment
-func gitInit() error {
+func GitInit() error {
 	if !gofile.Exists(".gitignore") {
 		gorepo.GitIgnore("", "")
 	}
