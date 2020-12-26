@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/prometheus/common/log"
-	"github.com/skeptycal/util/http/http"
+	"github.com/skeptycal/util/webtools/http"
 )
 
 const googleSearchStringPrefix = "http://www.google.com/search?q="

@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 
-	"github.com/skeptycal/util/http/getpage"
+	"github.com/skeptycal/util/webtools/getpage"
 )
 
 func main() {
