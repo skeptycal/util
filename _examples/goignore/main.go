@@ -6,6 +6,10 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+const (
+	urlRoot = "https://www.toptal.com/developers/gitignore/api/"
+)
+
 func main() {
 
 	// https://www.toptal.com/developers/gitignore/api/macos,linux,windows,ssh,vscode,go,zsh

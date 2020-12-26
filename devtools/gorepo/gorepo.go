@@ -10,12 +10,22 @@ import (
 
 	log "github.com/sirupsen/logrus"
 	"github.com/skeptycal/util/devtools/gogit"
+	"github.com/skeptycal/util/gofile"
 	"github.com/skeptycal/zsh"
 )
 
+// To escape a text segment, bracket it with Escape characters. For instance, the tab in this string "Ignore this tab: \xff\t\xff" does not terminate a cell and constitutes a single character of width one for formatting purposes.
+//
+// The value 0xff was chosen because it cannot appear in a valid UTF-8 sequence.
+//
+// Ref: https://golang.org/pkg/text/tabwriter/
+const Escape = '\xff'
+
 type GitHubRepo struct {
-	name string
-	url  string
+	name    string
+	url     string
+	license string
+	tag     string // most recent (highest) version tag
 }
 
 // gitIgnore writes a .gitignore file, including default items followed by the response from
@@ -95,7 +105,7 @@ func createAutomatedFiles() error {
 
 // GoTestSh creates the go.test.sh script.
 func GoTestSh() error {
-	goTestTemplate = ``
+	gofile.WriteFile("go.test.sh", goTestTemplate)
 	return nil
 }
 

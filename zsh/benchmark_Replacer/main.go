@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-const Mu = ascii.("µ")
+const Mu = "µ"
 
 func main() {
 	n := 1000000

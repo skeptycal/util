@@ -1,10 +1,18 @@
 package gofile
 
-import "bytes"
+import (
+	"bytes"
+	"os"
+	"runtime"
+)
 
-// This file contains the portions of code that are largely modified variations
-//  or unexported parts of the original standard library code (from Go 1.15.5)
+var (
+	ErrHandling errorHandling = continueOnError
+	emptyPath   string        = getEmptyPath()
+)
 
+// These constants are mostly modified variations or unexported parts
+// of the Go standard library code (from Go 1.15.5)
 const (
 	minReadBufferSize        = 16
 	smallBufferSize          = 64
@@ -12,6 +20,34 @@ const (
 	maxConsecutiveEmptyReads = 100
 	maxInt                   = int(^uint(0) >> 1)
 	chunk                    = bytes.MinRead
+	SEP                      = string(os.PathSeparator)
+)
+
+// getEmptyPath returns a valid empty path for the current OS
+/*
+macOS results:
+  getEmptyPath()                 .
+  filepath.Clean("")            .
+
+Windows results:
+  GOOS=windows go build
+  getEmptyPath()                .\
+  filepath.Clean("")            .
+*/
+func getEmptyPath() string {
+	// return filepath.Clean("") // alternative
+	if runtime.GOOS == "windows" || runtime.GOOS == "plan9" {
+		return ".\\"
+	}
+	return "."
+}
+
+// errorHandling implements the behavior for handling errors.
+type errorHandling uint8
+
+const (
+	continueOnError errorHandling = iota
+	exitOnError
 )
 
 // The readOp constants describe the last action performed on

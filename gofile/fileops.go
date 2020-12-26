@@ -2,6 +2,7 @@ package gofile
 
 import (
 	"os"
+	"path/filepath"
 )
 
 // ReadFrom reads data from r until EOF and appends it to the buffer, growing
@@ -29,16 +30,25 @@ import (
 // 	}
 // }
 
-// GetFileSize returns the size of the file using os.Stat. If an error occurred
-// while reading the file, the function will return -1.
+// GetFileSize returns file information (after symlink evaluation)
+// using os.Stat(). If the file is not a regular file, an error of type
+// *PathError is returned.
 func GetFileInfo(filename string) (os.FileInfo, error) {
+
+	filename, err := filepath.EvalSymlinks(filename)
+	if err != nil {
+		return nil, err
+	}
+
 	fi, err := os.Stat(filename)
 	if err != nil {
 		return nil, err
 	}
+
 	if !fi.Mode().IsRegular() {
-		return nil, os.ErrNotExist
+		return nil, &os.PathError{"is file a regular file", filename, os.ErrNotExist}
 	}
+
 	return fi, err
 }
 

@@ -3,20 +3,30 @@ package gofile
 import (
 	"bufio"
 	"bytes"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
 )
 
-// BufferedFileReader implements buffering for an io.Reader object to read from a file
+// Reader implements buffering for an io.Reader object.
+type Reader struct {
+	buf          []byte
+	rd           io.Reader // reader provided by the client
+	r, w         int       // buf read and write positions
+	err          error
+	lastByte     int // last byte read for UnreadByte; -1 means invalid
+	lastRuneSize int // size of last rune read for UnreadRune; -1 means invalid
+}
+
+// BufferedFileReader implements a wrapper for bufio.Reader that
+// calculates the initial buffer size and contains additional information
+// about the underlying file.
 type BufferedFileReader struct {
 	r  *bufio.Reader
 	f  *os.File
 	fi os.FileInfo
 }
-
-// Reader implements buffering for an io.Reader object.
-// type Reader bufio.Reader
 
 // BytesFileReader represents a buffered io.Reader optimized for file reads.
 type FileReader interface {
@@ -28,9 +38,30 @@ type FileReader interface {
 	Open()
 }
 
-// NewBufferedReader returns a new Reader whose buffer has at least the size of
-// the specified file. If the argument io.Reader is already a Reader with large enough
-// size, it returns the underlying Reader.
+// NewBufferedReader returns a new buffered bufio.Reader whose buffer has at least the size of
+// the specified file. In addition, it stores the file Stat() information to avoid redundant calls.
+/*
+
+// It is designed to be used when accessing large files where many operations will be performed and the savings of calls to os.Stat can be substantial.
+//
+// It is important to use defer both file.Close() and buffer.Reset() during setup to guarantee the release of resources.
+Reset discards any buffered data, resets all state, and switches the buffered reader to read from r.
+
+
+
+The method Close() performs both of these tasks, eliminating the need to add strange habits to coding workflows. e.g.
+/*
+   // normal process when using buffers and file handles:
+	file, err := os.Open("filename")
+	if err != nil {
+		return err
+	}
+	r := bufio.NewReader(file)
+	defer r.Reset(nil)
+	defer file.Close()
+	// ... do stuff
+
+*/
 func NewBufferedReader(filename string) (rd *BufferedFileReader, err error) {
 
 	// panic recover:
@@ -63,23 +94,26 @@ func NewBufferedReader(filename string) (rd *BufferedFileReader, err error) {
 		return nil, err
 	}
 
+	if fi.Size() == 0 {
+		return nil, fmt.Errorf("file %v is empty", filename)
+	}
+
+	rd.fi = fi
 	cap := InitialCapacity(fi.Size())
 
-	f, err := os.Open(filename)
+	f, err := os.Open(fi.Name())
 	if err != nil {
 		return nil, err
 	}
-
-	r := bufio.NewReaderSize(f, cap)
-
-	rd = new(BufferedFileReader)
-	rd.r = r
-	rd.fi = fi
 	rd.f = f
+	// defer f.Close() // this is the usual practice
 
-	defer f.Close()
+	return &BufferedFileReader{
+		r:  bufio.NewReaderSize(f, cap),
+		f:  f,
+		fi: fi,
+	}, nil
 
-	return rd, nil
 }
 
 // ReadAll reads from r until an error or EOF and returns the data it read.
@@ -90,9 +124,17 @@ func (fr *BufferedFileReader) ReadAll() ([]byte, error) {
 	return ioutil.ReadAll(fr.r)
 }
 
+func (fr *BufferedFileReader) Resize() error {
+	if fr.r.Size() < int(fr.fi.Size()) {
+		cap := InitialCapacity(fr.fi.Size())
+		fr.r.Grow(cap)
+	}
+
+}
+
 // Close closes the underlying file and frees any resources.
 func (fr *BufferedFileReader) Close() error {
-	defer fr.r.Reset(fr.f)
+	defer fr.Reset()
 	return fr.f.Close()
 }
 

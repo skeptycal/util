@@ -24,23 +24,8 @@ var (
 	red     string = string(redb)                     // ANSI red
 )
 
-type errorHandling uint8
-
-const (
-	SEP = string(os.PathSeparator)
-
-	continueOnError errorHandling = iota
-	exitOnError
-)
-
-var ErrHandling errorHandling = continueOnError
-var emptyPath string
-
 func init() {
-	if runtime.GOOS == "windows" || runtime.GOOS == "plan9" {
-		emptyPath = ".\\"
-	}
-	emptyPath = "."
+
 }
 
 // DoOrDie handles errors based on the value of ErrHandling

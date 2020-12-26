@@ -1,23 +1,61 @@
 package gofile
 
 import (
+	"bufio"
 	"encoding/json"
 	"errors"
 	"io/ioutil"
+	"os"
 )
+
+type jsonMap map[string]interface{}
+
+// buf is a reusable buffer for reading JSON files.
+// a global buffer does not seem to help much
+// and definitely isn't concurrency friendly
+// var buf bufio.Reader
 
 // JSON describes a JSON object.
 type JSON interface {
-	New(name string) error
 	Load() error
 	Size() int
+}
+
+
+
+
+func New(filename string) (*JSON, error) {
+
+    r, err := NewBufferedReader(filename)
+
+
+	jsonFile, err := os.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+	defer jsonFile.Close()
+
+	size := jsonFile.
+
+	buf := bufio.NewReader
+
+	b, err := ioutil.ReadAll(jsonFile)
+	if err != nil {
+		return nil, err
+	}
+
+	var jm jsonMap
+
+	json.Unmarshal(b, &jm)
+
+	return &jm, nil
 }
 
 type jsonStruct struct {
 	filename string
 	size     int64
 	data     []byte
-	v        interface{}
+	v        *jsonMap
 }
 
 // Load - loads the data from the JSON file

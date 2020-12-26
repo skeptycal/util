@@ -3,34 +3,37 @@ package gorepo
 import (
 	"fmt"
 	"os"
+	"reflect"
 	"strings"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/skeptycal/util/gofile"
-	"github.com/skeptycal/util/http/http"
+	"github.com/skeptycal/util/webtools/http"
 )
 
-func NewGitIgnore(force bool, skip bool) (*os.File, error) {
+func ReturnCheck(f func()) ([]interface{}, error) {
+	foo := reflect.TypeOf(f)
 
-	ok := gofile.Exists(".gitignore")
+	fmt.Printf("f is type: %v", foo)
+	return nil, nil
+}
 
-	if ok {
+func CreateGitIgnore(force bool) error {
+
+	if gofile.Exists(".gitignore") {
 		if !force {
-			return nil, fmt.Errorf(".gitignore already exists; use force option to overwrite")
+			return fmt.Errorf(".gitignore already exists; use force option to overwrite")
 		}
 	}
 
-	gitFileFlag := os.O_RDWR
-	if force {
-		gitFileFlag |= os.O_CREATE
-	}
-
-	file, err := os.OpenFile(".gitignore", gitFileFlag, 0644)
+	f, err := os.Create(".gitignore")
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return file, nil
+	log.Infof("Creating gitignore file %v", f.Name())
+
+	return nil
 }
 
 // gitignoreAPIList returns a list of available gitignore file languages parameters
@@ -67,29 +70,6 @@ func gitIgnoreAPI(args string) string {
 		return ""
 	}
 	return body
-}
-
-// gi returns a .gitignore file from the www.gitignore.io API containing
-// standard .gitignore items for the space delimited args given.
-//
-//      default: "macos linux windows ssh vscode go zsh node vue nuxt python django"
-//
-// using: https://www.toptal.com/developers/gitignore/api/
-func GetGitIgnore(args string) (string, error) {
-
-	if len(args) == 0 {
-		args = defaultGitIgnoreItems
-	}
-
-	url := "https://www.gitignore.io/api/\"${(j:,:)@}\" " + args
-	// command := "curl -fLw '\n' https://www.gitignore.io/api/\"${(j:,:)@}\" " + args
-
-	buf, err := GetPageBody(url)
-	if err != nil {
-		return "", err
-	}
-	defer buf.Reset()
-	return buf.String(), nil
 }
 
 // GitIgnore writes a .gitignore file, including default items followed by the response from
