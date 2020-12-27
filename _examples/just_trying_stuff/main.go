@@ -1,11 +1,12 @@
 package main
 
-import (
-	"path/filepath"
-)
+import "golang.org/x/net/ipv6"
 
 func main() {
-	buildtools.BuildList()
-	println("filepath.Clean() result: ", filepath.Clean(""))
+
+	ipv6.Conn()
+
+	var mode uint32 = 511
+	println(mode)
 
 }

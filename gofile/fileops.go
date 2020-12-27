@@ -1,6 +1,7 @@
 package gofile
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 )
@@ -45,15 +46,23 @@ func GetFileInfo(filename string) (os.FileInfo, error) {
 		return nil, err
 	}
 
+	//Check 'others' permission
+	m := fi.Mode()
+	if m&(1<<2) != 0 {
+		//other users have read permission
+	} else {
+		//other users don't have read permission
+	}
+
 	if !fi.Mode().IsRegular() {
-		return nil, &os.PathError{"is file a regular file", filename, os.ErrNotExist}
+		return nil, fmt.Errorf("the filename %s is not a regular file", filename)
 	}
 
 	return fi, err
 }
 
 // chunkMultiple returns a multiple of chunk size closest to but greater than size.
-func chunkMultiple(size int64, chunk int64) int64 {
+func chunkMultiple(size int64) int64 {
 	return (size/chunk + 1) * chunk
 }
 
@@ -63,5 +72,5 @@ func InitialCapacity(capacity int64) int {
 	if capacity < defaultBufSize {
 		return defaultBufSize
 	}
-	return int((capacity/chunk + 1) * chunk)
+	return int(chunkMultiple(capacity))
 }

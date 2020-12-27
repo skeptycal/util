@@ -1,86 +1,83 @@
 package gofile
 
 import (
-	"bufio"
 	"encoding/json"
-	"errors"
 	"io/ioutil"
 	"os"
 )
 
 type jsonMap map[string]interface{}
 
-// buf is a reusable buffer for reading JSON files.
-// a global buffer does not seem to help much
-// and definitely isn't concurrency friendly
-// var buf bufio.Reader
+// GetJSONFile loads and returns a JSON structure representing the json file.
+func GetJSONFile(filename string) (JSON, error) {
+	fi, err := GetFileInfo(filename)
+	if err != nil {
+		return nil, err
+	}
 
-// JSON describes a JSON object.
+	j := &jsonStruct{fi, &jsonMap{}}
+	j.Load()
+	if err != nil {
+		return nil, err
+	}
+	return j, nil
+}
+
+// func NewJSONFile(filename string) (*jsonMap, error) {
+// 	f, err := os.Create(filename)
+
+// 	j := new(jsonMap)
+
+// }
+
+// JSON describes a JSON file and data structure object.
 type JSON interface {
 	Load() error
-	Size() int
+	Name() string
+	Save() error
+	Size() int64
+	Marshal(v interface{}) ([]byte, error)
+	Unmarshal(data []byte, v interface{}) error
 }
 
-
-
-
-func New(filename string) (*JSON, error) {
-
-    r, err := NewBufferedReader(filename)
-
-
-	jsonFile, err := os.Open(filename)
-	if err != nil {
-		return nil, err
-	}
-	defer jsonFile.Close()
-
-	size := jsonFile.
-
-	buf := bufio.NewReader
-
-	b, err := ioutil.ReadAll(jsonFile)
-	if err != nil {
-		return nil, err
-	}
-
-	var jm jsonMap
-
-	json.Unmarshal(b, &jm)
-
-	return &jm, nil
-}
-
+// jsonStruct implements a JSON mapping with os.FileInfo included.
 type jsonStruct struct {
-	filename string
-	size     int64
-	data     []byte
-	v        *jsonMap
+	os.FileInfo
+	v *jsonMap
 }
 
-// Load - loads the data from the JSON file
+// Load loads the data from the JSON file
 // note: variable/field names should begin with a uppercase letter
 // of they will not load correctly - similar to the uppercase requirement
 // for exported functions ...
-func (j *jsonStruct) Load(file string) (err error) {
-	j.data, err = ioutil.ReadFile(j.filename)
+func (j *jsonStruct) Load() error {
+	data, err := ioutil.ReadFile(j.Name())
 	if err != nil {
-		return
+		return err
 	}
-
-	// dataBuffer := bytes.NewBuffer(data).Bytes()
-
-	return json.Unmarshal(j.data, j.v)
+	return j.Unmarshal(data, j.v)
 }
 
-// New returns a new JSON object.
-func (j *jsonStruct) New(name string) error {
-	return errors.New("Not Implemented")
+// Save saves the data to the JSON file
+// note: variable/field names should begin with a uppercase letter
+// of they will not save correctly - similar to the uppercase requirement
+// for exported functions ...
+func (j *jsonStruct) Save() error {
+	data, err := j.Marshal(j.v)
+	if err != nil {
+		return err
+	}
+	return ioutil.WriteFile(j.Name(), data, 0644)
 }
 
-// Size returns the number of bytes occupied by the JSON data.
-// Returns -1 on error.
-func (j *jsonStruct) Size() int {
-	// todo - not implemented
-	return int(j.size)
+// Unmarshal is only present to satisfy the Unmarshaler interface requirement.
+// If used, v is ignored and the interface{} from the internal structure is used.
+func (j *jsonStruct) Unmarshal(data []byte, v interface{}) error {
+	return json.Unmarshal(data, j.v)
+}
+
+// Marshal is only present to satisfy the Marshaler interface requirement.
+// If used, v is ignored and the interface{} from the internal structure is used.
+func (j *jsonStruct) Marshal(v interface{}) ([]byte, error) {
+	return json.Marshal(j.v)
 }

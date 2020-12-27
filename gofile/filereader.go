@@ -124,14 +124,6 @@ func (fr *BufferedFileReader) ReadAll() ([]byte, error) {
 	return ioutil.ReadAll(fr.r)
 }
 
-func (fr *BufferedFileReader) Resize() error {
-	if fr.r.Size() < int(fr.fi.Size()) {
-		cap := InitialCapacity(fr.fi.Size())
-		fr.r.Grow(cap)
-	}
-
-}
-
 // Close closes the underlying file and frees any resources.
 func (fr *BufferedFileReader) Close() error {
 	defer fr.Reset()

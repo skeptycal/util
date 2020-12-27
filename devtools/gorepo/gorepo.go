@@ -231,6 +231,6 @@ func GoMod() error {
 	zsh.Sh("go mod init")
 	zsh.Sh("go mod tidy")
 	zsh.Sh("go mod download")
-	gogit.GitCommit("go mod setup")
+	gogit.Commit("go mod setup")
 	return nil
 }

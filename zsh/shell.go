@@ -33,7 +33,7 @@ func Sh(command string) string {
 		return fmt.Sprintf("%verror: %v", red, err)
 	}
 
-	return string(stdout)
+	return strings.TrimSpace(string(stdout))
 }
 
 // Repl executes the command and returns the the result.
@@ -64,7 +64,8 @@ func ShellOut(command string) (string, error) {
 
 // Shell executes a command line string and returns the result.
 func Shell(command string) (string, error) {
-	return shell(CmdPrep(command), nil, nil, nil)
+	out, err := shell(CmdPrep(command), nil, nil, nil)
+	return strings.TrimSpace(out), err
 }
 
 // shell executes a prepared command structure and returns the result.
