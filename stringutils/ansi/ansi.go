@@ -9,20 +9,36 @@ package ansi
 import (
 	"fmt"
 	"strconv"
+	"strings"
 )
 
-type Ansi int8
+type Ansi uint8
 
+// String returns the string representation of an Ansi
+// value as a color escape sequence.
 func (a Ansi) String() string {
 	return fmt.Sprintf("/x1b[%d;", a)
 }
 
-func MarshalAnsi(s string) ([]byte, error) {
-	return nil, nil
+// Build returns a string containing multiple ANSI
+// color escape sequences.
+func (a Ansi) Build(list ...Ansi) string {
+	var sb strings.Builder
+	defer sb.Reset()
+
+	for _, v := range list {
+		sb.WriteString(Ansi(v).String())
+	}
+
+	return sb.String()
 }
 
-// itoa converts the binary value n into an ascii byte slice.  Negative
-// values produce an empty slice.
+func MarshalAnsi(s string) ([]byte, error) {
+	return []byte{}, nil
+}
+
+// itoa converts the integer value n into an ascii byte slice.
+// Negative values produce an empty slice.
 func itoa(n int) []byte {
 	if n < 0 {
 		return []byte{}

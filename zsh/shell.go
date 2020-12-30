@@ -9,13 +9,59 @@ import (
 	"strings"
 
 	log "github.com/sirupsen/logrus"
+	"github.com/skeptycal/util/gofile"
 	. "github.com/skeptycal/util/stringutils/ansi"
 )
 
 var (
-	DefaultContext      = context.Background()
-	red            Ansi = Ansi(Red)
+	DefaultContext = context.Background()
+	errorColor     = Ansi.Build(Black, Bold, RedBackground)
+	reset          = Ansi(Normal).String()
 )
+
+// OutErr executes a shell command line string and returns
+// the result. There is no error or statuscode returned.
+//
+// There is no programatic error information returned at all.
+// This has the advantage of returning a single string variable
+// that can easily be used as a function argument. e.g.
+//
+//      fmt.Printf(OutErr("fmtstring 'temp'"),OutErr("statustemp"))
+//
+// Any error encountered is returned as an ANSI errorColor
+// (default bold black on maroon) string. This is most useful
+// for REPL style commands where the error can be seen by the
+// user but that can fail without effecting progress, such as:
+//
+//      ls -lah  # it does not change anything important
+//
+// If you must have a way to test the return status or error
+// returned, the string begins with:
+//
+//      "/x1b["
+//
+// This works with:
+//
+//      s := OutErr("fake_program_that_is_not_real")
+//      if s[:2] == `/x1b[` {
+//          // handle error
+//      }
+//
+// However, it is probably better to use one of the following:
+//
+//      Shell(command string) (string, error)
+//      Status(command string) error
+//
+func CombinedOutput(command string) string {
+	cmd := CmdPrep(command)
+	stdout, err := cmd.Output()
+
+	if err != nil {
+		return fmt.Sprintf("%verror: %v", errorColor, err)
+	}
+
+	return strings.TrimSpace(string(stdout))
+}
 
 // Status executes a shell command and returns the exit status as an error.
 func Status(command string) error {
@@ -23,55 +69,76 @@ func Status(command string) error {
 	return cmd.Run()
 }
 
-// Sh executes a shell command line string and returns the result.
-// Any error encountered is returned as an ANSI red string.
-func Sh(command string) string {
-	cmd := CmdPrep(command)
-	stdout, err := cmd.Output()
-
-	if err != nil {
-		return fmt.Sprintf("%verror: %v", red, err)
-	}
-
-	return strings.TrimSpace(string(stdout))
-}
-
 // Repl executes the command and returns the the result.
 // Unlike Shell(), the Repl() process has access to the parent's
 // stdin, stdout, and stderr streams.
+//
+// Stdin will be consumed by any process that is able to use it.
+//
+// StdOut will be sent to os.Stdout
+// StdErr will be sent to os.Stderr
 func Repl(command string) (string, error) {
-	return shell(CmdPrep(command), os.Stdin, os.Stdout, os.Stderr)
+	return shell(command, os.Stdin, os.Stdout, os.Stderr)
 }
 
-// ShellIn executes the command and returns the the result.
-// Unlike Shell(), the ShellIn() process has access to the parent's stdin.
-// This can be used to query stdin for parameters like 'size'
+// PipeIn executes the command and returns the the result.
+// Unlike Shell(), the PipeIn() process has access to the parent's stdin.
+// This can be used to preload the stdin with the string stdInString.
+//
+// If stdInString == "", it can still be used to query stdin for
+// parameters like 'size':
 //      ShellIn("stty size")
 //      out: "36 118\n"
 //      err: <nil>
 //
-// Or to preload the stdin buffer.
-func ShellIn(command string) (string, error) {
-	return shell(CmdPrep(command), os.Stdin, nil, nil)
+func PipeIn(command string, stdInString string) (string, error) {
+	// return shell(command, os.Stdin, nil, nil)
+	cmd := CmdPrep(command)
+	stdin, err := cmd.StdinPipe()
+	if gofile.DoOrDie(err) != nil {
+		return "", err
+	}
+
+	go func() {
+		defer stdin.Close()
+		io.WriteString(stdin, stdInString)
+	}()
+
+	out, err := cmd.CombinedOutput()
+	if gofile.DoOrDie(err) != nil {
+		return string(out), err
+	}
+
+	return string(out), nil
 }
 
 // ShellOut executes the command and returns the the result.
 // Unlike Shell(), the ShellOut() process has access to the parent's
 // stdout and stderr streams.
-func ShellOut(command string) (string, error) {
-	return shell(CmdPrep(command), nil, os.Stdout, os.Stderr)
+func PipeOut(command string) (string, error) {
+	return shell(command, nil, os.Stdout, os.Stderr)
 }
 
 // Shell executes a command line string and returns the result.
-func Shell(command string) (string, error) {
-	out, err := shell(CmdPrep(command), nil, nil, nil)
+func Shell(cmd string) (string, error) {
+	out, err := shell(cmd, nil, nil, nil)
 	return strings.TrimSpace(out), err
+}
+
+// appArgs preps (app,args) for os.Command
+func appArgs(command string) (app string, args string) {
+	i := strings.Index(command, " ")
+	app = command[:i]
+	args = command[i+1:]
+	return
 }
 
 // shell executes a prepared command structure and returns the result.
 // []byte values are converted to string
 // sin, sout, and serr are used to redirect input and output of the command.
-func shell(cmd *exec.Cmd, sin io.Reader, sout, serr io.Writer) (string, error) {
+func shell(cmd string, sin io.Reader, sout, serr io.Writer) (string, error) {
+
+	c := exec.Command(appArgs(command))
 	if sin != nil {
 		cmd.Stdin = sin
 	}
@@ -91,15 +158,6 @@ func shell(cmd *exec.Cmd, sin io.Reader, sout, serr io.Writer) (string, error) {
 	return string(out), err
 }
 
-// cmdPrep prepares a Cmd struct from a command line string.
-func cmdPrep(command string, ctx context.Context) *exec.Cmd {
-	if ctx == nil {
-		ctx = DefaultContext
-	}
-	s := strings.Split(command, " ")
-	return exec.CommandContext(ctx, s[0], s[1:]...)
-}
-
 // CmdPrep returns a Cmd struct from CommandContext.
 // It is like Command but includes a context. Since ctx is a private
 // field, this is the only way to add a context.
@@ -111,52 +169,13 @@ func CmdPrep(command string) *exec.Cmd {
 	return cmdPrep(command, DefaultContext)
 }
 
-// WriteFile creates the file 'fileName' and writes all 'data' to it.
-// It returns any error encountered. If the file already exists, it
-// will be TRUNCATED and OVERWRITTEN.
-func WriteFile(fileName string, data string) error {
-	dataFile, err := OpenTrunc(fileName)
-	if err != nil {
-		log.Error(err)
-		return err
+// cmdPrep prepares a Cmd struct from a command line string.
+func cmdPrep(command string, ctx context.Context) *exec.Cmd {
+	if ctx == nil {
+		ctx = DefaultContext
 	}
-	defer dataFile.Close()
-
-	n, err := dataFile.WriteString(data)
-	if err != nil {
-		log.Println(err)
-		return err
-	}
-	if n != len(data) {
-		log.Printf("incorrect string length written (wanted %d): %d\n", len(data), n)
-		return fmt.Errorf("incorrect string length written (wanted %d): %d", len(data), n)
-	}
-	return nil
-}
-
-// type result struct {
-// 	stdout string
-// 	stderr string
-// 	retval int
-// 	err    error
-// }
-
-// OpenTrunc creates and opens the named file for writing. If successful, methods on
-// the returned file can be used for writing; the associated file descriptor has mode
-//      O_WRONLY|O_CREATE|O_TRUNC
-// If the file does not exist, it is created with mode o644;
-//
-// If the file already exists, it is TRUNCATED and overwritten
-//
-// If there is an error, it will be of type *PathError.
-func OpenTrunc(name string) (*os.File, error) {
-	return os.OpenFile(name, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 644)
-}
-
-// appArgs preps (app,args) for os.Command
-func appArgs(command string) (string, []string) {
-	a := strings.Split(command, " ")
-	return a[0], a[1:]
+	s := strings.Split(command, " ")
+	return exec.CommandContext(ctx, s[0], s[1:]...)
 }
 
 // fileExists checks if a file exists and is not a directory

@@ -10,7 +10,7 @@ import (
 )
 
 // Reader implements buffering for an io.Reader object.
-type Reader struct {
+type BufReader struct {
 	buf          []byte
 	rd           io.Reader // reader provided by the client
 	r, w         int       // buf read and write positions
@@ -19,10 +19,14 @@ type Reader struct {
 	lastRuneSize int // size of last rune read for UnreadRune; -1 means invalid
 }
 
-// BufferedFileReader implements a wrapper for bufio.Reader that
+type BufferedFileReader interface {
+	bufio.Reader
+}
+
+// bufferedFileReader implements a wrapper for bufio.Reader that
 // calculates the initial buffer size and contains additional information
 // about the underlying file.
-type BufferedFileReader struct {
+type bufferedFileReader struct {
 	r  *bufio.Reader
 	f  *os.File
 	fi os.FileInfo
@@ -62,7 +66,7 @@ The method Close() performs both of these tasks, eliminating the need to add str
 	// ... do stuff
 
 */
-func NewBufferedReader(filename string) (rd *BufferedFileReader, err error) {
+func NewBufferedReader(filename string) (rd *bufferedFileReader, err error) {
 
 	// panic recover:
 	// If the buffer overflows, we will get bytes.ErrTooLarge.
@@ -108,7 +112,7 @@ func NewBufferedReader(filename string) (rd *BufferedFileReader, err error) {
 	rd.f = f
 	// defer f.Close() // this is the usual practice
 
-	return &BufferedFileReader{
+	return &bufferedFileReader{
 		r:  bufio.NewReaderSize(f, cap),
 		f:  f,
 		fi: fi,
@@ -120,34 +124,34 @@ func NewBufferedReader(filename string) (rd *BufferedFileReader, err error) {
 // A successful call returns err == nil, not err == EOF. Because ReadAll is
 // defined to read from src until EOF, it does not treat an EOF from Read
 // as an error to be reported.
-func (fr *BufferedFileReader) ReadAll() ([]byte, error) {
+func (fr *bufferedFileReader) ReadAll() ([]byte, error) {
 	return ioutil.ReadAll(fr.r)
 }
 
 // Close closes the underlying file and frees any resources.
-func (fr *BufferedFileReader) Close() error {
+func (fr *bufferedFileReader) Close() error {
 	defer fr.Reset()
 	return fr.f.Close()
 }
 
 // Reset discards any buffered data, resets all state, and switches
 // the buffered reader to read from r.
-func (fr *BufferedFileReader) Reset() {
+func (fr *bufferedFileReader) Reset() {
 	fr.r.Reset(fr.f)
 }
 
-func (fr *BufferedFileReader) Size() int {
+func (fr *bufferedFileReader) Size() int {
 	return fr.r.Size()
 }
 
-func (fr *BufferedFileReader) FileSize() int {
+func (fr *bufferedFileReader) FileSize() int {
 	return int(fr.fi.Size())
 }
 
-func (fr *BufferedFileReader) FileName() string {
+func (fr *bufferedFileReader) FileName() string {
 	return fr.fi.Name()
 }
 
-func (fr *BufferedFileReader) FileInfo() *os.FileInfo {
+func (fr *bufferedFileReader) FileInfo() *os.FileInfo {
 	return &fr.fi
 }

@@ -1,0 +1,16 @@
+package gogit // import "github.com/skeptycal/util/devtools/gogit"
+
+Package gogit implements git cli commands in a more convenient way.
+
+func Add(s ...string) error
+func AddAll() error
+func Commit(message string) error
+func CommitAll(message string) error
+func Init() error
+func IsAlphaNum(s string) bool
+func IsHash(s string) bool
+func PushTags() error
+func Remote() string
+func RemoteName() string
+func Tag(s string) error
+func VersionTag() string

@@ -1,0 +1,30 @@
+package gorepo // import "github.com/skeptycal/util/devtools/gorepo"
+
+const Escape = '\xff'
+func BugReportMd() error
+func CodeCovYml() error
+func CodeOfConduct() error
+func CreateAutomatedFiles() error
+func CreateGitIgnore(force bool) error
+func DocGo() error
+func FeatureRequestMd() error
+func FundingYml() error
+func GetModuleList(dir string) ([]string, error)
+func GetPageBody(url string) (*bytes.Buffer, error)
+func GitHubRepoSetup() (err error)
+func GitIgnore(reponame, args string, personal string) error
+func GitRepoSetup() error
+func GitWorkflows() error
+func GoDoc() error
+func GoMod() error
+func GoTestSh() error
+func License(license string) error
+func PreCommitYaml() error
+func ReadMeMd() error
+func ReturnCheck(f func()) ([]interface{}, error)
+func SecurityMd() error
+func Setup() error
+func TravisYml() error
+func GetConfig() (*softwareInfo, error)
+type GitHubRepo struct{ ... }
+    func NewGitHubRepo(name string, dir string) (*GitHubRepo, error)

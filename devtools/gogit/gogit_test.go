@@ -178,6 +178,7 @@ func TestAddAll(t *testing.T) {
 func TestAdd(t *testing.T) {
 	zsh.Sh("mkdir -p tmp")
 	zsh.Sh("touch tmp/fake")
+	zsh.Sh("echo 'fake' >> tmp/fake")
 	type args struct {
 		s []string
 	}
@@ -197,7 +198,7 @@ func TestAdd(t *testing.T) {
 			}
 		})
 	}
-	zsh.Sh("rm -rf tmp/fake")
-	zsh.Sh("rm -rf tmp/")
+	// zsh.Sh("rm -rf tmp/fake")
+	// zsh.Sh("rm -rf tmp/")
 
 }

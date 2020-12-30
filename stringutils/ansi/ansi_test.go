@@ -40,6 +40,7 @@ func Test_itoa(t *testing.T) {
 		{"42", args{42}, []byte{52, 50}},
 		{"testing", args{128}, []byte{49, 50, 56}},
 		{"42", args{255}, []byte{50, 53, 53}},
+		{"-1", args{-1}, []byte{}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -65,6 +66,57 @@ func Test_ansi_String(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := tt.a.String(); got != tt.want {
 				t.Errorf("ansi.String() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestAnsi_Build(t *testing.T) {
+	var ansi Ansi
+	type args struct {
+		list []Ansi
+	}
+	tests := []struct {
+		name string
+		a    Ansi
+		args args
+		want string
+	}{
+		// TODO: Add test cases.
+		{"Blue", ansi, args{[]Ansi{Ansi(Blue)}}, "/x1b[34;"},
+		{"Blue and Bold", ansi, args{[]Ansi{Ansi(34), Ansi(Bold)}}, "/x1b[34;/x1b[1;"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.a.Build(tt.args.list...); got != tt.want {
+				t.Errorf("Ansi.Build() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestMarshalAnsi(t *testing.T) {
+	type args struct {
+		s string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    []byte
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+		{"empty", args{""}, []byte{}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := MarshalAnsi(tt.args.s)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("MarshalAnsi() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("MarshalAnsi() = %v, want %v", got, tt.want)
 			}
 		})
 	}

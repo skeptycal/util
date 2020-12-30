@@ -5,6 +5,14 @@ import (
 	"os"
 )
 
+type okCheck int
+
+const (
+	isError okCheck = iota - 1
+	isTrue
+	isFalse
+)
+
 // ByteSize is a set of constants representing sizes of bytes in SI format.
 //      https://golang.org/doc/effective_go.html#composite_literals
 //

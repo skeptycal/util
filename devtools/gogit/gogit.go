@@ -2,7 +2,6 @@
 package gogit
 
 import (
-	"errors"
 	"fmt"
 	"regexp"
 	"strings"
@@ -43,7 +42,7 @@ func Add(s ...string) error {
 		b += a
 	}
 	command := fmt.Sprintf("git add %s", b)
-	return errors.New(b)
+	return fmt.Errorf("command: %v  b: %v", command, b)
 	return zsh.Status(command)
 }
 

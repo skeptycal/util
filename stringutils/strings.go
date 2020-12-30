@@ -7,3 +7,5 @@
 //
 // For information about UTF-8 strings in Go, see https://blog.golang.org/strings.
 package strings
+
+const digits = "0123456789abcdefghijklmnopqrstuvwxyz"
