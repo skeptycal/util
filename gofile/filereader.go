@@ -20,7 +20,11 @@ type BufReader struct {
 }
 
 type BufferedFileReader interface {
-	bufio.Reader
+	Read([]byte) (int, error)
+	Close() error
+	Reset() error
+	Name() string
+	Size() int
 }
 
 // bufferedFileReader implements a wrapper for bufio.Reader that
@@ -148,7 +152,7 @@ func (fr *bufferedFileReader) FileSize() int {
 	return int(fr.fi.Size())
 }
 
-func (fr *bufferedFileReader) FileName() string {
+func (fr *bufferedFileReader) Name() string {
 	return fr.fi.Name()
 }
 
