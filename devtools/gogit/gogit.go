@@ -8,6 +8,7 @@ import (
 	"unicode"
 
 	log "github.com/sirupsen/logrus"
+	"github.com/skeptycal/util/gofile"
 	"github.com/skeptycal/util/zsh"
 )
 
@@ -32,33 +33,33 @@ func IsAlphaNum(s string) bool {
 }
 
 func AddAll() error {
-	return zsh.Status("git add --all")
+	return Err(zsh.Status("git add --all"))
 }
 
 func Add(s ...string) error {
-	b := ""
+	command := "git add"
 	for _, a := range s {
-		a = fmt.Sprintf("'%s' ", a)
-		b += a
+		command += fmt.Sprintf(" %q", a)
 	}
-	command := fmt.Sprintf("git add %s", b)
-	return fmt.Errorf("command: %v  b: %v", command, b)
-	return zsh.Status(command)
+	if err := Err(zsh.Status(command)); err != nil {
+		return fmt.Errorf("error during command: %v", command)
+	}
+	return nil
 }
 
 // Commit creates a commit with message
 func Commit(message string) error {
 	command := fmt.Sprintf(gitCommitFormatString, message)
-	return zsh.Status(command)
+	return Err(zsh.Status(command))
 }
 
 // CommitAll creates a commit with message that
 // contains all updated files.
 func CommitAll(message string) error {
-	if err := AddAll(); err != nil {
+	if err := Err(AddAll()); err != nil {
 		return err
 	}
-	return Commit(message)
+	return Err(Commit(message))
 }
 
 // GitInit initializes the Git environment in the current directory with:
@@ -66,27 +67,22 @@ func CommitAll(message string) error {
 //  git add --all
 //  git commit -m 'Initial Commit'
 func Init() error {
-	err := zsh.Status("git init")
-	if err != nil {
+	if err := Err(zsh.Status("git init")); err != nil {
 		return err
 	}
-	return CommitAll("Initial Commit")
+	return Err(CommitAll("Initial Commit"))
 }
 
 func PushTags() error {
 	command := fmt.Sprintf("git push %s --tags", RemoteName())
-	err := zsh.Status(command)
-	if err != nil {
-		log.Error(err)
-	}
-	return nil
+	return Err(zsh.Status(command))
 }
 
 func getVersionCommitHash() string {
-	return zsh.Sh("git rev-list --tags --max-count=1")
+	return zsh.Out("git rev-list --tags --max-count=1")
 }
 func VersionTag() string {
-	return zsh.Sh("git describe --tags $(git rev-list --tags --max-count=1)")
+	return zsh.CombinedOutput("git describe --tags $(git rev-list --tags --max-count=1)")
 }
 
 // GitTag create a git tag object signed with GPG
@@ -121,7 +117,10 @@ func RemoteName() string {
 func Remote() string {
 	// todo - this is ... kinda messy
 	remote := RemoteName()
-	out := zsh.Sh("git remote -v")
+	out, err := zsh.Shell("git remote -v")
+	if err = gofile.DoOrDie(err); err != nil {
+		return ""
+	}
 
 	list := strings.Split(out, "\n")
 	for _, s := range list {
@@ -142,4 +141,9 @@ func Remote() string {
 	list = strings.Split(s, " ")
 	// return fmt.Sprintf("list(%v): %v", len(list), list[1]) //! dev testing
 	return list[1]
+}
+
+// Err calls error handling and logging routines
+func Err(err error) error {
+	return gofile.DoOrDie(err)
 }

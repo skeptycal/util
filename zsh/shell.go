@@ -19,14 +19,14 @@ var (
 	reset          = Ansi(Normal).String()
 )
 
-// OutErr executes a shell command line string and returns
+// CombinedOutput executes a shell command line string and returns
 // the result. There is no error or statuscode returned.
 //
 // There is no programatic error information returned at all.
 // This has the advantage of returning a single string variable
 // that can easily be used as a function argument. e.g.
 //
-//      fmt.Printf(OutErr("fmtstring 'temp'"),OutErr("statustemp"))
+//      fmt.Printf(CombinedOutput("fmtstring 'temp'"),CombinedOutput("statustemp"))
 //
 // Any error encountered is returned as an ANSI errorColor
 // (default bold black on maroon) string. This is most useful
@@ -61,6 +61,18 @@ func CombinedOutput(command string) string {
 	}
 
 	return strings.TrimSpace(string(stdout))
+}
+
+func Out(command string) string {
+	cmd := CmdPrep(command)
+	out, err := cmd.Output()
+
+	if err != nil {
+		err = gofile.DoOrDie(fmt.Errorf("%verror during command %v: %v", errorColor, command, err))
+		return ""
+	}
+
+	return strings.TrimSpace(string(out))
 }
 
 // Status executes a shell command and returns the exit status as an error.
@@ -112,7 +124,7 @@ func PipeIn(command string, stdInString string) (string, error) {
 	return string(out), nil
 }
 
-// ShellOut executes the command and returns the the result.
+// PipeOut executes the command and returns the the result.
 // Unlike Shell(), the ShellOut() process has access to the parent's
 // stdout and stderr streams.
 func PipeOut(command string) (string, error) {
@@ -125,20 +137,12 @@ func Shell(cmd string) (string, error) {
 	return strings.TrimSpace(out), err
 }
 
-// appArgs preps (app,args) for os.Command
-func appArgs(command string) (app string, args string) {
-	i := strings.Index(command, " ")
-	app = command[:i]
-	args = command[i+1:]
-	return
-}
-
 // shell executes a prepared command structure and returns the result.
 // []byte values are converted to string
 // sin, sout, and serr are used to redirect input and output of the command.
-func shell(cmd string, sin io.Reader, sout, serr io.Writer) (string, error) {
+func shell(command string, sin io.Reader, sout, serr io.Writer) (string, error) {
 
-	c := exec.Command(appArgs(command))
+	cmd := exec.Command(AppArgs(command))
 	if sin != nil {
 		cmd.Stdin = sin
 	}

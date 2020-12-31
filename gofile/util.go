@@ -48,44 +48,75 @@ func IsEmpty(path string) (bool, error) {
 	return false, err
 }
 
-// FileExists checks if file exists in the current directory
+// FileExists checks if path exists in the current directory
 // and is not a directory itself.
-func FileExists(file string) bool {
-	info, err := os.Stat(file)
-	if os.IsNotExist(err) {
+func FileExists(path string) bool {
+	_, err := os.Stat(path)
+	if err != nil {
+		if !os.IsNotExist(err) {
+			err = DoOrDie(err)
+		}
 		return false
 	}
-	return !info.IsDir()
+	return true // !info.IsDir()
+}
+
+// IsDir checks to see if path is a directory in the current directory.
+func IsDir(path string) bool {
+	info, err := os.Stat(path)
+	if err != nil {
+		if !os.IsNotExist(err) {
+			err = DoOrDie(err)
+		}
+		return false
+	}
+	return info.Mode().IsDir()
+	return info.Mode()&os.ModeDir != 0
+
 }
 
 // Exists returns true if the file exists and is a regular file.
 // Does not differentiate between path, file, or permission errors.
 func Exists(file string) bool {
-	d, err := os.Stat(file)
+	info, err := os.Stat(file)
 	if err != nil {
 		return false
 	}
-	if m := d.Mode(); m.Perm().IsRegular() {
+	if m := info.Mode(); m.Perm().IsRegular() {
 		return true
 	}
 	return false
 }
 
-// IsExecutable returns 0 if the file exists and is executable.
-// Returns 1 if the file does not exist, -1 for all other errors.
-//
-func IsExecutable(file string) int {
+// IsRegular returns true if the file exists and is regular.
+func IsRegular(file string) bool {
 	d, err := os.Stat(file)
 	if err != nil {
 		if err == os.ErrNotExist {
-			return 1
+			return false
 		}
-		return -1
+		return false
 	}
 	if m := d.Mode(); !m.IsDir() && m&0111 != 0 {
-		return 0
+		return true
 	}
-	return -1
+	return false
+}
+
+// IsExecutable returns true if the file exists and is executable.
+func IsExecutable(file string) bool {
+	d, err := os.Stat(file)
+	if err != nil {
+		if err == os.ErrNotExist {
+			return false
+		}
+		err = DoOrDie(err)
+		return false
+	}
+	if m := d.Mode(); !m.IsDir() && m&0111 != 0 {
+		return true
+	}
+	return false
 }
 
 // Which searches for an executable named file in the

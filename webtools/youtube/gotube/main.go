@@ -329,7 +329,7 @@ func checkParameters(videoURL string) (string, error) {
 	var id string
 	var err error
 
-	isMatch, err := regexp.MatchString(`https://www\.youtube\.com/watch\?v=[\w-]+`, videoURL) // TODO need better regex pattern
+	isMatch, err := regexp.MatchString(`^https://www\.youtube\.com/watch\?v=[\w-]+`, videoURL) // TODO need better regex pattern
 	if err != nil {
 		return id, err
 	}

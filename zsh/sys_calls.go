@@ -8,6 +8,32 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// NewTTY returns a TTY interface used to access the
+// terminal capabilities for window size.
+func NewTTY() TTY {
+	var err error = nil
+	ws := &winsize{}
+	retCode, _, errno := syscall.Syscall(
+		syscall.SYS_IOCTL,
+		uintptr(syscall.Stdin),
+		uintptr(syscall.TIOCGWINSZ),
+		uintptr(unsafe.Pointer(ws)),
+	)
+
+	if errno != 0 {
+		err = errno
+	}
+
+	if err != nil {
+		log.Error(err)
+	}
+
+	if int(retCode) == -1 {
+		log.Errorf("syscall error ... retCode: %d errno: %d", &retCode, &errno)
+	}
+	return ws
+}
+
 // TTY is the interface implemented to access terminal emulation capabilities.
 /*
 A teleprinter or teletypewriter (TTY) is an electromechanical typewriter
@@ -68,28 +94,4 @@ func (ws *winsize) X() uint {
 
 func (ws *winsize) Y() uint {
 	return uint(ws.ypixel)
-}
-
-func NewTTY() TTY {
-	var err error = nil
-	ws := &winsize{}
-	retCode, _, errno := syscall.Syscall(
-		syscall.SYS_IOCTL,
-		uintptr(syscall.Stdin),
-		uintptr(syscall.TIOCGWINSZ),
-		uintptr(unsafe.Pointer(ws)),
-	)
-
-	if errno != 0 {
-		err = errno
-	}
-
-	if err != nil {
-		log.Error(err)
-	}
-
-	if int(retCode) == -1 {
-		log.Errorf("syscall error ... retCode: %d errno: %d", &retCode, &errno)
-	}
-	return ws
 }
