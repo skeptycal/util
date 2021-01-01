@@ -7,6 +7,8 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"os/signal"
+	"syscall"
 )
 
 // Reader implements buffering for an io.Reader object.
@@ -19,11 +21,13 @@ type BufReader struct {
 	lastRuneSize int // size of last rune read for UnreadRune; -1 means invalid
 }
 
+// BufferedFileReader represents a buffered io.Reader optimized for file reads.
 type BufferedFileReader interface {
-	Read([]byte) (int, error)
 	Close() error
-	Reset() error
 	Name() string
+	Open()
+	Read(p []byte) (int, error)
+	Reset(r io.Reader) error
 	Size() int
 }
 
@@ -32,43 +36,33 @@ type BufferedFileReader interface {
 // about the underlying file.
 type bufferedFileReader struct {
 	r  *bufio.Reader
+	rd *io.ReadCloser
 	f  *os.File
 	fi os.FileInfo
 }
 
-// BytesFileReader represents a buffered io.Reader optimized for file reads.
-type FileReader interface {
-	Close() error
-	Read(p []byte) (int, error)
-	ReadBytes(delim byte) ([]byte, error)
-	ReadString(delim byte) (string, error)
-	Reset(r io.Reader)
-	Open()
-}
-
-// NewBufferedReader returns a new buffered bufio.Reader whose buffer has at least the size of
-// the specified file. In addition, it stores the file Stat() information to avoid redundant calls.
+// NewBufferedReader returns a new buffered Reader whose buffer has
+// at least the size of the specified file.
 /*
+In addition, it stores the file Stat() information to avoid redundant
+calls. There is no guarantee that this information will remain current.
 
-// It is designed to be used when accessing large files where many operations will be performed and the savings of calls to os.Stat can be substantial.
-//
-// It is important to use defer both file.Close() and buffer.Reset() during setup to guarantee the release of resources.
-Reset discards any buffered data, resets all state, and switches the buffered reader to read from r.
+It is designed to be used when accessing large files where many operations
+will be performed and the savings of calls to os.Stat can be substantial.
+The buffer grows as needed. The file information is updated when changed.
 
+It is important to use defer both file.Close() and buffer.Reset() during
+setup to guarantee the release of resources. The bufferedFileReader
+method Close() performs both of these tasks, eliminating the need to
+add strange habits to coding workflows. e.g.
 
+    file, err := os.Open("filename")
+    if err != nil { return err }
+    bfr := gofile.NewBufferedReader(file)
+    defer bfr.Close()
+    // ... do your stuff
 
-The method Close() performs both of these tasks, eliminating the need to add strange habits to coding workflows. e.g.
-/*
-   // normal process when using buffers and file handles:
-	file, err := os.Open("filename")
-	if err != nil {
-		return err
-	}
-	r := bufio.NewReader(file)
-	defer r.Reset(nil)
-	defer file.Close()
-	// ... do stuff
-
+    // ... and that's all ... it just works
 */
 func NewBufferedReader(filename string) (rd *bufferedFileReader, err error) {
 
@@ -130,18 +124,31 @@ func NewBufferedReader(filename string) (rd *bufferedFileReader, err error) {
 // as an error to be reported.
 func (fr *bufferedFileReader) ReadAll() ([]byte, error) {
 	return ioutil.ReadAll(fr.r)
+	b := bytes.Buffer{}
+	buf := bufio.NewReader(&b)
+	buf.Reset(nil)
+
+	print(buf)
+	print(b)
 }
 
 // Close closes the underlying file and frees any resources.
 func (fr *bufferedFileReader) Close() error {
-	defer fr.Reset()
+	defer fr.Reset(nil)
 	return fr.f.Close()
 }
 
 // Reset discards any buffered data, resets all state, and switches
 // the buffered reader to read from r.
-func (fr *bufferedFileReader) Reset() {
+func (fr *bufferedFileReader) Reset(r io.Reader) {
+	if r == nil && fr.f != nil {
+		r = fr.f
+	}
 	fr.r.Reset(fr.f)
+}
+
+func (fr *bufferedFileReader) File() (io.ReadCloser, error) {
+	return fr.r, nil
 }
 
 func (fr *bufferedFileReader) Size() int {
@@ -159,3 +166,42 @@ func (fr *bufferedFileReader) Name() string {
 func (fr *bufferedFileReader) FileInfo() *os.FileInfo {
 	return &fr.fi
 }
+
+// Reference: https://gobyexample.com/signals
+func Sig() {
+	sigs := make(chan os.Signal, 1)
+	done := make(chan bool, 1)
+
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+
+	go func() {
+		sig := <-sigs
+		fmt.Println()
+		fmt.Println(sig)
+		done <- true
+	}()
+
+	fmt.Println("awaiting signal")
+	<-done
+	fmt.Println("exiting")
+
+}
+
+// func NewFileCloseRemover(r *bufio.Reader, w *bufio.Writer) *readWriteRemover {
+
+// 	rw := &readWriteRemover{
+// 		bufio.NewReadWriter(r, w),
+// 	}
+// 	return rw
+// }
+
+// os.File notes:
+/* type file struct {
+	pfd         poll.FD
+	name        string
+	dirinfo     *dirInfo // nil unless directory being read
+	nonblock    bool     // whether we set nonblocking mode
+	stdoutOrErr bool     // whether this is stdout or stderr
+	appendMode  bool     // whether file is opened for appending
+}
+*/

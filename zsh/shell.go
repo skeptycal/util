@@ -19,6 +19,47 @@ var (
 	reset          = Ansi(Normal).String()
 )
 
+const defaultGetStdinArgs = `Example: tr lowercase to UpperCase`
+
+// GetStdin sets the stdin pipe for cmd in order of preference.
+/*
+1. os.Stdin - This will contain piped data allowing UNIX-style
+chaining of CLI commands. e.g.
+    ls -lah | grep '.go' | myprogram
+
+2. os.Args - This will contain cli arguments.
+    myprogram These are the arguments we want.
+
+3. default - A default is available, but optional.
+
+4. none - GetStdin returns an error. Cmd is unchanged.
+*/
+func GetStdin(cmd *exec.Cmd) error {
+	// Prefer piped data
+	// TODO - options in os.Args are not supported
+
+	// if Stdin already contains piped data, add it to cmd
+	// (This is the reason cmd is passed as a pointer.)
+	if os.Stdin != nil {
+		cmd.Stdin = os.Stdin
+		return nil
+	}
+
+	// if there are command line arguments,
+	// add them to cmd.stdin
+	if len(os.Args) > 1 {
+		args := strings.Join(os.Args[1:], " ")
+		cmd.Stdin = strings.NewReader(args)
+		return nil
+	}
+
+	if len(defaultGetStdinArgs) > 0 {
+		cmd.Stdin = strings.NewReader(defaultGetStdinArgs)
+		return nil
+	}
+	return fmt.Errorf("No arguments found for stdin.")
+}
+
 // CombinedOutput executes a shell command line string and returns
 // the result. There is no error or statuscode returned.
 //

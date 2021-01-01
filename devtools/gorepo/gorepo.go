@@ -72,7 +72,7 @@ func Setup() error {
 // gitRepoSetup initializes the repo, prompts as needed, creates the
 // github.com repository, and pushes the initial commit.
 func gitRepoSetup() error {
-	err := gogit.GitInit()
+	err := gogit.Init()
 	if err != nil {
 		return err
 	}
