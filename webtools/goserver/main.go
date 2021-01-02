@@ -52,12 +52,12 @@ type basicServer struct {
 //
 // Except for reading the body, handlers should not modify the
 // provided Request.
-func (b *basicServer) SimpleHandler() *mux.Route {
-	func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Hello Medium, you've requested: %s\n", r.URL.Path)
-	}
+// func (b *basicServer) SimpleHandler() *mux.Route {
+// 	func(w http.ResponseWriter, r *http.Request) {
+// 		fmt.Fprintf(w, "Hello Medium, you've requested: %s\n", r.URL.Path)
+// 	}
 
-}
+// }
 
 func startBasicServer() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
