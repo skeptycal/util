@@ -9,5 +9,5 @@ import (
 func main() {
 	v, err := gorepo.ReturnCheck(fmt.Print())
 
-	fmt.Printf("Function returned %v (%v)", v, err)
+	fmt.Printf("Function returned %v (type: %T) (error: %v)", v, v, err)
 }

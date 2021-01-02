@@ -12,18 +12,6 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// DoOrDie handles errors based on the value of ErrHandling
-// by logging the error and either continuing or exiting.
-func DoOrDie(err error) error {
-	if err != nil {
-		log.Error(err)
-		if ErrHandling == exitOnError {
-			os.Exit(1)
-		}
-	}
-	return err
-}
-
 // IsEmpty returns true if the directory is empty.
 // If path is the empty string, the current directory is tested.
 //
@@ -188,7 +176,6 @@ func Base(path string) string {
 // If the path is empty, Base returns ".".
 // If the path consists entirely of separators, Base returns a single separator.
 func BaseGo(path string) string {
-
 	// Strip trailing slashes.
 	path = strings.TrimRight(path, SEP)
 
@@ -209,7 +196,6 @@ func BaseGo(path string) string {
 	default: // return all after the last path separator
 		return path[i+1:]
 	}
-
 }
 
 // SafeRename renames (moves) oldpath to newpath.
