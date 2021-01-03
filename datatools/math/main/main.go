@@ -1,9 +1,5 @@
 package main
 
-import (
-    "github.com/skeptycal/util/datatools/math/floatingints"
-)
-
 func WhiteSpace(c rune) bool {
 	switch c {
 	case ' ', '\t', '\n', '\f', '\r':
@@ -13,5 +9,5 @@ func WhiteSpace(c rune) bool {
 }
 
 func main() {
-	pi := floatingints.float(3.14)
+	pi := float.Float(3.14)
 }

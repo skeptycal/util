@@ -1,9 +1,9 @@
-package floatingints
+package float
 
 import "fmt"
 
-type float int16
+type Float int16
 
-func (f *float) String() string {
+func (f *Float) String() string {
 	return fmt.Sprintf("%e", f)
 }
