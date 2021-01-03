@@ -119,11 +119,11 @@ func Which(file string) (string, error) {
 
 var (
 	redb, _        = hex.DecodeString("1b5b33316d0a") // byte code for ANSI red
-	red     string = string(redb)                     // ANSI red
+	Red     string = string(redb)                     // ANSI red
 )
 
 func RedLogger(args ...interface{}) {
-	log.Infof("%s%s", red, args)
+	log.Infof("%s%s", Red, args)
 }
 
 // PWD returns the current working directory. It does not return
