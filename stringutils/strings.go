@@ -9,3 +9,32 @@
 package strings
 
 const digits = "0123456789abcdefghijklmnopqrstuvwxyz"
+
+func IsDigit(c byte) bool {
+	if c >= '0' && c <= '9' {
+		return true
+	}
+	return false
+}
+
+func IsAlpha(c byte) bool {
+	if c >= 'a' && c <= 'z' && c >= 'A' && c <= 'Z' {
+		return true
+	}
+	return false
+}
+
+func IsAlphaNum(c byte) bool {
+	if c >= 'a' && c <= 'z' && c >= 'A' && c <= 'Z' && c >= '0' && c <= '9' {
+		return true
+	}
+	return false
+}
+
+func IsWhiteSpace(c rune) bool {
+	switch c {
+	case ' ', '\t', '\n', '\f', '\r', '\v':
+		return true
+	}
+	return false
+}

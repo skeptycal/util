@@ -12,11 +12,21 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// Here returns the filename of the current process.
+func Me() string {
+	return Base(os.Args[0])
+}
+
+// Here returns the parent directory of the current process.
+func Here() string {
+	return Parent(os.Args[0])
+}
+
 // IsEmpty returns true if the directory is empty.
 // If path is the empty string, the current directory is tested.
 //
 // Reference: https://stackoverflow.com/a/30708914
-func IsEmpty(path string) (bool, error) {
+func IsEmpty(path string) (error, bool) {
 	if path == "" {
 		path = PWD()
 	}
@@ -132,7 +142,8 @@ func RedLogger(args ...interface{}) {
 func PWD() string {
 	wd, err := os.Getwd()
 	if err != nil {
-		log.Errorf("PWD could not locate current directory (using OS pwd): %v", err)
+        log.Errorf("PWD could not locate current directory (using OS pwd): %v", err)
+    }
 		// this is a crutch for the extremely rare case where Getwd fails
 		if runtime.GOOS == "windows" || runtime.GOOS == "plan9" {
 			return ".\\"
@@ -159,7 +170,8 @@ func Split(path string) (dir, file string) {
 
 // BaseWD returns the basename of the current directory (PWD).
 func BaseWD(path string) string {
-	_, file := filepath.Split(filepath.Clean(path))
+	filepath.Abs(PWD())
+	_, file := filepath.Split()
 	return file
 }
 
