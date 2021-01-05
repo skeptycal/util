@@ -1,5 +1,7 @@
 // package fastinvsqrt
 /*
+note - start here: https://commandcenter.blogspot.com/2012/04/byte-order-fallacy.html
+
 IEEE 754
 
 uses IEEE 754 standard floating point number with
@@ -55,33 +57,35 @@ import (
 	"math/big"
 	"unsafe"
 
+	log "github.com/sirupsen/logrus"
 	"gonum.org/v1/gonum/diff/fd"
 )
 
-const (
-	zeroBitMask     uint32 = 0b00000000000000000000000000000000 // 0
-	signBitMask     uint32 = 0b10000000000000000000000000000000 // 0x80000000
-	expBitMask      uint32 = 0b01111111100000000000000000000000 // 0x7F800000
-	mantissaBitMask uint32 = 0b00000000011111111111111111111111 // 0x7FFFFF
-	all32BitMask    uint32 = 0b11111111111111111111111111111111 // 0xFFFFFFFF (2^32)
-)
+type Any interface{}
 
-type Bits interface {
-	Sign() bool
+//  i = (data[3]<<0) | (data[2]<<8) | (data[1]<<16) | (data[0]<<24);
+// Ref: https://commandcenter.blogspot.com/2012/04/byte-order-fallacy.html
+type Bits [4]byte
+
+func (b Bits) String() string {
+	return fmt.Sprintf("%v", Any(b))
 }
 
-type bits interface{} // [4]byte
-
-func (b bits) Sign() bool {
-	val, ok := b.(uint32)
-	return b & signBitMask
-	// return f & signBitMask
+// Sign returns the sign bit of the Bits number.
+// 0 or 1 (-1 represents an error)
+func (b Bits) Sign() uint32 {
+	val, ok := Any(b).(uint32)
+	if ok {
+		return val & signBitMask
+	}
+	log.Errorf("cannot convert %b to int32", b)
+	return 0
 }
 
-func (b *bits) Decode() float32 { return DecodeBits(b) }
+func (b *Bits) Decode() float32 { return DecodeBits(b) }
 
 // Decode returns an IEEE 754 floating point number.
-func DecodeBits(b *bits) float32 { return *(*float32)(unsafe.Pointer(&b)) }
+func DecodeBits(b *Bits) float32 { return *(*float32)(unsafe.Pointer(&b)) }
 
 // Encode returns an new bitmapped IEEE 754 float32
 func EncodeBits(f float32) uint32 { return *(*uint32)(unsafe.Pointer(&f)) }
@@ -90,6 +94,7 @@ func ByteToInt(n uint64) float64 {
 	return math.Float64frombits(n)
 }
 
+// invSqrtBasic is a simple and slow implementation
 func invSqrtBasic(x float64) float64 {
 	return 1 / math.Sqrt(x)
 }
@@ -117,10 +122,14 @@ func slope(x1, x2 float64, f func(float64) float64) float64 {
 	return dy / dx
 }
 
-func addAny(things ...interface{}) interface{} {
+func AddAny(things ...interface{}) interface{} {
 	var x, y big.Float
+	// nan := math.NaN()
 
 	for _, v := range things {
+		if v, ok := v.(float64); ok && math.IsNaN(v) {
+			return math.NaN()
+		}
 		if _, _, err := x.Parse(fmt.Sprint(v), 10); err != nil {
 			return nil
 		}
