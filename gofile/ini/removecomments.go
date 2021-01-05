@@ -1,5 +1,9 @@
 package ini
 
+import (
+	"github.com/skeptycal/util/gofile"
+)
+
 // RemoveComments returns the contents of a text file with
 // comments removed.
 //

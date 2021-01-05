@@ -41,9 +41,21 @@ func IsEmpty(path string) (error, bool) {
 	// error explaining why. At the end of a directory, the error is io.EOF.
 	_, err = f.Readdirnames(1)
 	if err == io.EOF {
-		return true, nil
+		return nil, true
 	}
-	return false, err
+	return err, false
+}
+
+// IsDir checks to see if path is a directory in the current directory.
+func IsDir(path string) bool {
+	info, err := os.Stat(path)
+	if err != nil {
+		if !os.IsNotExist(err) {
+			err = DoOrDie(err)
+		}
+		return false
+	}
+	return info.Mode().IsDir()
 }
 
 // FileExists checks if path exists in the current directory
@@ -59,25 +71,14 @@ func FileExists(path string) bool {
 	return true // !info.IsDir()
 }
 
-// IsDir checks to see if path is a directory in the current directory.
-func IsDir(path string) bool {
-	info, err := os.Stat(path)
-	if err != nil {
-		if !os.IsNotExist(err) {
-			err = DoOrDie(err)
-		}
-		return false
-	}
-	return info.Mode().IsDir()
-	return info.Mode()&os.ModeDir != 0
-
-}
-
 // Exists returns true if the file exists and is a regular file.
 // Does not differentiate between path, file, or permission errors.
 func Exists(file string) bool {
 	info, err := os.Stat(file)
 	if err != nil {
+		if err == os.ErrNotExist {
+			return false
+		}
 		return false
 	}
 	if m := info.Mode(); m.Perm().IsRegular() {
@@ -140,10 +141,17 @@ func RedLogger(args ...interface{}) {
 //  any error, but instead logs the error and returns the system
 // default glob pattern for current working directory.
 func PWD() string {
-	wd, err := os.Getwd()
+	dir, err := os.Getwd()
 	if err != nil {
-        log.Errorf("PWD could not locate current directory (using OS pwd): %v", err)
-    }
+		log.Errorf("PWD could not locate current directory (using OS pwd): %v", err)
+
+		// this is a crutch for the extremely rare case where Getwd fails
+		return defaultPWD
+	}
+	wd, err := filepath.Abs(dir)
+	if err != nil {
+		log.Errorf("PWD could not determine absolute path of pwd: %v", err)
+
 		// this is a crutch for the extremely rare case where Getwd fails
 		if runtime.GOOS == "windows" || runtime.GOOS == "plan9" {
 			return ".\\"

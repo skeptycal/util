@@ -15,12 +15,13 @@ type Pack struct {
 	unpacker *binpacker.Unpacker
 }
 
-func (p *Pack) Write(b []byte) (i int, err error) {
+func (p *Pack) Write(b []byte) (c int, err error) {
 
-	for i, w := range b {
+	for _, w := range b {
 		p.packer.PushByte(w)
+		c++
 	}
-	return i, nil
+	return c, nil
 }
 
 func Bpit() error {

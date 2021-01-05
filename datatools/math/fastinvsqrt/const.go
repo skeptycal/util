@@ -1,4 +1,4 @@
-package main
+package fastinvsqrt
 
 const (
 	// arbitrary 1 ppt tolerance // TODO - move to config
