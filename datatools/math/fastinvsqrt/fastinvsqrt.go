@@ -1,6 +1,5 @@
+// package fastinvsqrt
 /*
-package fastinvsqrt
-
 IEEE 754
 
 uses IEEE 754 standard floating point number with
@@ -54,6 +53,7 @@ import (
 	"fmt"
 	"math"
 	"math/big"
+	"unsafe"
 
 	"gonum.org/v1/gonum/diff/fd"
 )
@@ -66,16 +66,25 @@ const (
 	all32BitMask    uint32 = 0b11111111111111111111111111111111 // 0xFFFFFFFF (2^32)
 )
 
-type Float interface {
+type Bits interface {
 	Sign() bool
 }
 
-type float big.Float // [4]byte
+type bits interface{} // [4]byte
 
-func (f float) Sign() bool {
-	return f&signBitMask == 0
+func (b bits) Sign() bool {
+	val, ok := b.(uint32)
+	return b & signBitMask
 	// return f & signBitMask
 }
+
+func (b *bits) Decode() float32 { return DecodeBits(b) }
+
+// Decode returns an IEEE 754 floating point number.
+func DecodeBits(b *bits) float32 { return *(*float32)(unsafe.Pointer(&b)) }
+
+// Encode returns an new bitmapped IEEE 754 float32
+func EncodeBits(f float32) uint32 { return *(*uint32)(unsafe.Pointer(&f)) }
 
 func ByteToInt(n uint64) float64 {
 	return math.Float64frombits(n)
