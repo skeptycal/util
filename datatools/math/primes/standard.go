@@ -2,6 +2,7 @@ package primes
 
 import (
 	"fmt"
+	"unsafe"
 
 	"github.com/skeptycal/util/stringutils/ansi"
 )
@@ -13,6 +14,32 @@ var (
 	Red   = ansi.Ansi(ansi.Red)
 )
 
+// Float32bits returns the IEEE 754 binary representation of f,
+// with the sign bit of f and the result in the same bit position.
+// Float32bits(Float32frombits(x)) == x.
+func Float32bits(f float32) uint32 { return *(*uint32)(unsafe.Pointer(&f)) }
+
+// Float32frombits returns the floating-point number corresponding
+// to the IEEE 754 binary representation b, with the sign bit of b
+// and the result in the same bit position.
+// Float32frombits(Float32bits(x)) == x.
+func Float32frombits(b uint32) float32 { return *(*float32)(unsafe.Pointer(&b)) }
+
+// Float64bits returns the IEEE 754 binary representation of f,
+// with the sign bit of f and the result in the same bit position,
+// and Float64bits(Float64frombits(x)) == x.
+func Float64bits(f float64) uint64 { return *(*uint64)(unsafe.Pointer(&f)) }
+
+// Float64frombits returns the floating-point number corresponding
+// to the IEEE 754 binary representation b, with the sign bit of b
+// and the result in the same bit position.
+// Float64frombits(Float64bits(x)) == x.
+func Float64frombits(b uint64) float64 { return *(*float64)(unsafe.Pointer(&b)) }
+
+// Fib calculates the nth Fibonacci number
+// BenchmarkFib10-8   	 2516619	       448 ns/op	       0 B/op	       0 allocs/op
+// BenchmarkFib20-8   	   19195	     54657 ns/op	       0 B/op	       0 allocs/op
+//
 func Fib(n int) int {
 	if n < 2 {
 		return n
@@ -24,9 +51,9 @@ func Fib(n int) int {
 //  0 for true - number is prime
 //  1 for false
 //  2 for even number
-//  5 for "ends in 5"
 //  3 for "digits sum to 3"
-//  -1 for unknown / untested
+//  5 for "ends in 5"
+//  -1 for unknown / untested / not yet implemented
 //
 func IsPrime(n int) int {
 
@@ -60,7 +87,7 @@ func IsPrime(n int) int {
 		}
 
 		// If the sum of the digits is a multiple of 3, then the number is not prime (except for 3)
-		if sumDigits(n)%3 == 0 {
+		if sumDigits(uint(n))%3 == 0 {
 			return 3
 		}
 
@@ -68,13 +95,14 @@ func IsPrime(n int) int {
 	}
 }
 
-func sumDigits(number int) int {
-	rem := 0
-	retval := 0
-	for number != 0 {
-		rem = number % 10
+func sumDigits(n uint) uint {
+	var rem uint = 0
+	var retval uint = 0
+
+	for n != 0 {
+		rem = n & 1
 		retval += rem
-		number = number / 10
+		n = n / 10
 	}
 	return retval
 }

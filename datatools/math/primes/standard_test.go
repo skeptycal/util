@@ -5,10 +5,52 @@ import (
 	"testing"
 )
 
-func BenchmarkFib10(b *testing.B) {
+func BenchmarkSumDigitsPreString(b *testing.B) {
+	s := fmt.Sprintf("%d", 9055327)
+	// BenchmarkSumDigitsStr-8   	111466232	        10.8 ns/op	       0 B/op	       0 allocs/op
+	// run the Fib function b.N times with prepared string
+	for n := 0; n < b.N; n++ {
+		sumDigitsStr(s)
+	}
+}
+
+func BenchmarkSumDigitsPreInteger(b *testing.B) {
+	var x int = 9055327
+	// BenchmarkSumDigits-8   	94464870	        18.0 ns/op	       0 B/op	       0 allocs/op
 	// run the Fib function b.N times
 	for n := 0; n < b.N; n++ {
+		sumDigits(x)
+	}
+}
+
+func BenchmarkIsPrime(b *testing.B) {
+	// run the Fib function b.N times
+	for n := 0; n < b.N; n++ {
+		IsPrime(n)
+	}
+}
+
+func BenchmarkFib10(b *testing.B) {
+	// run the Fib(10) function b.N times
+	// BenchmarkFib10-8   	 2261953	       444 ns/op	       0 B/op	       0 allocs/op
+	for n := 0; n < b.N; n++ {
 		Fib(10)
+	}
+}
+
+func BenchmarkFib5(b *testing.B) {
+	// run the Fib(5) function b.N times
+	// BenchmarkFib5-8   	30979549	        36.1 ns/op	       0 B/op	       0 allocs/op
+	for n := 0; n < b.N; n++ {
+		Fib(5)
+	}
+}
+
+func BenchmarkFib20(b *testing.B) {
+	// run the Fib(20) function b.N times
+	// BenchmarkFib20-8   	   18566	     54421 ns/op	       0 B/op	       0 allocs/op
+	for n := 0; n < b.N; n++ {
+		Fib(20)
 	}
 }
 
@@ -35,13 +77,9 @@ func TestFib(t *testing.T) {
 	}
 }
 
-func BenchmarkIsPrime(b *testing.B) {
-	// run the Fib function b.N times
-	for n := 0; n < b.N; n++ {
-		IsPrime(n)
-	}
-}
 func TestIsPrime(t *testing.T) {
+	// BenchmarkIsPrime-8   	15331015	        82.6 ns/op	       8 B/op	       0 allocs/op
+
 	type args struct {
 		n int
 	}
@@ -71,13 +109,6 @@ func TestIsPrime(t *testing.T) {
 	}
 }
 
-func BenchmarkSumDigitsStr(b *testing.B) {
-	// BenchmarkSumDigitsStr-8   	 9055327	       139 ns/op	      16 B/op	       1 allocs/op
-	// run the Fib function b.N times
-	for n := 0; n < b.N; n++ {
-		sumDigitsStr(fmt.Sprintf("%d", n))
-	}
-}
 func Test_sumDigitsStr(t *testing.T) {
 	type args struct {
 		s string
@@ -101,22 +132,14 @@ func Test_sumDigitsStr(t *testing.T) {
 	}
 }
 
-func BenchmarkSumDigits(b *testing.B) {
-	// BenchmarkSumDigits-8   	94464870	        18.0 ns/op	       0 B/op	       0 allocs/op
-	// run the Fib function b.N times
-	for n := 0; n < b.N; n++ {
-		sumDigits(n)
-	}
-}
-
 func Test_sumDigits(t *testing.T) {
 	type args struct {
-		number int
+		number uint
 	}
 	tests := []struct {
 		name string
 		args args
-		want int
+		want uint
 	}{
 		// TODO: Add test cases.
 		{"five", args{5}, 5},
