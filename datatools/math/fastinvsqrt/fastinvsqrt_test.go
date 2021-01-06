@@ -52,7 +52,7 @@ func Test_AddAny(t *testing.T) {
 		{"string + int", args{things: []interface{}{"32", 32}}, "64"},
 		{"func + int", args{things: []interface{}{AddAny(), 32}}, "32"},
 		{"func + nil", args{things: []interface{}{AddAny(), nil}}, nil},
-		{"NaN + nil", args{things: []interface{}{math.NaN(), nil}}, math.NaN()},
+		{"NaN + nil", args{things: []interface{}{math.NaN(), nil}}, float64(math.NaN())},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

@@ -11,7 +11,7 @@ func main() {
 	if runTempTests == true {
 		justforfunc18.TempTests()
 	}
-	var b fastinvsqrt.Bits = make([]byte, 0, 4)
+	var b fastinvsqrt.Bits { make([]byte, 0, 4)}
 	fmt.Println(b)
 }
 
