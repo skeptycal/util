@@ -57,7 +57,7 @@ func GetStdin(cmd *exec.Cmd) error {
 		cmd.Stdin = strings.NewReader(defaultGetStdinArgs)
 		return nil
 	}
-	return fmt.Errorf("No arguments found for stdin.")
+	return fmt.Errorf("no arguments found for stdin")
 }
 
 // CombinedOutput executes a shell command line string and returns
@@ -109,7 +109,7 @@ func Out(command string) string {
 	out, err := cmd.Output()
 
 	if err != nil {
-		err = gofile.DoOrDie(fmt.Errorf("%verror during command %v: %v", errorColor, command, err))
+		_ = gofile.DoOrDie(fmt.Errorf("%verror during command %v: %v", errorColor, command, err))
 		return ""
 	}
 

@@ -15,15 +15,15 @@ type ReadWriteRemover interface {
 
 type readWriteRemover struct {
 	*bufio.ReadWriter
-	*os.File
+	f *os.File
 }
 
-func (f *readWriteRemover) Close() error {
-	defer os.Remove(f.Name())
-	f.Close()
+func (r *readWriteRemover) Close() {
+	defer os.Remove(r.f.Name())
+	r.f.Close()
 }
 
-func (f *readWriteRemover) Remove() error {
+func (r *readWriteRemover) Remove() error {
 	// todo - this is redundant and should be accomplished in Close()
-	os.Remove(f.Name())
+	return os.Remove(r.f.Name())
 }

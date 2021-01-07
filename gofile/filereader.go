@@ -124,12 +124,6 @@ func NewBufferedReader(filename string) (rd *bufferedFileReader, err error) {
 // as an error to be reported.
 func (fr *bufferedFileReader) ReadAll() ([]byte, error) {
 	return ioutil.ReadAll(fr.r)
-	b := bytes.Buffer{}
-	buf := bufio.NewReader(&b)
-	buf.Reset(nil)
-
-	print(buf)
-	print(b)
 }
 
 // Close closes the underlying file and frees any resources.
@@ -148,7 +142,7 @@ func (fr *bufferedFileReader) Reset(r io.Reader) {
 }
 
 func (fr *bufferedFileReader) File() (io.ReadCloser, error) {
-	return fr.r, nil
+	return fr.f, nil
 }
 
 func (fr *bufferedFileReader) Size() int {

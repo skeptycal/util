@@ -1,18 +1,17 @@
 package gofile
 
 import (
-	"encoding/hex"
 	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
-	"runtime"
 	"strings"
 
 	log "github.com/sirupsen/logrus"
+	. "github.com/skeptycal/util/stringutils/ansi"
 )
 
-// Here returns the filename of the current process.
+// Me returns the filename of the current process.
 func Me() string {
 	return Base(os.Args[0])
 }
@@ -32,7 +31,7 @@ func IsEmpty(path string) (error, bool) {
 	}
 	f, err := os.Open(path)
 	if err != nil {
-		return false, err
+		return err, false
 	}
 	defer f.Close()
 
@@ -128,13 +127,9 @@ func Which(file string) (string, error) {
 	return exec.LookPath(file)
 }
 
-var (
-	redb, _        = hex.DecodeString("1b5b33316d0a") // byte code for ANSI red
-	Red     string = string(redb)                     // ANSI red
-)
-
 func RedLogger(args ...interface{}) {
-	log.Infof("%s%s", Red, args)
+	red := Ansi(Red)
+	log.Infof("%s%s", red, args)
 }
 
 // PWD returns the current working directory. It does not return
@@ -152,12 +147,10 @@ func PWD() string {
 	if err != nil {
 		log.Errorf("PWD could not determine absolute path of pwd: %v", err)
 
-		// this is a crutch for the extremely rare case where Getwd fails
-		if runtime.GOOS == "windows" || runtime.GOOS == "plan9" {
-			return ".\\"
-		}
-		return "."
+		// this is a crutch for the extremely rare case where Abs fails
+		return defaultPWD
 	}
+
 	return wd
 }
 
@@ -167,7 +160,7 @@ func PWD() string {
 // and file set to path.
 // The returned values have the property that path = dir+file.
 func Split(path string) (dir, file string) {
-	vol := filepath.VolumeName(path)
+	vol := VolumeName(path)
 	path = path[len(vol):]
 	i := len(path) - 1
 	for i >= len(vol) && !os.IsPathSeparator(path[i]) {
@@ -176,11 +169,23 @@ func Split(path string) (dir, file string) {
 	return path[:i+1], path[i+1:]
 }
 
+func Split2(path string) (dir, file string) {
+	vol := VolumeName(path)
+	path = path[len(vol):]
+	i := strings.LastIndex(path, string(os.PathSeparator))
+
+	return path[:i+1], path[i+1:]
+}
+
 // BaseWD returns the basename of the current directory (PWD).
-func BaseWD(path string) string {
-	filepath.Abs(PWD())
-	_, file := filepath.Split()
+func BaseWD() string {
+	_, file := filepath.Split(Abs(PWD()))
 	return file
+}
+
+func Abs(path string) string {
+	path, _ = filepath.Abs(path)
+	return path
 }
 
 func Base(path string) string {
@@ -230,11 +235,10 @@ func SafeRename(oldpath string, newpath string) error {
 
 // Parent returns the parent directory of path.
 func Parent(path string) string {
-	dir, _ := filepath.Split(filepath.Clean(path))
+	dir, _ := filepath.Split(Abs(path))
 	return dir
 }
 
 func Parents(path string) []string {
-	clean := filepath.Clean(path)
-	return filepath.SplitList(clean)
+	return filepath.SplitList(Abs(path))
 }
