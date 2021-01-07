@@ -1,4 +1,6 @@
 // goex is a command line tool to execute Go code. Output is printed as goons to stdout.
+// It is heavily modeled after goexec (https://github.com/shurcooL/goexec) and is
+// my interpretation of that project.
 package main
 
 import (
