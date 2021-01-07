@@ -94,34 +94,6 @@ func (b *Bits) Binary() string {
 	return fmt.Sprintf("0b%032b", b.Int())
 }
 
-// Big casts b to a []byte
-// Ref: func (bigEndian) PutUint32(b []byte, v uint32)
-func (b Bits) big() []byte {
-	buf := make([]byte, 4)
-	_ = buf[3] // early bounds check to guarantee safety of writes below
-	buf[0] = byte(b >> 24)
-	buf[1] = byte(b >> 16)
-	buf[2] = byte(b >> 8)
-	buf[3] = byte(b)
-	return buf
-}
-
-// Little casts b to a []byte
-// Ref: func (littleEndian) PutUint32(b []byte, v uint32)
-func (b Bits) little() []byte {
-	buf := make([]byte, 4)
-	_ = buf[3] // early bounds check to guarantee safety of writes below
-	buf[0] = byte(b)
-	buf[1] = byte(b >> 8)
-	buf[2] = byte(b >> 16)
-	buf[3] = byte(b >> 24)
-	return buf
-}
-
-func (b Bits) Bytes() []byte {
-	return b.big()
-}
-
 func (b Bits) Any() interface{} {
 	return Any(b)
 }

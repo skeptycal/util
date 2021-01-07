@@ -7,3 +7,15 @@
 package fastinvsqrt
 
 const isBigEndian = false
+
+// Bytes casts b to a []byte
+// Ref: func (littleEndian) PutUint32(b []byte, v uint32)
+func (b Bits) Bytes() []byte {
+	buf := make([]byte, 4)
+	_ = buf[3] // early bounds check to guarantee safety of writes below
+	buf[0] = byte(b)
+	buf[1] = byte(b >> 8)
+	buf[2] = byte(b >> 16)
+	buf[3] = byte(b >> 24)
+	return buf
+}
