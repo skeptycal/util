@@ -24,7 +24,7 @@ func TestBackground(t *testing.T) {
 	}
 }
 
-func TestOutErr(t *testing.T) {
+func TestCombinedOutput(t *testing.T) {
 	type args struct {
 		command string
 	}
@@ -38,13 +38,13 @@ func TestOutErr(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := OutErr(tt.args.command); got != tt.want {
-				t.Errorf("OutErr() = %v, want %v", got, tt.want)
+			if got := CombinedOutput(tt.args.command); got != tt.want {
+				t.Errorf("CombinedOutput() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 	// additional tests
-	s := OutErr("fake_program_that_is_not_real")
+	s := CombinedOutput("fake_program_that_is_not_real")
 	if s[:2] == `/x1b[` {
 		t.Errorf("OutErr() = %v, want %v", s, "(error string beginning with '/x1b'")
 

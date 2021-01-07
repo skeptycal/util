@@ -1,5 +1,8 @@
-// package fastinvsqrt
-/*
+// Package fastinvsqrt is an implementation of there
+/*Quake 3 released algorithm that estimates 1 / sqrt(x)
+to within 1% and runs about 3 times as fast as the
+standard calculation on some machines.
+
 note - start here: https://commandcenter.blogspot.com/2012/04/byte-order-fallacy.html
 
 IEEE 754
@@ -46,58 +49,128 @@ References
 
 based on code from quake3 algorithm
 
-Reference: https://www.youtube.com/watch?v=p8u_k2LIZyo
-
-*/
+Reference: https://www.youtube.com/watch?v=p8u_k2LIZyo */
 package fastinvsqrt
 
 import (
 	"fmt"
+	"io"
 	"math"
 	"math/big"
+	"os"
 	"unsafe"
 
-	log "github.com/sirupsen/logrus"
 	"gonum.org/v1/gonum/diff/fd"
 )
 
 type Any interface{}
 
+type Hex struct {
+	uint32
+}
+
+func (h *Hex) hex() string {
+	return fmt.Sprintf("0x%08X", h)
+}
+
+func (h *Hex) String() string {
+	return h.hex()
+}
+
+// Bits represents a float32 bit pattern in an integer
+// container. This allows for bit shifting and masks.
+//
 //  i = (data[3]<<0) | (data[2]<<8) | (data[1]<<16) | (data[0]<<24);
 // Ref: https://commandcenter.blogspot.com/2012/04/byte-order-fallacy.html
-type Bits [4]byte
+type Bits uint32
 
-func (b Bits) String() string {
-	return fmt.Sprintf("%v", Any(b))
+func (b *Bits) String() string {
+	return fmt.Sprintf("%v", b.Int())
+}
+func (b *Bits) Hex() string {
+	return fmt.Sprintf("0x%08X", b.Int())
+}
+func (b *Bits) Binary() string {
+	return fmt.Sprintf("0b%032b", b.Int())
 }
 
-// Sign returns the sign bit of the Bits number.
-// 0 or 1 (-1 represents an error)
-func (b Bits) Sign() uint32 {
-	val, ok := Any(b).(uint32)
-	if ok {
-		return val & signBitMask
+// Big casts b to a []byte
+// Ref: func (bigEndian) PutUint32(b []byte, v uint32)
+func (b Bits) big() []byte {
+	buf := make([]byte, 4)
+	_ = buf[3] // early bounds check to guarantee safety of writes below
+	buf[0] = byte(b >> 24)
+	buf[1] = byte(b >> 16)
+	buf[2] = byte(b >> 8)
+	buf[3] = byte(b)
+	return buf
+}
+
+// Little casts b to a []byte
+// Ref: func (littleEndian) PutUint32(b []byte, v uint32)
+func (b Bits) little() []byte {
+	buf := make([]byte, 4)
+	_ = buf[3] // early bounds check to guarantee safety of writes below
+	buf[0] = byte(b)
+	buf[1] = byte(b >> 8)
+	buf[2] = byte(b >> 16)
+	buf[3] = byte(b >> 24)
+	return buf
+}
+
+func (b Bits) Bytes() []byte {
+	return b.big()
+}
+
+func (b Bits) Any() interface{} {
+	return Any(b)
+}
+
+func (b Bits) Int() uint32 {
+	return uint32(b)
+}
+
+func (b Bits) Decode() float32 { return DecodeBits(b.Int()) }
+
+func (b Bits) Shift(n int) uint32 {
+	return uint32(b.Int() << n)
+}
+
+func (b Bits) PrintMethods(w io.Writer) {
+	if w == nil {
+		w = os.Stderr
 	}
-	log.Errorf("cannot convert %b to int32", b)
-	return 0
+
+	anymap := map[string]interface{}{
+		"value":    "0x0FFF0FFF",
+		"variable": b,
+		"Any()":    b.Any(),
+		"Int()":    b.Int(),
+		"Hex()":    b.Hex(),
+		"Binary()": b.Binary(),
+		"String()": b.String(),
+		"Bytes()":  b.Bytes(),
+		"Decode()": b.Decode(),
+		"Shift(1)": b.Shift(1),
+	}
+
+	fmt.Fprintln(w, "")
+	fmt.Fprintf(w, "  Bits method values for %T : %v\n\n", b, b)
+	for k, v := range anymap {
+		fmt.Fprintf(w, "   %-15v  ...  %-20T  :  %v\n", k, v, v)
+	}
+	fmt.Fprintln(w, "")
+	fmt.Fprintln(w, "")
 }
 
-func (b *Bits) Decode() float32 { return DecodeBits(b) }
+// DecodeBits returns an IEEE 754 floating point number.
+func DecodeBits(b uint32) float32 { return *(*float32)(unsafe.Pointer(&b)) }
 
-// Decode returns an IEEE 754 floating point number.
-func DecodeBits(b *Bits) float32 { return *(*float32)(unsafe.Pointer(&b)) }
-
-// Encode returns an new bitmapped IEEE 754 float32
+// EncodeBits returns an new bitmapped IEEE 754 float32
 func EncodeBits(f float32) uint32 { return *(*uint32)(unsafe.Pointer(&f)) }
 
-func ByteToInt(n uint64) float64 {
-	return math.Float64frombits(n)
-}
-
 // invSqrtBasic is a simple and slow implementation
-func invSqrtBasic(x float64) float64 {
-	return 1 / math.Sqrt(x)
-}
+func invSqrtBasic(x float64) float64 { return 1 / math.Sqrt(x) }
 
 // func sqrtEstimate(n float64, t tolerance) float64 {
 // 	maxError := n * t // max absolute error
@@ -110,6 +183,14 @@ func invSqrtBasic(x float64) float64 {
 // 		d = d + dx
 // 	}
 // }
+
+func derivativeOfParabola(x float64) float64 {
+	return 2 * x
+}
+
+func parabola(x float64) float64 {
+	return math.Pow(x, 2.0)
+}
 
 // slope is a slow approximation of the slope of f between 2 points
 // it contains float64 values, function calls, and division operations,

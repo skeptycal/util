@@ -4,9 +4,46 @@ import (
 	"fmt"
 	"go/parser"
 	"go/token"
+	"math"
 
 	"github.com/skeptycal/util/datatools/math/tree"
 )
+
+func RunFuncSeries(min, max, step int, f func(args ...interface{}) ([]interface{}, error)) {
+
+	var retval []interface{}
+
+	for _, v := range args {
+
+	}
+
+	for i := min; i < max; i += step {
+		a, err := f(args)
+		if err != nil {
+			break
+		}
+		retval = append(retval, a)
+	}
+
+	return retval, nil
+}
+
+// showTable creates a table of example data using
+// a range of [min .. max] as x values and inputs for f
+func showTable(min, max, cols int, f func(args ...interface{}) ([]interface{}, error)) {
+
+	for i := min; i < max; i++ {
+		c, err := f(i) // uint8(math.Pow(2, float64(i)))
+		if err != nil {
+			println(err)
+		}
+		fmt.Printf("%4d : %08b  ", c, c)
+		if (i+1)%cols == 0 {
+			fmt.Print("\n")
+		}
+	}
+	fmt.Print("\n")
+}
 
 func main() {
 	// err := floatingints.BpPush()
@@ -36,7 +73,7 @@ func main() {
 		fmt.Printf("  thing%d ( %-7T) : %v\n", i, v, v)
 	}
 
-	showTable(maxNum, "uint8(math.Pow(2,float64(%v)))")
+	showTable(1, maxNum, 2, math.Pow10(v))
 
 	// ------------------------------------------------------------
 
@@ -63,18 +100,4 @@ func bar() {
 	for _, s := range f.Imports {
 		fmt.Println(s.Path.Value)
 	}
-}
-
-// showTable creates a table of example data using
-// a range of [min .. max] as x values and inputs for f
-func showTable(min, max, cols int, f func()) {
-
-	for i := min; i < max; i++ {
-		c := f(i) // uint8(math.Pow(2, float64(i)))
-		fmt.Printf("%4d : %08b  ", c, c)
-		if (i+1)%cols == 0 {
-			fmt.Print("\n")
-		}
-	}
-	fmt.Print("\n")
 }

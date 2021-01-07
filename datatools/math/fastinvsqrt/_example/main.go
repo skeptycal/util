@@ -1,11 +1,15 @@
 package main
 
-import "github.com/skeptycal/util/datatools/math/fastinvsqrt"
+import (
+	"math"
+
+	"github.com/skeptycal/util/datatools/math/fastinvsqrt"
+)
 
 func main() {
 
 	var i interface{}
-	var f float32 = 3.14
+	var f float32 = math.Pi
 
 	b := fastinvsqrt.EncodeBits(f)
 	println("b: ", b)

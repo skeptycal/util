@@ -1,3 +1,11 @@
+// Package justforfunc18 is an environment for playing with
+// the ideas from:
+//
+// justforfunc #18: understanding Go's type aliases
+//
+// by Francesc Campoy
+//
+// Reference: https://www.youtube.com/watch?v=Vg603e9C-Vg
 package justforfunc18
 
 import "fmt"
