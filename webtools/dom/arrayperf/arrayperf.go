@@ -2,7 +2,9 @@
 package arrayperf
 
 import (
+	"fmt"
 	"math/rand"
+	"strings"
 	"time"
 )
 
@@ -16,8 +18,26 @@ const (
 )
 
 type array struct {
-	s []string
-	i []int
+	Len  int
+	Size int
+	S    []string
+	I    []int
+}
+
+func (a array) String() string {
+	sb := strings.Builder{}
+	for i, s := range a.S {
+		sb.WriteString(fmt.Sprintf("%d - %v  ...  %32v : %-32v\n", i, s, a.S[i], a.I[i]))
+	}
+	return sb.String()
+}
+
+func (a array) Display() string {
+	sb := strings.Builder{}
+	for i, _ := range a.S {
+		sb.WriteString(fmt.Sprintf("  %v = %v\n", a.S[i], a.I[i]))
+	}
+	return sb.String()
 }
 
 func MakeArray(count, size int) *array {
@@ -39,8 +59,10 @@ func MakeArray(count, size int) *array {
 		ii[i] = randomInt(defaultMinIntSize, defaultInt32)
 	}
 	return &array{
-		s: ss,
-		i: ii,
+		Len:  count,
+		Size: size,
+		S:    ss,
+		I:    ii,
 	}
 }
 

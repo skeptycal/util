@@ -13,6 +13,28 @@ import (
 	. "github.com/skeptycal/util/stringutils/ansi"
 )
 
+// Version represents the SemVer version of this package.
+/* The format is:
+  vMAJOR[.MINOR[.PATCH[-PRERELEASE][+BUILD]]]
+where square brackets indicate optional parts of the syntax;
+MAJOR, MINOR, and PATCH are decimal integers without extra
+leading zeros; PRERELEASE and BUILD are each a series of
+non-empty dot-separated identifiers using only alphanumeric
+characters and hyphens; and all-numeric PRERELEASE identifiers
+must not have leading zeros.
+
+".-A..Z"
+
+Reference: https://godoc.org/golang.org/x/mod/semver
+*/
+type version struct {
+	Major      int
+	Minor      int
+	Patch      int
+	PreRelease string
+	Build      string
+}
+
 var (
 	DefaultContext = context.Background()
 	errorColor     = Ansi.Build(Black, Bold, RedBackground)
@@ -20,6 +42,14 @@ var (
 )
 
 const defaultGetStdinArgs = `Example: tr lowercase to UpperCase`
+
+func Hash() string {
+	return CombinedOutput("git rev-list --tags --max-count=1")
+}
+
+func Version() string {
+	return CombinedOutput(fmt.Sprintf("git describe --tags %s", Hash()))
+}
 
 // GetStdin sets the stdin pipe for cmd in order of preference.
 /*
