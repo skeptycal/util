@@ -8,9 +8,10 @@ import (
 )
 
 func main() {
+	// Reference: https://yourbasic.org/golang/bitmask-flag-set-clear/
 
 	// Sieve of Eratosthenes
-	const n = 50
+	const n = 1000000000
 	sieve := bit.New().AddRange(2, n)
 	sqrtN := int(math.Sqrt(n))
 	for p := 2; p <= sqrtN; p = sieve.Next(p) {

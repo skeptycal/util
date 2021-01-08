@@ -1,3 +1,15 @@
+//little-endian
+// +build 386 amd64 arm arm64 ppc64le mips64le mipsle riscv64 wasm
+//big-endian
+// +build ppc64 s390x mips mips64
+
+// non windows file system
+// +build aix darwin dragonfly freebsd js,wasm linux netbsd openbsd solaris
+
+// not windows
+// +build !windows
+
+// Package gofile provides access to the file system.
 package gofile
 
 import (
@@ -135,23 +147,29 @@ func RedLogger(args ...interface{}) {
 // PWD returns the current working directory. It does not return
 //  any error, but instead logs the error and returns the system
 // default glob pattern for current working directory.
+//
+// PWD runs Abs and returns an absolute representation of path.
+// If the path is not absolute it will be joined with the current
+// working directory to turn it into an absolute path. The absolute
+// path name for a given file is not guaranteed to be unique.
+// Abs calls Clean on the result.
 func PWD() string {
 	dir, err := os.Getwd()
 	if err != nil {
 		log.Errorf("PWD could not locate current directory (using OS pwd): %v", err)
 
 		// this is a crutch for the extremely rare case where Getwd fails
-		return defaultPWD
+		return Abs(defaultPWD)
 	}
 	wd, err := filepath.Abs(dir)
 	if err != nil {
 		log.Errorf("PWD could not determine absolute path of pwd: %v", err)
 
 		// this is a crutch for the extremely rare case where Abs fails
-		return defaultPWD
+		return Abs(defaultPWD)
 	}
 
-	return wd
+	return Abs(wd)
 }
 
 // Split splits path immediately following the final Separator,
@@ -183,11 +201,20 @@ func BaseWD() string {
 	return file
 }
 
+// Abs returns an absolute representation of path.
+// If the path is not absolute it will be joined with the current
+// working directory to turn it into an absolute path. The absolute
+// path name for a given file is not guaranteed to be unique.
+// Abs calls Clean on the result.
 func Abs(path string) string {
 	path, _ = filepath.Abs(path)
 	return path
 }
 
+// Base returns the last element of path.
+// Trailing path separators are removed before extracting the last element.
+// If the path is empty, Base returns ".".
+// If the path consists entirely of separators, Base returns a single separator.
 func Base(path string) string {
 	_, file := filepath.Split(path)
 	return file
@@ -241,4 +268,18 @@ func Parent(path string) string {
 
 func Parents(path string) []string {
 	return filepath.SplitList(Abs(path))
+}
+
+// Split splits path immediately following the final Separator,
+// separating it into a directory and file name component.
+// If there is no Separator in path, Split returns an empty dir
+// and file set to path.
+// The returned values have the property that path = dir+file.
+func Split(path string) (dir, file string) {
+	vol := VolumeName(path)
+	i := len(path) - 1
+	for i >= len(vol) && !os.IsPathSeparator(path[i]) {
+		i--
+	}
+	return path[:i+1], path[i+1:]
 }
