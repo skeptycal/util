@@ -93,3 +93,26 @@ func ExampleCmd_StdinPipe() {
 
 	fmt.Printf("%s\n", out)
 }
+
+func TestGetRecentTagHash(t *testing.T) {
+	tests := []struct {
+		name    string
+		want    string
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+		{"normal run", "dbe396e0c8cf6aad91a36bb6d665aeefcf04460c", false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := GetRecentTagHash()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetRecentTagHash() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("GetRecentTagHash() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

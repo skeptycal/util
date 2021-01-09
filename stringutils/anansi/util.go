@@ -5,21 +5,17 @@ import (
 	"time"
 
 	log "github.com/sirupsen/logrus"
-	db "github.com/skeptycal/godebug"
 )
-
-var config db.Session
 
 func init() {
 	log.Debug("anansi logging started")
-
 }
 
-func br() (n int, err error) {
+func BR() (n int, err error) {
 	return fmt.Println("")
 }
 
-func hr() (n int, err error) {
+func HR() (n int, err error) {
 	// todo fix this
 	return fmt.Println("")
 }

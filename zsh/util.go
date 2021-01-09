@@ -7,7 +7,6 @@ import (
 
 	log "github.com/sirupsen/logrus"
 	"github.com/skeptycal/util/gofile"
-	// "google.golang.org/appengine/log"
 )
 
 // Err calls error handling and logging routines

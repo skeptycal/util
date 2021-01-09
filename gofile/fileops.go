@@ -31,11 +31,13 @@ import (
 // 	}
 // }
 
-// GetFileSize returns file information (after symlink evaluation)
+// GetFileInfo returns file information (after symlink evaluation)
 // using os.Stat(). If the file is not a regular file, an error of type
 // *PathError is returned.
 func GetFileInfo(filename string) (os.FileInfo, error) {
 
+	// EvalSymlinks also calls Abs and Clean as well as
+	// checking for existance of the file.
 	filename, err := filepath.EvalSymlinks(filename)
 	if err != nil {
 		return nil, err
@@ -48,10 +50,12 @@ func GetFileInfo(filename string) (os.FileInfo, error) {
 
 	//Check 'others' permission
 	m := fi.Mode()
-	if m&(1<<2) != 0 {
-		//other users have read permission
-	} else {
-		//other users don't have read permission
+	if m&(1<<2) == 0 {
+		return nil, fmt.Errorf("insufficient permissions: %v", filename)
+	}
+
+	if fi.IsDir() {
+		return nil, fmt.Errorf("the filename %s is a directory", filename)
 	}
 
 	if !fi.Mode().IsRegular() {

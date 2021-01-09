@@ -27,3 +27,22 @@ func (r *readWriteRemover) Remove() error {
 	// todo - this is redundant and should be accomplished in Close()
 	return os.Remove(r.f.Name())
 }
+
+// func NewFileCloseRemover(r *bufio.Reader, w *bufio.Writer) *readWriteRemover {
+
+// 	rw := &readWriteRemover{
+// 		bufio.NewReadWriter(r, w),
+// 	}
+// 	return rw
+// }
+
+// os.File notes:
+/* type file struct {
+	pfd         poll.FD
+	name        string
+	dirinfo     *dirInfo // nil unless directory being read
+	nonblock    bool     // whether we set nonblocking mode
+	stdoutOrErr bool     // whether this is stdout or stderr
+	appendMode  bool     // whether file is opened for appending
+}
+*/

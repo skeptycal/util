@@ -52,8 +52,8 @@ func TestInitialCapacity(t *testing.T) {
 
 func TestGetFileInfo(t *testing.T) {
 	fiSample, _ := os.Stat("fileops_test.go")
-	fiTestJson, _ := os.Stat("testdata/test.json")
-	fiDev, _ := os.Stat("/dev")
+	fiTestJSON, _ := os.Stat("testdata/test.json")
+	// fiDev, _ := os.Stat("/dev")
 
 	type args struct {
 		filename string
@@ -65,13 +65,14 @@ func TestGetFileInfo(t *testing.T) {
 		wantErr bool
 	}{
 		// TODO: Add test cases.
-		{"fileops_test.go", args{"fileops_test.go"}, fiSample, false},
-		{"fakefile", args{"fakefile"}, nil, true},
-		{"directory", args{"~/"}, nil, true},
-		{"json file", args{"testdata/test.json"}, fiTestJson, false},
+		{"this file: fileops_test.go", args{"fileops_test.go"}, fiSample, false},
+		{"filetest testdata/test.json", args{"testdata/test.json"}, fiTestJSON, false},
+		{"symlink testdata/test_ln.json", args{"testdata/test_ln.json"}, fiTestJSON, false},
+		{"not exist error", args{"fakefile"}, nil, true},
+		{"PWD() directory error", args{PWD()}, nil, true},
+		{"not regular file error", args{"/dev/null"}, nil, true},
 		// filepath.EvalSymlinks() in GetFileInfo() parses the path to return the target of any symlinks before proceeding
-		{"symlink", args{"testdata/test_ln.json"}, fiTestJson, false},
-		{"directory permission error", args{"/dev"}, fiDev, false},
+		{"directory permission error", args{"/dev/rdisk0"}, nil, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

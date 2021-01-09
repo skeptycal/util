@@ -1,20 +1,34 @@
-package anansi
-
 // Anansi - ANSI color for terminal output
 // Copyright (c) 2020 Michael Treanor
 // MIT License this
-//
-// Most of the available packages expose objects as part of the API. I find exporting and manipulating strings directly to be much simple and cleaner for the most part.
-//
-// Terminal output is a stream of bytes. The most efficient and flexible ways to handle them has long been using bytes.Buffer and converting to strings as needed. The strings.Builder implementation improved on this method in many ways.
-//
-// At any given time, only one character is 'printing' to the terminal output. Instead of thinking of the text as chunks and processing each piece of text as an object, we can think of all CLI text as a stream of characters that always have these ANSI color  attributes. They are stored somewhere and applied all the time. At any point along the stream, we can insert ANSI escape codes into the strings to change the stored attributes. This changes the current behavior and the behavior remains until it is changed.
-//
-// The 'anansi.go' file contains the majority of original code to focus more on inserting strings into the stream.
-// The 'anansi_codes.go' file contains the new strings.Builder implementation for ANSI code sets
-// The 'anansi_attribute.go' file contains the updated strings.Builder implementation of the Attribute type
-// Much of the basic types, constants, and terminal checks in 'anansi_const.go' are based on the very popular and well documented color project
-// https://github.com/fatih/color (MIT License)
+
+// Package anansi implements ANSI color codes and other
+// CSI functionality for command line programs.
+/*
+Most of the available packages expose objects as part of the API. I find exporting and manipulating strings directly to be much simple and cleaner for the most part.
+
+Terminal output is a stream of bytes. The most efficient and flexible ways to handle them has long been using bytes.Buffer and converting to strings as needed. The strings.Builder implementation improved on this method in many ways.
+
+At any given time, only one character is 'printing' to the terminal output. Instead of thinking of the text as chunks and processing each piece of text as an object, we can think of all CLI text as a stream of characters that always have these ANSI color  attributes. They are stored somewhere and applied all the time. At any point along the stream, we can insert ANSI escape codes into the strings to change the stored attributes. This changes the current behavior and the behavior remains until it is changed.
+
+The 'anansi.go' file contains the majority of original code
+to focus more on inserting strings into the stream.
+
+The 'anansi_codes.go' file contains the new strings.Builder
+implementation for ANSI code sets
+
+The 'anansi_attribute.go' file contains the updated strings.Builder
+implementation of the Attribute type
+
+Much of the basic types, constants, and terminal checks in
+'anansi_const.go' are based on the very popular and well
+documented `color` project,
+
+https://www.github.com/fatih/color
+
+which is released under the MIT License.
+*/
+package anansi
 
 import (
 	"fmt"

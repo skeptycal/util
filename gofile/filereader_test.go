@@ -62,10 +62,26 @@ func TestTruncateFile(t *testing.T) {
 }
 
 func TestWriteFile(t *testing.T) {
-	filename := "TestWriteFile"
-	data := "fake data"
 
-	err := WriteFile(filename, data)
+	errorfile := "/dev/rdisk0"
+	_, err := TruncateFile(errorfile)
+	if err == nil {
+		t.Errorf("file should cause permission error %s: %v", errorfile, err)
+	}
+
+	utf8TestFile := "testdata/utf8TestFile"
+	data := "€"
+
+	err = WriteFile(utf8TestFile, data)
+	if err == nil {
+		t.Errorf("file should cause 'incorrect bytes written' error in %s with data '%s': %v", utf8TestFile, data, err)
+
+	}
+
+	filename := "testdata/TestWriteFile"
+	data = "fake data"
+
+	err = WriteFile(filename, data)
 	if err != nil {
 		t.Errorf("error writing data to file %s: %v", filename, err)
 	}

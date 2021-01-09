@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"syscall"
 )
 
 // Writer is the interface that wraps the basic Write method.
@@ -19,9 +20,17 @@ type Writer interface {
 	Write(p []byte) (n int, err error)
 }
 
+// StringWriterCloser implements a Writer that can handle string
+// and []byte messages as well as having a protected close method.
+// It is specifically designed to be used for writing data to
+// local standard files on standard hard drives.
 type StringWriterCloser interface {
-	io.StringWriter
-	io.Closer
+	Write(p []byte) (n int, err error)
+	WriteString(s string) (n int, err error)
+	Close() error
+}
+
+type fileWriter struct {
 }
 
 // WriteString writes the contents of the string s to w, which accepts a slice of bytes.
@@ -43,6 +52,8 @@ func WriteFile(fileName string, data string) (err error) {
 		return
 	}
 
+	w := StringWriterCloser(dataFile)
+
 	// I/O Error checking on file close
 	//
 	// do not defer Close() on files open for writing...
@@ -51,7 +62,7 @@ func WriteFile(fileName string, data string) (err error) {
 	defer func() {
 		// close the file, but grab the error without
 		// disturbing the err value
-		cerr := dataFile.Close()
+		cerr := w.Close()
 		// if there is no other error, return the value of
 		// the Close() error, which is most likely, but not
 		// necessarily, nil
@@ -60,11 +71,11 @@ func WriteFile(fileName string, data string) (err error) {
 		}
 	}()
 
-	w := StringWriterCloser(dataFile)
-	defer w.Close()
-
-	n, err := dataFile.WriteString(data)
+	n, err := dataFile.Write([]byte(data))
+	// todo remove this dev test err statement
+	err = fmt.Errorf("n: %d len: %d", n, len(data))
 	if DoOrDie(err) != nil {
+
 		return
 	}
 
@@ -83,7 +94,22 @@ func WriteFile(fileName string, data string) (err error) {
 	return
 }
 
-// OpenTrunc creates and opens the named file for writing.
+// Flags to OpenFile wrapping those of the underlying system. Not all
+// flags may be implemented on a given system.
+const (
+	// Exactly one of O_RDONLY, O_WRONLY, or O_RDWR must be specified.
+	O_RDONLY int = syscall.O_RDONLY // open the file read-only.
+	O_WRONLY int = syscall.O_WRONLY // open the file write-only.
+	O_RDWR   int = syscall.O_RDWR   // open the file read-write.
+	// The remaining values may be or'ed in to control behavior.
+	O_APPEND int = syscall.O_APPEND // append data to the file when writing.
+	O_CREATE int = syscall.O_CREAT  // create a new file if none exists.
+	O_EXCL   int = syscall.O_EXCL   // used with O_CREATE, file must not exist.
+	O_SYNC   int = syscall.O_SYNC   // open for synchronous I/O.
+	O_TRUNC  int = syscall.O_TRUNC  // truncate regular writable file when opened.
+)
+
+// TruncateFile creates and opens the named file for writing.
 // If successful, methods on the returned file can be used for
 // writing; the associated file descriptor has mode
 //
@@ -94,7 +120,7 @@ func WriteFile(fileName string, data string) (err error) {
 //
 // If you want other options, use:
 //
-//      	func os.OpenFile(name string, flag int, perm os.FileMode) (*os.File, error)
+//      func os.OpenFile(name string, flag int, perm os.FileMode) (*os.File, error)
 //
 // If there is an error, it will be of type *PathError.
 func TruncateFile(name string) (*os.File, error) {

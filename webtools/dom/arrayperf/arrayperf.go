@@ -9,22 +9,24 @@ import (
 )
 
 const (
-	pool              string = `_:$%&/()`
-	defaultStringSize int    = 32
-	defaultMinIntSize int    = 1
-	defaultInt16      int    = 1<<16 - 1
-	defaultInt32      int    = 1<<32 - 1
-	defaultInt8       int    = 1<<8 - 1
+	MaxInt16               int    = 1<<16 - 1
+	MaxInt32               int    = 1<<32 - 1
+	MaxInt8                int    = 1<<8 - 1
+	Pool                   string = `_:$%&/()`
+	DefaultIntFieldSizeMin int    = 0
+	DefaultIntFieldSizeMax int    = MaxInt16
+	DefaultStringFieldSize int    = 8
+	DefaultArrayFieldCount int    = MaxInt8
 )
 
-type array struct {
-	Len  int
-	Size int
-	S    []string
-	I    []int
+type arrayParallel struct {
+	Count int
+	Size  int
+	S     []string
+	I     []int
 }
 
-func (a array) String() string {
+func (a arrayParallel) String() string {
 	sb := strings.Builder{}
 	for i, s := range a.S {
 		sb.WriteString(fmt.Sprintf("%d - %v  ...  %32v : %-32v\n", i, s, a.S[i], a.I[i]))
@@ -32,7 +34,7 @@ func (a array) String() string {
 	return sb.String()
 }
 
-func (a array) Display() string {
+func (a arrayParallel) Display() string {
 	sb := strings.Builder{}
 	for i, _ := range a.S {
 		sb.WriteString(fmt.Sprintf("  %v = %v\n", a.S[i], a.I[i]))
@@ -40,30 +42,27 @@ func (a array) Display() string {
 	return sb.String()
 }
 
-func MakeArray(count, size int) *array {
-	if size == 0 {
-		size = defaultStringSize
+func MakeParallelArray(fieldCount, fieldSize int) *arrayParallel {
+	if fieldSize <= 0 {
+		fieldSize = DefaultStringFieldSize
 	}
-	if count == 0 {
-		count = defaultInt8
+	if fieldCount <= 0 {
+		fieldCount = DefaultArrayFieldCount
 	}
-	ss := make([]string, count)
-	ii := make([]int, count)
 
-	// a := array{
-	//     s: [n]string "",
-	//     i: [n]0,
-	// }
-	for i := 0; i < count; i++ {
-		ss[i] = randUpper(size)
-		ii[i] = randomInt(defaultMinIntSize, defaultInt32)
+	a := arrayParallel{
+		Count: fieldCount,
+		Size:  fieldSize,
+		S:     make([]string, fieldCount),
+		I:     make([]int, fieldCount),
 	}
-	return &array{
-		Len:  count,
-		Size: size,
-		S:    ss,
-		I:    ii,
+
+	for i := 0; i < fieldCount; i++ {
+		a.S[i] = randUpper(fieldSize)
+		a.I[i] = randomInt(DefaultIntFieldSizeMin, DefaultIntFieldSizeMax)
 	}
+
+	return &a
 }
 
 // Returns an int >= min, < max

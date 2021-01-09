@@ -43,12 +43,31 @@ var (
 
 const defaultGetStdinArgs = `Example: tr lowercase to UpperCase`
 
-func Hash() string {
-	return CombinedOutput("git rev-list --tags --max-count=1")
+func GetRecentTagHash() (string, error) {
+
+	// git-rev-list - Lists commit objects in reverse chronological order
+	// --tags limits the objects returned to git tags
+	// --max-count=1 limit the number of commits to one
+	// --pretty=oneline
+	out, err := Shell("git rev-list --tags --max-count=1")
+
+	if err != nil {
+		log.Error(err)
+		return "", err
+	}
+	return out, nil
 }
 
-func Version() string {
-	return CombinedOutput(fmt.Sprintf("git describe --tags %s", Hash()))
+func GitVersionTag() string {
+	tag, err := GetRecentTagHash()
+	if gofile.DoOrDie(err) != nil {
+		return ""
+	}
+	out, err := Shell(fmt.Sprintf("git describe --tags %s", tag))
+	if gofile.DoOrDie(err) != nil {
+		return ""
+	}
+	return out
 }
 
 // GetStdin sets the stdin pipe for cmd in order of preference.
