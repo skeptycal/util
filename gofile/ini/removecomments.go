@@ -31,21 +31,32 @@ var (
 )
 
 type ini struct {
-	fi os.FileInfo // fi is stored to avoid repeated os queries
-	f  *os.File    // f is stored to avoid repeated os queries
-	br *bufio.Reader
-	sc *bufio.Scanner
-	sb *strings.Builder // sb is reused for this ini file
+	*gofile.BufReader                       // file reader
+	*gofile.BufferedWriter                  // file writer
+	sc                     *bufio.Scanner   // data parser
+	sb                     *strings.Builder // string buffer
 }
 
-func (i *ini) Size() int { return int(i.fi.Size()) }
+// type ini struct {
+// 	w  Writer
+// 	r  Reader
+// 	fi os.FileInfo // fi is stored to avoid repeated os queries
+// 	f  *os.File    // f is stored to avoid repeated os queries
+// 	br *bufio.Reader
+// 	sc *bufio.Scanner
+// 	sb *strings.Builder // sb is reused for this ini file
+// }
 
-func NewIni(path string) *ini {
-	if !gofile.Exists(path) {
-		log.Errorf("path does not exist: %v", path)
+// func (i *ini) Size() int { return int(i.fi.Size()) }
+
+func NewIni(filename string, data []byte) (*ini, error) {
+	if !gofile.Exists(filename) {
+		log.Errorf("path does not exist: %v", filename)
 		return nil
 	}
-	in := ini{}
+	r, err := gofile.NewBufferedReader(filename)
+	w, err := gofile.NewBufferedWriter(filename, data)
+	in := ini{r, w, bufio.NewScanner(*r), &strings.Builder{}}
 	in.fi, _ = os.Stat(path)
 	f, err := os.Open(path)
 	if err != nil {
@@ -58,13 +69,9 @@ func NewIni(path string) *ini {
 	in.sb = &strings.Builder{}
 
 	in.br = bufio.NewReaderSize(in.f, int(in.Size()))
-	n, err := in.br.Read()
 	if err != nil {
 		log.Error(err)
 		return nil
-	}
-	if n != int(in.Size()) {
-		log.Errorf("incorrect number of bytes read: %d want: %d", n, in.Size())
 	}
 
 	in.sc = bufio.NewScanner(in.br)

@@ -32,9 +32,9 @@ import (
 // }
 
 // GetFileInfo returns file information (after symlink evaluation)
-// using os.Stat(). If the file is not a regular file, an error of type
-// *PathError is returned.
-func GetFileInfo(filename string) (os.FileInfo, error) {
+// using os.Stat(). If the file does not exist, is not a regular file,
+// or if the user lacks adequate permissions, an error is returned.
+func GetRegularFileInfo(filename string) (os.FileInfo, error) {
 
 	// EvalSymlinks also calls Abs and Clean as well as
 	// checking for existance of the file.

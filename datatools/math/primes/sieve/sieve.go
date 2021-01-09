@@ -15,7 +15,6 @@ import (
 
 const defaultSieveMax = 1000
 
-
 // GetFlags gets the values of the command line flags.
 func GetFlags(args CLIoptions) *flag.FlagSet {
 
@@ -35,9 +34,9 @@ func GetFlags(args CLIoptions) *flag.FlagSet {
 	filename := flags.Lookup("output").Value.String()
 	if !zsh.Exists(filename) {
 		log.Fatalf("error creating file: %v", filename)
-    }
+	}
 
-    out OutputFormat("json")=
+	// out = OutputFormat("json")
 
 	switch args["format"] {
 	case "json", "csv", "md", "text":

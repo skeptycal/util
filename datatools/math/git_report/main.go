@@ -11,17 +11,17 @@ import (
 // scan scans a new folder for Git repositories
 func scan(folder string) {
 	fmt.Printf("Found folders:\n\n")
-	repositories := recursiveScanFolder(folder)
-	filePath := getDotFilePath()
-	addNewSliceElementsToFile(filePath, repositories)
-	fmt.Printf("\n\nSuccessfully added\n\n")
+	// repositories := recursiveScanFolder(folder)
+	// filePath := getDotFilePath()
+	// addNewSliceElementsToFile(filePath, repositories)
+	// fmt.Printf("\n\nSuccessfully added\n\n")
 }
 
 // recursiveScanFolder starts the recursive search of git repositories
 // living in the `folder` subtree
-func recursiveScanFolder(folder string) []string {
-	return scanGitFolders(make([]string, 0), folder)
-}
+// func recursiveScanFolder(folder string) []string {
+// 	return scanGitFolders(make([]string, 0), folder)
+// }
 
 // scanGitFolders returns a list of subfolders of `folder` ending with `.git`.
 // Returns the base folder of the repo, the .git folder parent.

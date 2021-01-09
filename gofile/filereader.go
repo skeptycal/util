@@ -9,36 +9,45 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 )
 
-// BufReader implements buffering for an io.Reader object.
-type BufReader struct {
-	buf          []byte
-	rd           io.Reader // reader provided by the client
-	r, w         int       // buf read and write positions
-	err          error
-	lastByte     int // last byte read for UnreadByte; -1 means invalid
-	lastRuneSize int // size of last rune read for UnreadRune; -1 means invalid
+// BufferedReader implements buffering for an io.Reader object.
+type BufferedReader struct {
+	bufio.Reader
+	f *os.File
+	FileInfo
 }
 
 // BufferedFileReader represents a buffered io.Reader optimized for file reads.
 type BufferedFileReader interface {
-	Close() error
-	Name() string
-	Open()
-	Read(p []byte) (int, error)
-	Reset(r io.Reader) error
+	Buffered() int
+	Discard(n int) (discarded int, err error)
+	Peek(n int) ([]byte, error)
+	Read(p []byte) (n int, err error)
+	ReadByte() (byte, error)
+	ReadBytes(delim byte) ([]byte, error)
+	ReadLine() (line []byte, isPrefix bool, err error)
+	ReadRune() (r rune, size int, err error)
+	ReadSlice(delim byte) (line []byte, err error)
+	ReadString(delim byte) (string, error)
+	Reset(r io.Reader)
 	Size() int
-}
+	UnreadByte() error
+	UnreadRune() error
+	WriteTo(w io.Writer) (n int64, err error)
 
-// bufferedFileReader implements a wrapper for bufio.Reader that
-// calculates the initial buffer size and contains additional information
-// about the underlying file.
-type bufferedFileReader struct {
-	r  *bufio.Reader
-	rd *io.ReadCloser
-	f  *os.File
-	fi os.FileInfo
+	// os.FileInfo //Size() int64 replaced with FileSize()
+	Name() string       // base name of the file
+	Mode() os.FileMode  // file mode bits
+	ModTime() time.Time // modification time
+	Sys() interface{}   // underlying data source (can return nil)
+
+	// from ioutil.go
+	ReadAll(r io.Reader) ([]byte, error)
+
+	// from os.File
+	Close() error
 }
 
 // NewBufferedReader returns a new buffered Reader whose buffer has
@@ -64,7 +73,7 @@ add strange habits to coding workflows. e.g.
 
     // ... and that's all ... it just works
 */
-func NewBufferedReader(filename string) (rd *bufferedFileReader, err error) {
+func NewBufferedReader(filename string) (rd BufferedFileReader, err error) {
 
 	// panic recover:
 	// If the buffer overflows, we will get bytes.ErrTooLarge.
@@ -91,7 +100,7 @@ func NewBufferedReader(filename string) (rd *bufferedFileReader, err error) {
 	// or reallocate as needed, but in the overwhelmingly common case we'll get
 	// it just right.
 
-	fi, err := GetFileInfo(filename)
+	fi, err := GetRegularFileInfo(filename)
 	if err != nil {
 		return nil, err
 	}
@@ -100,65 +109,29 @@ func NewBufferedReader(filename string) (rd *bufferedFileReader, err error) {
 		return nil, fmt.Errorf("file %v is empty", filename)
 	}
 
-	rd.fi = fi
 	cap := InitialCapacity(fi.Size())
 
 	f, err := os.Open(fi.Name())
 	if err != nil {
 		return nil, err
 	}
-	rd.f = f
 	// defer f.Close() // this is the usual practice
 
-	return &bufferedFileReader{
-		r:  bufio.NewReaderSize(f, cap),
-		f:  f,
-		fi: fi,
-	}, nil
-
+	return &BufferedReader{*bufio.NewReaderSize(f, cap), f, fi}, nil
 }
 
 // ReadAll reads from r until an error or EOF and returns the data it read.
 // A successful call returns err == nil, not err == EOF. Because ReadAll is
 // defined to read from src until EOF, it does not treat an EOF from Read
 // as an error to be reported.
-func (fr *bufferedFileReader) ReadAll() ([]byte, error) {
-	return ioutil.ReadAll(fr.r)
+func (fr *BufferedReader) ReadAll(r io.Reader) ([]byte, error) {
+	return ioutil.ReadAll(fr)
 }
 
 // Close closes the underlying file and frees any resources.
-func (fr *bufferedFileReader) Close() error {
+func (fr *BufferedReader) Close() error {
 	defer fr.Reset(nil)
 	return fr.f.Close()
-}
-
-// Reset discards any buffered data, resets all state, and switches
-// the buffered reader to read from r.
-func (fr *bufferedFileReader) Reset(r io.Reader) {
-	if r == nil && fr.f != nil {
-		r = fr.f
-	}
-	fr.r.Reset(fr.f)
-}
-
-func (fr *bufferedFileReader) File() (io.ReadCloser, error) {
-	return fr.f, nil
-}
-
-func (fr *bufferedFileReader) Size() int {
-	return fr.r.Size()
-}
-
-func (fr *bufferedFileReader) FileSize() int {
-	return int(fr.fi.Size())
-}
-
-func (fr *bufferedFileReader) Name() string {
-	return fr.fi.Name()
-}
-
-func (fr *bufferedFileReader) FileInfo() *os.FileInfo {
-	return &fr.fi
 }
 
 // Sig is an experimental feature
@@ -181,22 +154,3 @@ func Sig() {
 	fmt.Println("exiting")
 
 }
-
-// func NewFileCloseRemover(r *bufio.Reader, w *bufio.Writer) *readWriteRemover {
-
-// 	rw := &readWriteRemover{
-// 		bufio.NewReadWriter(r, w),
-// 	}
-// 	return rw
-// }
-
-// os.File notes:
-/* type file struct {
-	pfd         poll.FD
-	name        string
-	dirinfo     *dirInfo // nil unless directory being read
-	nonblock    bool     // whether we set nonblocking mode
-	stdoutOrErr bool     // whether this is stdout or stderr
-	appendMode  bool     // whether file is opened for appending
-}
-*/

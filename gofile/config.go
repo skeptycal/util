@@ -2,8 +2,11 @@ package gofile
 
 import (
 	"bytes"
+	_ "net/http/pprof"
 	"os"
 	"runtime"
+
+	_ "github.com/sirupsen/logrus"
 )
 
 // These constants are mostly modified variations or unexported parts

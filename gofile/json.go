@@ -10,7 +10,7 @@ type jsonMap map[string]interface{}
 
 // GetJSONFile loads and returns a JSON structure representing the json file.
 func GetJSONFile(filename string) (JSON, error) {
-	fi, err := GetFileInfo(filename)
+	fi, err := GetRegularFileInfo(filename)
 	if err != nil {
 		return nil, err
 	}

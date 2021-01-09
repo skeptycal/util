@@ -4,7 +4,6 @@ import (
 	"encoding/binary"
 	"fmt"
 	"net"
-	"net/http"
 )
 
 const ( // 4 + 8 + 20 = 32
@@ -75,7 +74,7 @@ func (h *Header) String() string {
 // ParseHeader parses b as an IPv6 base header.
 func ParseHeader(b []byte) (*Header, error) {
 	if len(b) < HeaderLen {
-		return nil, http.MethodHeaderrHeaderTooShort
+		return nil, &net.ParseError{}
 	}
 	h := &Header{
 		Version:      int(b[0]) >> 4,

@@ -3,49 +3,78 @@ package gofile
 import (
 	"bufio"
 	"bytes"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
+	"syscall"
+	"time"
 )
 
-// BufWriter implements buffering for an io.Writer object.
-// If an error occurs writing to a Writer, no more data will be
-// accepted and all subsequent writes, and Flush, will return the error.
-//
-// Close should check the error before closing and return any error
-// after calling Flush.
-//
-// After all data has been written, the client should call the
-// Flush method to guarantee all data has been forwarded to
-// the underlying io.Writer.
-type BufWriter struct {
-	err  error
-	buf  []byte
-	r, w int       // buf read and write positions
-	rd   io.Writer // writer provided by the client
-}
+// bufferedWriter implements buffering for an io.Writer object.
+/*
+If an error occurs writing to a Writer, no more data will be
+accepted and all subsequent writes, and Flush, will return the error.
 
-// bufferedFileWriter implements a wrapper for BufWriter that
-// maintains a File pointer, FileInfo,
-type bufferedFileWriter struct {
-	w  *BufWriter
-	rd *io.ReadCloser
-	f  *os.File
-	fi os.FileInfo
+Close should check the error before closing and return any error
+after calling Flush. After all data has been written, the client
+should call the Flush method to guarantee all data has been forwarded
+to the underlying io.Writer.
+
+It maintains a File pointer and FileInfo interface. The file pointer
+is the io.Writer supplied by the client in bufio.Writer. It is stored
+to avoid repetitive system calls.
+
+The FileInfo interface provides access to the following methods:
+
+    Name() string       // base name of the file
+    Size() int64        // length in bytes for regular files; system-dependent for others
+    Mode() FileMode     // file mode bits
+    ModTime() time.Time // modification time
+    IsDir() bool        // abbreviation for Mode().IsDir() // not used
+    Sys() interface{}   // underlying data source (can return nil) // not used
+*/
+type bufferedWriter struct {
+	bufio.Writer
+	f *os.File
+	FileInfo
 }
 
 // BufferedFileWriter represents a buffered io.Reader optimized for file reads.
+/*
+type FileInfo interface {
+    Name() string       // base name of the file
+    Size() int64        // length in bytes for regular files; system-dependent for others
+    Mode() FileMode     // file mode bits
+    ModTime() time.Time // modification time
+    IsDir() bool        // abbreviation for Mode().IsDir()
+    Sys() interface{}   // underlying data source (can return nil)
+}
+*/
 type BufferedFileWriter interface {
-	Close() error
-	Name() string
-	Open()
-	Write(p []byte) (int, error)
-	Reset(r io.Reader) error
+	Available() int
+	Buffered() int
+	Flush() error
+	ReadFrom(r io.Reader) (n int64, err error)
+	Reset(w io.Writer)
 	Size() int
+	Write(p []byte) (n int, err error)
+	WriteByte(c byte) error
+	WriteRune(r rune) (size int, err error)
+	WriteString(s string) (int, error)
+
+	// from FileInfo
+	Name() string       // base name of the file
+	Mode() os.FileMode  // file mode bits
+	ModTime() time.Time // modification time
+
+	// from ioutil.go
+	WriteFile(filename string, data []byte, perm os.FileMode) error
+
+	// from os.File
+	Close() error
 }
 
-// NewBufferedReader returns a new buffered Reader whose buffer has
+// NewBufferedWriter returns a new buffered Reader whose buffer has
 // at least the size of the specified file.
 /*
 In addition, it stores the file Stat() information to avoid redundant
@@ -56,7 +85,7 @@ will be performed and the savings of calls to os.Stat can be substantial.
 The buffer grows as needed. The file information is updated when changed.
 
 It is important to use defer both file.Close() and buffer.Reset() during
-setup to guarantee the release of resources. The bufferedFileWriter
+setup to guarantee the release of resources. The BufferedFileWriter
 method Close() performs both of these tasks, eliminating the need to
 add strange habits to coding workflows. e.g.
 
@@ -68,7 +97,7 @@ add strange habits to coding workflows. e.g.
 
     // ... and that's all ... it just works
 */
-func NewBufferedReader(filename string) (rd *bufferedFileWriter, err error) {
+func NewBufferedWriter(filename string, data []byte) (w BufferedFileWriter, err error) {
 
 	// panic recover:
 	// If the buffer overflows, we will get bytes.ErrTooLarge.
@@ -85,82 +114,84 @@ func NewBufferedReader(filename string) (rd *bufferedFileWriter, err error) {
 		}
 	}()
 
-	// It's a good but not certain bet that FileInfo will tell us exactly how much to
-	// read, so let's try it but be prepared for the answer to be wrong.
-
-	// As initial capacity for readAll, use Size + a little extra in case Size
-	// is zero, and to avoid another allocation after Write has filled the
-	// buffer. The readAll call will read into its allocated internal buffer
-	// cheaply. If the size was wrong, we'll either waste some space off the end
-	// or reallocate as needed, but in the overwhelmingly common case we'll get
-	// it just right.
-
-	fi, err := GetFileInfo(filename)
+	f, err := TruncateFile(filename)
 	if err != nil {
 		return nil, err
 	}
 
-	if fi.Size() == 0 {
-		return nil, fmt.Errorf("file %v is empty", filename)
-	}
-
-	rd.fi = fi
-	cap := InitialCapacity(fi.Size())
-
-	f, err := os.Open(fi.Name())
+	fi, err := GetRegularFileInfo(filename)
 	if err != nil {
 		return nil, err
 	}
-	rd.f = f
+
+	cap := InitialCapacity(int64(len(data)))
+
 	// defer f.Close() // this is the usual practice
 
-	return &bufferedFileWriter{
-		r:  bufio.NewReaderSize(f, cap),
-		f:  f,
-		fi: fi,
-	}, nil
-
+	return &bufferedWriter{*bufio.NewWriterSize(f, cap), f, fi}, nil
 }
 
-// ReadAll reads from r until an error or EOF and returns the data it read.
-// A successful call returns err == nil, not err == EOF. Because ReadAll is
-// defined to read from src until EOF, it does not treat an EOF from Write
-// as an error to be reported.
-func (fr *bufferedFileWriter) ReadAll() ([]byte, error) {
-	return ioutil.ReadAll(fr.r)
+// WriteFile writes a file.
+func (fr *bufferedWriter) WriteFile(filename string, data []byte, perm os.FileMode) error {
+	return ioutil.WriteFile(fr.Name(), data, 0644)
 }
 
-// Close closes the underlying file and frees any resources.
-func (fr *bufferedFileWriter) Close() error {
+// Close closes the underlying File, rendering it unusable for I/O. The
+// buffer is also reset to nil and its resources freed up to be garbage
+// collected. This has the effect of rendering the bufferedWriter unusable.
+//
+// On files that support SetDeadline, any pending I/O operations will be
+// canceled and return immediately with an error. Close will return an
+// error if it has already been called.
+func (fr bufferedWriter) Close() error {
 	defer fr.Reset(nil)
-	return fr.f.Close()
+	fr.Flush()
+	return fr.Close()
 }
 
-// Reset discards any buffered data, resets all state, and switches
-// the buffered reader to read from r.
-func (fr *bufferedFileWriter) Reset(r io.Reader) {
-	if r == nil && fr.f != nil {
-		r = fr.f
-	}
-	fr.r.Reset(fr.f)
+// FileInfo implements os.FileInfo except for Size() and IsDir().
+//
+// Size() conflicts with bufio.Writer Size().
+//
+// IsDir() is nonsensical because the File used as the io.Writer as
+// the target for the buffer in bufferedWriter is never a directory.
+//
+// The Mode() and Name() are implemented and necessary.
+//
+// The remaining methods, ModTime() and Sys(), are of dubious
+// importance but there is no good reason to exclude them.
+type FileInfo interface {
+	Name() string       // base name of the file
+	Mode() os.FileMode  // file mode bits
+	ModTime() time.Time // modification time
+	Sys() interface{}   // underlying data source (can return nil)
 }
 
-func (fr *bufferedFileWriter) File() (io.ReadCloser, error) {
-	return fr.f, nil
-}
-
-func (fr *bufferedFileWriter) Size() int {
-	return fr.r.Size()
-}
-
-func (fr *bufferedFileWriter) FileSize() int {
-	return int(fr.fi.Size())
-}
-
-func (fr *bufferedFileWriter) Name() string {
-	return fr.fi.Name()
-}
-
-func (fr *bufferedFileWriter) FileInfo() *os.FileInfo {
-	return &fr.fi
+// FileMethods implements a selection of os.File methods that are useful
+// and do not conflict with other interfaces.
+//
+// Methods not implemented because of conflicts are;
+//  Name, Read, Write, WriteString, Truncate
+// Methods not implemented because of other issues are
+//  Chdir (could cause awkward problems ...)
+//
+// Methods implemented, but not used, are:
+//  Chmod, Chown, Fd, Readdir, Readdirnames, Seek, SetDeadline,
+//  SetReadDeadline, SetWriteDeadline, Sync, SyscallConn, WriteAt
+type FileMethods interface {
+	Chmod(mode os.FileMode) error
+	Chown(uid, gid int) error
+	Close() error
+	Fd() uintptr
+	Readdir(n int) ([]FileInfo, error)
+	Readdirnames(n int) (names []string, err error)
+	Seek(offset int64, whence int) (ret int64, err error)
+	SetDeadline(t time.Time) error
+	SetReadDeadline(t time.Time) error
+	SetWriteDeadline(t time.Time) error
+	Stat() (os.FileInfo, error)
+	Sync() error
+	SyscallConn() (syscall.RawConn, error)
+	Truncate(size int64) error
+	WriteAt(b []byte, off int64) (n int, err error)
 }

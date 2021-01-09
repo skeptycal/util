@@ -2,13 +2,12 @@ package gofile
 
 import (
 	"fmt"
+	"io"
 	"os"
-
-	log "github.com/sirupsen/logrus"
 )
 
-// CreateFileTruncate - Creates a file and returns a closer on success else error
-func CreateFileTruncate(filename string) (*os.File, error) {
+// Create creates a file and returns an io.ReadCloser on success else error
+func Create(filename string) (io.ReadCloser, error) {
 	file, err := os.Create(filename)
 	if err != nil {
 		return nil, fmt.Errorf("failed creating file (%s): %v", filename, err)
@@ -16,14 +15,10 @@ func CreateFileTruncate(filename string) (*os.File, error) {
 	return file, nil
 }
 
-// CreateFileSafe - Creates a file and returns a closer on success else error
-func CreateFileSafe(filename string) (*os.File, error) {
-	file, err := os.Create(filename)
-	if err != nil {
-		log.Error(err)
-		// err1 := file.Close()
-		// log.Error(err1)
-		return nil, fmt.Errorf("failed creating file (%s): %v", filename, err)
+// CreateSafe creates a file and returns a ReadCloser on success else error
+func CreateSafe(filename string) (io.ReadCloser, error) {
+	if Exists(filename) {
+		return nil, fmt.Errorf("file already exists (%s): %v", filename, os.ErrExist)
 	}
-	return file, nil
+	return Create(filename)
 }
