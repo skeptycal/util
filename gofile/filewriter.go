@@ -35,7 +35,7 @@ The FileInfo interface provides access to the following methods:
 */
 type bufferedWriter struct {
 	bufio.Writer
-	f *os.File
+	*os.File
 	FileInfo
 }
 
@@ -72,6 +72,7 @@ type BufferedFileWriter interface {
 
 	// from os.File
 	Close() error
+	FileMethods
 }
 
 // NewBufferedWriter returns a new buffered Reader whose buffer has
@@ -144,9 +145,14 @@ func (fr *bufferedWriter) WriteFile(filename string, data []byte, perm os.FileMo
 // canceled and return immediately with an error. Close will return an
 // error if it has already been called.
 func (fr bufferedWriter) Close() error {
-	defer fr.Reset(nil)
+	// defer func()
 	fr.Flush()
-	return fr.Close()
+	fr.Reset(nil)
+	return fr.File.Close()
+}
+
+func (fr bufferedWriter) ReadAll(r io.Reader) ([]byte, error) {
+	return ioutil.ReadAll(fr)
 }
 
 // FileInfo implements os.FileInfo except for Size() and IsDir().
@@ -161,7 +167,7 @@ func (fr bufferedWriter) Close() error {
 // The remaining methods, ModTime() and Sys(), are of dubious
 // importance but there is no good reason to exclude them.
 type FileInfo interface {
-	Name() string       // base name of the file
+	// Name() string       // base name of the file
 	Mode() os.FileMode  // file mode bits
 	ModTime() time.Time // modification time
 	Sys() interface{}   // underlying data source (can return nil)

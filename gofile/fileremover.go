@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-// FileCloseRemover is a wrapper around bufio.ReadWriter that removes
+// ReadWriteRemover is a wrapper around bufio.ReadWriter that removes
 // the file when it is closed, useful for temporary files.
 type ReadWriteRemover interface {
 	Read(p []byte) (int, error)

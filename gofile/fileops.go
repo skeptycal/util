@@ -31,7 +31,7 @@ import (
 // 	}
 // }
 
-// GetFileInfo returns file information (after symlink evaluation)
+// GetRegularFileInfo returns file information (after symlink evaluation)
 // using os.Stat(). If the file does not exist, is not a regular file,
 // or if the user lacks adequate permissions, an error is returned.
 func GetRegularFileInfo(filename string) (os.FileInfo, error) {
