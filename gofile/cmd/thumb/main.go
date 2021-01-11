@@ -9,8 +9,21 @@ import (
 )
 
 func main() {
+
+	// pwd, err := os.Getwd()
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	// samplePath := filepath.Join(pwd, "sample")
+	// sampleFmt := "%s/%s"
+
+	// fmt.Println(pwd)
+	// fmt.Println(samplePath)
+	// fmt.Printf(sampleFmt, samplePath, "clockworks.jpg")
+
 	// open "test.jpg"
-	file, err := os.Open("test.jpg")
+	file, err := os.Open("sample_images/clockworks.jpg")
 	if err != nil {
 		log.Fatal(err)
 	}
