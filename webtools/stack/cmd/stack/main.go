@@ -10,21 +10,26 @@ import (
 const serviceName = "Medium service"
 const serviceDescription = "Simple service, just for fun"
 
+var logger service.Logger
+
 type program struct{}
 
 func (p program) Start(s service.Service) error {
+	// Start should not block. Do the actual work async.
 	fmt.Println(s.String() + " started")
 	go p.run()
 	return nil
 }
 
 func (p program) Stop(s service.Service) error {
+	// Stop should not block. Return with a few seconds.
 	fmt.Println(s.String() + " stopped")
 	return nil
 }
 
 func (p program) run() {
 	for {
+		// Do work here
 		fmt.Println("Service is running")
 		time.Sleep(1 * time.Second)
 	}
