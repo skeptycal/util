@@ -2,7 +2,19 @@
 
 package main
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
+
+func BenchmarkMain(b *testing.B) {
+	for j := 0; j < 20; j++ {
+		for i := 0; i < b.N; i++ {
+			main()
+		}
+		fmt.Printf("%v", b.Name())
+	}
+}
 
 func Test_main(t *testing.T) {
 	tests := []struct {
