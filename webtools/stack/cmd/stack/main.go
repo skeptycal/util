@@ -36,6 +36,9 @@ func (p program) run() {
 }
 
 func main() {
+
+	logger.Info("logger started...")
+
 	serviceConfig := &service.Config{
 		Name:        serviceName,
 		DisplayName: serviceName,
@@ -44,10 +47,10 @@ func main() {
 	prg := &program{}
 	s, err := service.New(prg, serviceConfig)
 	if err != nil {
-		fmt.Println("Cannot create the service: " + err.Error())
+		logger.Errorf("Cannot create the service: %v\n", err.Error())
 	}
 	err = s.Run()
 	if err != nil {
-		fmt.Println("Cannot start the service: " + err.Error())
+		logger.Errorf("Cannot start the service: " + err.Error())
 	}
 }
