@@ -26,23 +26,35 @@ func Filter(in <-chan int, out chan<- int, prime int) {
 
 // The prime sieve: Daisy-chain Filter processes.
 func main() {
+	// maxnum is the number of primes to calculate.
 	maxnum := 1000
-	percent := 5.0
-	step := int(float64(maxnum) * percent / 100.0)
-	maxnumLength := len(fmt.Sprintf("%d", maxnum))
+	// 	percentInterval is the percentage of primes that are listed.
+	percentInterval := 5.0
+	seriesStart := 1
+	seriesStop := maxnum
+
+	statusInterval := int(float64(maxnum) * percentInterval / 100.0)
+
+	maxnumLengthFmt := fmt.Sprintf("%v", 5)
+	maxnumLengthFmtLen := len(maxnumLengthFmt)
+
 	// for maxnum ==5, generates " %5d : %-d\n"
-	maxLenStrFmt := fmt.Sprintf(" %%%dd : %%-d\n", maxnumLength)
+	maxLenStrFmt := fmt.Sprintf(" %%%dd : %%-d\n", maxnumLengthFmtLen)
 
 	ch := make(chan int) // Create a new channel.
 	go Generate(ch)      // Launch Generate goroutine.
-	for i := 0; i < maxnum; i++ {
+	for i := seriesStart; i < seriesStop; i++ {
 		prime := <-ch
-		if i%step == 0 {
+		if (i+1)%statusInterval == 0 {
 			fmt.Printf(maxLenStrFmt, i, prime)
 		}
 		ch1 := make(chan int)
 		go Filter(ch, ch1, prime)
 		ch = ch1
+		if i > seriesStop {
+			last = prime
+			fmt.Printf(maxLenStrFmt, i, prime)
+		}
 	}
-	fmt.Printf("That was %.0f%% of the first %d prime numbers.\n", percent, maxnum)
+	fmt.Printf("That was %.0f%% of the first %d prime numbers.\n", percentInterval, maxnum)
 }
