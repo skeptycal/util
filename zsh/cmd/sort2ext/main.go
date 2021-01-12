@@ -46,9 +46,9 @@ func usage() { fmt.Fprintf(os.Stderr, "Usage: %s  [path]\n", basename) }
 
 // Echo checks for format strings, io.Writers, and ANSI tags before printing results.
 func Echo(v ...interface{}) {
-    if len(v) < 2 {
-        fmt.Println(v...)
-    }
+	if len(v) < 2 {
+		fmt.Println(v...)
+	}
 	var w io.Writer = os.Stdout
 	var fmtString string = "%v\n"
 	var args []interface{} = v[0:]
