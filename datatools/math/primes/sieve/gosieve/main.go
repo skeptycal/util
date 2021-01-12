@@ -2,6 +2,8 @@
 
 package main
 
+var last int = 0
+
 // Generate - Send the sequence 2, 3, 4, ... to channel 'ch'.
 func Generate(ch chan<- int) {
 	for i := 2; ; i++ {
@@ -22,15 +24,20 @@ func Filter(in <-chan int, out chan<- int, prime int) {
 
 // The prime sieve: Daisy-chain Filter processes.
 func main() {
-	last int := 0
+	maxnum := 1000
+	step := maxnum / 100
 	ch := make(chan int) // Create a new channel.
 	go Generate(ch)      // Launch Generate goroutine.
-	for i := 0; i < 100000; i++ {
+	for i := 0; i < maxnum; i++ {
 		prime := <-ch
-		// print(prime, "\n")
+		if i%step == 0 {
+
+			print(prime, "\n")
+		}
 		ch1 := make(chan int)
 		go Filter(ch, ch1, prime)
 		ch = ch1
 	}
-	print(prime, "\n")
+    print(last, "\n")
+    fmt.Printf("That was the first %d prime numbers.\n",maxnum)
 }
