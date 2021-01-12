@@ -12,7 +12,7 @@ func BenchmarkMain(b *testing.B) {
 		for i := 0; i < b.N; i++ {
 			main()
 		}
-		fmt.Printf("%v", b.Name())
+		fmt.Printf("%vs", b.Name())
 	}
 }
 
