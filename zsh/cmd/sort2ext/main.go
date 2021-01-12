@@ -53,20 +53,12 @@ func Echo(v ...interface{}) {
 	var fmtString string = "%v\n"
 	var args []interface{} = v[0:]
 
-	g := v[0]
+	if ok := v[0]; ok != true {
+		fmt.Println("%v", v[0])
 
-	// gt := reflect.TypeOf(g)
-
-	fmt.Printf("userType: %T\n", g)
-	t := fmt.Sprintf("type: %T\n", g)
-	if strings.Contains(t, "os.File") {
-		fmt.Println("yes!")
 	}
 
-	// if reflect.Kind(v[0]) == reflect.Ptr {
-
-	// }
-
+	t := fmt.Sprintf("type: %T\n", v[0])
 	if strings.Contains(t, "os.File") {
 		w = args[0].(io.Writer)
 		args = args[1:]
