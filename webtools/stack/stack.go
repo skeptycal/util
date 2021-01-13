@@ -7,14 +7,20 @@ package stack
 
 import (
 	"fmt"
+	"html/template"
 	"net/http"
 	"sync"
 	"time"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/julienschmidt/sse"
 	"github.com/kardianos/service"
 	log "github.com/sirupsen/logrus"
 )
+
+type TimePage struct {
+	Time string
+}
 
 var (
 	serviceIsRunning bool
@@ -73,26 +79,55 @@ func (p *program) Stop(s service.Service) error {
 
 func (p *program) run() {
 	// for serviceIsRunning {
-	// 	writingSync.Lock()
-	// 	programIsRunning = true
-	// 	writingSync.Unlock()
+	lock()
 
 	router := httprouter.New()
+	timer := sse.New()
+
 	router.ServeFiles("/js/*filepath", http.Dir("js"))
 	router.ServeFiles("/css/*filepath", http.Dir("css"))
 
 	router.GET("/", serveHomepage)
 
+	router.Handler("GET", "/time", timer)
+	go streamTime(timer)
+
 	err := http.ListenAndServe(":81", router)
 	if err != nil {
 		log.Errorf("Problem starting web server: %v", err.Error())
 	}
-	// 	writingSync.Lock()
-	// 	programIsRunning = false
-	// 	writingSync.Unlock()
-	// }
+	unlock()
+
 }
 
 func serveHomepage(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	lock()
 
+	var indexPage TimePage
+	indexPage.Time = time.Now().String()
+
+	tmpl := template.Must(template.ParseFiles("src/index.html"))
+	_ = tmpl.Execute(writer, indexPage)
+
+	unlock()
+}
+
+func streamTime(timer *sse.Streamer) {
+	fmt.Println("Streaming time  started")
+	for serviceIsRunning {
+		timer.SendString("", "time", time.Now().String())
+		time.Sleep(100 * time.Millisecond)
+	}
+}
+
+func unlock() {
+	writingSync.Lock()
+	programIsRunning = false
+	writingSync.Unlock()
+}
+
+func lock() {
+	writingSync.Lock()
+	programIsRunning = true
+	writingSync.Unlock()
 }
