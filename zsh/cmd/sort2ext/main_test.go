@@ -3,6 +3,10 @@
 // file extension.
 package main_test
 
+import (
+	. "github.com/skeptycal/util/zsh/cmd/sort2ext/main"
+)
+
 // type thing string
 
 // func (thing thing) String() string {
