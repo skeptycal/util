@@ -1,13 +1,19 @@
 package zsh
 
 import (
+	"fmt"
 	"os"
+	"strconv"
 	"strings"
 	"syscall"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/skeptycal/util/gofile"
 )
+
+type Stringer interface {
+	String() string
+}
 
 // Err calls error handling and logging routines
 func Err(err error) error {
@@ -81,4 +87,17 @@ func Home() string {
 		return "~/"
 	}
 	return s
+}
+
+func ToString(any interface{}) string {
+	if v, ok := any.(Stringer); ok {
+		return v.String()
+	}
+	switch v := any.(type) {
+	case int:
+		return strconv.Itoa(v)
+	case float64, float32:
+		return fmt.Sprintf("%.2g", v)
+	}
+	return "???"
 }
