@@ -77,7 +77,7 @@ func Echo(v ...interface{}) {
 			return
 		}
 	default:
-		fmt.Fprintln(echoWriter, v[1:])
+		fmt.Fprintln(echoWriter, v[1:]...)
 		return
 	}
 
@@ -94,6 +94,8 @@ func EchoSB(v ...interface{}) (n int, err error) {
 	for _, a := range v {
 
 		switch t := a.(type) {
+		case Stringer:
+			sb.WriteString(t.String())
 		case string:
 			sb.WriteString(t)
 		case []byte:
@@ -103,11 +105,9 @@ func EchoSB(v ...interface{}) (n int, err error) {
 		case float32, float64:
 			sb.WriteString(fmt.Sprintf("%f", t))
 		case nil:
-
+			sb.WriteString("<nil>")
 		default:
-			if s, ok := t.(Stringer); ok {
-				sb.WriteString(s.String())
-			}
+			// skip all others
 
 		}
 	}
