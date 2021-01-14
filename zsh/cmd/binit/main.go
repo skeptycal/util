@@ -5,10 +5,9 @@ import (
 	"io"
 	"os"
 	"path"
-	"path/filepath"
-	"strings"
 
 	log "github.com/sirupsen/logrus"
+	"github.com/skeptycal/util/zsh"
 )
 
 const (
@@ -37,49 +36,17 @@ func init() {
 
 // name returns the name of this file
 func me() string {
-	return FileName(os.Args[0])
+	return zsh.Base(os.Args[0])
 }
 
 // here returns the location of this file
 func here() string {
-	return AbsPath(os.Args[0])
-}
-
-// Name returns the name of file else  "."
-func FileName(file string) string {
-	return filepath.Base(file)
-}
-
-// AbsPath returns the absolute path of file
-func AbsPath(file string) string {
-	dir, _ := filepath.Abs(file)
-	return dir
+	return zsh.AbsPath(os.Args[0])
 }
 
 // OsArgs returns the slice of strings returned by os.Args[1:]
 func OsArgs() []string {
 	return os.Args[1:]
-}
-
-// Contains tells whether a contains x.
-func Contains(a []string, x string) bool {
-	for _, n := range a {
-		if x == n {
-			return true
-		}
-	}
-	return false
-}
-
-// NameSplit returns a slice of strings containing the name and extension of file.
-func NameSplit(file string) (string, string) {
-	s := strings.Split(filepath.Base(file), ".")
-	name := s[0]
-	ext := ""
-	if len(s) > 1 {
-		ext = s[1]
-	}
-	return name, ext
 }
 
 func copy(src, dst string) (int64, error) {

@@ -3,6 +3,7 @@ package zsh
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"syscall"
@@ -11,8 +12,43 @@ import (
 	"github.com/skeptycal/util/gofile"
 )
 
+type TrueMap map[string]bool
+
+func (a TrueMap) String() string {
+	sb := strings.Builder{}
+	for k, v := range a {
+		if v == true {
+			sb.WriteString(k)
+			sb.WriteString(",")
+		}
+	}
+	return sb.String()
+}
+
+func (a TrueMap) List() (s []string) {
+	for k, v := range a {
+		if v == true {
+			s = append(s, k)
+		}
+	}
+	return
+}
+
 type Stringer interface {
 	String() string
+}
+
+func Tree(pathname string) []string {
+
+}
+
+func Dir(pathname string) (files []os.FileInfo, err error) {
+	return files, filepath.Walk(pathname,
+		func(path string, info os.FileInfo, err error) error {
+            if
+			files = append(files, info)
+			return nil
+		})
 }
 
 // Err calls error handling and logging routines
@@ -100,4 +136,37 @@ func ToString(any interface{}) string {
 		return fmt.Sprintf("%.2g", v)
 	}
 	return "???"
+}
+
+// Contains tells whether a contains x.
+func Contains(a []string, x string) bool {
+	for _, n := range a {
+		if x == n {
+			return true
+		}
+	}
+	return false
+}
+
+// NameSplit returns separate name and extension of file.
+func NameSplit(filename string) (string, string) {
+	s := strings.Split(filepath.Base(filename), ".")
+	name := s[0]
+	ext := ""
+	if len(s) > 1 {
+		ext = s[len(s)-1]
+	}
+	return name, ext
+}
+
+// Name returns the name of file without path information.
+func Base(filename string) string {
+	ns, _ := NameSplit(filename)
+	return NameSplit[1]
+}
+
+// AbsPath returns the absolute path of file.
+func AbsPath(file string) string {
+	dir, _ := filepath.Abs(file)
+	return dir
 }

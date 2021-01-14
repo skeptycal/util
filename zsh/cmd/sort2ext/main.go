@@ -10,21 +10,21 @@ import (
 	"strings"
 
 	log "github.com/sirupsen/logrus"
+	"github.com/skeptycal/util/zsh"
 )
-
-type Stringer interface {
-	String() string
-}
 
 const (
 	fmtEchoString string = "%v "
 )
 
 var (
-	basename   string = path.Base(os.Args[0])
-	pwd, _            = os.Getwd()
-	echoWriter        = os.Stdout
+	basename string = path.Base(os.Args[0])
+	pwd, _          = os.Getwd()
+	echo            = os.Stdout
 )
+
+// ---------------------------------------------
+// -------------------------------------- set
 
 func main() {
 	argpath := pwd
@@ -47,24 +47,27 @@ func main() {
 
 	Echo("base: %s", basename)
 	Echo("argpath: %s", argpath)
+	usage()
 
+	zsh.Dir(pwd)
 }
 
-func usage() { fmt.Fprintf(os.Stderr, "Usage: %s  [path]\n", basename) }
+func usage() { Echo("Usage: %s [path]\n", basename) }
 
 // Echo checks for format strings, io.Writers, and ANSI tags before printing results.
+// Output is sent to echo, a buffered io.Writer implemented by EchoWriter.
 func Echo(v ...interface{}) {
 
 	// single string argument  ... newline assumed
 	// (most common desireable outcome)
 	// to print a single string without newline, use fmt.Print() instead.
 	if len(v) == 1 {
-		fmt.Fprintln(echoWriter, v[0])
+		fmt.Fprintln(echo, v[0])
 		return
 	}
 	// no arguments ... interpreted as newline only
 	if len(v) == 0 {
-		fmt.Fprintf(echoWriter, "%v\n", "")
+		fmt.Fprintf(echo, "%v\n", "")
 		return
 	}
 
@@ -73,44 +76,18 @@ func Echo(v ...interface{}) {
 		if strings.ContainsAny(s, "%") {
 			// fmtString = v[0].(string)
 			// args = args[1:]
-			fmt.Fprintf(echoWriter, s, v[1:]...)
+			fmt.Fprintf(echo, s, v[1:]...)
+			fmt.Println()
 			return
 		}
 	default:
-		fmt.Fprintln(echoWriter, v[1:]...)
+		fmt.Fprintln(echo, v[1:]...)
 		return
 	}
 
 	for _, a := range v[:len(v)-1] {
-		fmt.Fprintf(echoWriter, fmtEchoString, a)
+		fmt.Fprintf(echo, fmtEchoString, a)
 	}
-	fmt.Fprintf(echoWriter, "%v\n", v[len(v)-1])
+	fmt.Fprintf(echo, "%v\n", v[len(v)-1])
 
-}
-
-func EchoSB(v ...interface{}) (n int, err error) {
-	sb := strings.Builder{}
-
-	for _, a := range v {
-
-		switch t := a.(type) {
-		case Stringer:
-			sb.WriteString(t.String())
-		case string:
-			sb.WriteString(t)
-		case []byte:
-			sb.Write(t)
-		case int:
-			sb.WriteString(fmt.Sprintf("%d", t))
-		case float32, float64:
-			sb.WriteString(fmt.Sprintf("%f", t))
-		case nil:
-			sb.WriteString("<nil>")
-		default:
-			// skip all others
-
-		}
-	}
-
-	return fmt.Println(sb.String())
 }
