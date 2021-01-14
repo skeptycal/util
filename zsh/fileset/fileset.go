@@ -30,6 +30,7 @@ func (s FileSet) Contains(a string) bool {
 
 func (s FileSet) Search(pattern, searchpath string) FileSet {
 	s = ReDir(pattern, searchpath)
+	return s
 }
 
 func (s FileSet) Dirs() []string {
@@ -61,7 +62,11 @@ func (s FileSet) Get(a string) interface{} {
 	return nil
 }
 
-func (s FileSet) Add(v interface{}) { s = append(s, v) }
+func (s FileSet) Add(fi os.FileInfo) {
+	if s[fi.Name()] == nil {
+		s[fi.Name()] = fi
+	}
+}
 
 func (s FileSet) Remove(v interface{}) {}
 
