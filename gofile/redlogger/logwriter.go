@@ -1,3 +1,4 @@
+// Package redlogger implements a concurrent logging system.
 package redlogger
 
 import (
@@ -16,8 +17,12 @@ type MultiWriter interface {
 	WriteString(string) (int, error)
 }
 
-// NewMultiWriter returns a MultiWriter that duplicates its writes to all the
-// provided writers, similar to the Unix tee(1) command.
+type multiWriter struct {
+	writers []io.Writer
+}
+
+// NewMultiWriter returns a MultiWriter that duplicates its writes
+// to all the provided writers, similar to the Unix tee(1) command.
 //
 //  Write(p []byte) (n int, err error) // for bytes
 //
@@ -34,30 +39,24 @@ type MultiWriter interface {
 // Copyright 2010 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
-func NewMultiWriter(writers ...Writer) Writer {
+func NewMultiWriter(writers ...io.Writer) MultiWriter {
 	if len(writers) == 0 {
 		writers = append(writers, os.Stderr)
 	}
-	allWriters := make([]Writer, 0, len(writers))
+	allWriters := make([]io.Writer, 0, len(writers))
 	for _, w := range writers {
 		if mw, ok := w.(*multiWriter); ok {
 			allWriters = append(allWriters, mw.writers...)
+
+		} else if _, ok := w.(io.StringWriter); !ok {
+			// if writer is not a StringWriter, use BufferedWriter instead.
+			allWriters = append(allWriters, bufio.NewWriter(w))
 		} else {
 			allWriters = append(allWriters, w)
 		}
 	}
 
-	// if writer is not a StringWriter, use BufferedWriter instead.
-	for _, w := range writers {
-		if _, ok := w.(io.StringWriter); ok {
-			w = bufio.NewWriter(w)
-		}
-	}
 	return &multiWriter{allWriters}
-}
-
-type multiWriter struct {
-	writers []Writer
 }
 
 func (t *multiWriter) Write(p []byte) (n int, err error) {

@@ -1,16 +1,19 @@
+// Package json implements json serialization and deserialization.
 package json
 
 import (
 	"encoding/json"
 	"io/ioutil"
 	"os"
+
+	"github.com/skeptycal/util/gofile"
 )
 
 type jsonMap map[string]interface{}
 
 // GetJSONFile loads and returns a JSON structure representing the json file.
 func GetJSONFile(filename string) (JSON, error) {
-	fi, err := GetRegularFileInfo(filename)
+	fi, err := gofile.GetRegularFileInfo(filename)
 	if err != nil {
 		return nil, err
 	}
