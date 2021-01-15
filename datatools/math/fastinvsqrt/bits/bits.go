@@ -1,3 +1,4 @@
+// Package bits provides access to bitmapped flags stored in standard variables.
 package bits
 
 // Count returns the number of nonzero bits in w.

@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	log "github.com/sirupsen/logrus"
-	"github.com/skeptycal/util/gofile"
+	"github.com/skeptycal/util/gofile/filereader"
 )
 
 // RemoveComments returns the contents of a text file with
@@ -31,10 +31,9 @@ var (
 )
 
 type ini struct {
-	*gofile.BufReader                       // file reader
-	*gofile.BufferedWriter                  // file writer
-	sc                     *bufio.Scanner   // data parser
-	sb                     *strings.Builder // string buffer
+	filereader.BufferedReadWriter                  // file readwriter
+	sc                            *bufio.Scanner   // data parser
+	sb                            *strings.Builder // string buffer
 }
 
 // type ini struct {
@@ -49,36 +48,38 @@ type ini struct {
 
 // func (i *ini) Size() int { return int(i.fi.Size()) }
 
-func NewIni(filename string, data []byte) (*ini, error) {
-	if !gofile.Exists(filename) {
-		log.Errorf("path does not exist: %v", filename)
-		return nil
-	}
-	r, err := gofile.NewBufferedReader(filename)
-	w, err := gofile.NewBufferedWriter(filename, data)
-	in := ini{r, w, bufio.NewScanner(*r), &strings.Builder{}}
-	in.fi, _ = os.Stat(path)
-	f, err := os.Open(path)
-	if err != nil {
-		log.Error(err)
-		return nil
-	}
-	in.f = f
-	defer in.f.Close()
+// func NewIni(filename string, data []byte) (*ini, error) {
+// if !gofile.Exists(filename) {
+// 	log.Errorf("path does not exist: %v", filename)
+// 	return nil, nil
+// }
+// r, err := filereader.NewBufferedReader(filename)
+// w, err := filereader.NewBufferedWriter(filename, data)
+// bufio.NewReadWriter(r *bufio.Reader, w *bufio.Writer)
 
-	in.sb = &strings.Builder{}
+// in := ini{r, w, bufio.NewScanner(*r), &strings.Builder{}}
+// in.BufferedFileReader, _ = os.Stat(filename)
+// f, err := os.Open(filename)
+// if err != nil {
+// 	log.Error(err)
+// 	return nil, nil
+// }
+// in.BufferedFileWriter = f
+// defer in.BufferedFileWriter.Close()
 
-	in.br = bufio.NewReaderSize(in.f, int(in.Size()))
-	if err != nil {
-		log.Error(err)
-		return nil
-	}
+// in.sb = &strings.Builder{}
 
-	in.sc = bufio.NewScanner(in.br)
+// in.BufferedFileReader = bufio.NewReaderSize(in.BufferedFileReader, int(in.BufferedFileReader.Size()))
+// if err != nil {
+// 	log.Error(err)
+// 	return nil, nil
+// }
 
-	// buf, err := ioutil.ReadAll(file)
+// in.sc = bufio.NewScanner(in.BufferedFileReader)
 
-}
+// buf, err := ioutil.ReadAll(file)
+
+// }
 
 func readfile(r io.Reader) []byte {
 	b, err := ioutil.ReadAll(r)
@@ -90,7 +91,7 @@ func readfile(r io.Reader) []byte {
 }
 
 func (i *ini) RemoveComments() (string, error) {
-	file, err := os.Open(path)
+	file, err := os.Open(i.BufferedReadWriter.)
 	if err != nil {
 		log.Error(err)
 		return "", err
@@ -126,6 +127,7 @@ func IsComment(comment string, commentPrefixes []string) bool {
 	}
 	return false
 }
-func RemoveComments(path string) (string, error) {
 
-}
+// func RemoveComments(path string) (string, error) {
+
+// }

@@ -1,4 +1,4 @@
-package gofile
+package json
 
 import (
 	"encoding/json"

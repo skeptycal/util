@@ -1,4 +1,4 @@
-package gofile
+package redlogger
 
 import (
 	"bufio"
