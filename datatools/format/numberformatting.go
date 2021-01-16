@@ -29,8 +29,8 @@ func NumSpace(n float64) string {
 	mantissa := s
 	exponent := ""
 
-	eloc := strings.Index(mantissa, "e")
-	if eloc > 0 {
+	eloc := strings.Index(s, "e")
+	if eloc != -1 {
 		mantissa = s[:eloc]
 		exponent = s[eloc:]
 	}
@@ -41,22 +41,32 @@ func NumSpace(n float64) string {
 	dloc := strings.Index(intpart, ".")
 	if dloc > -1 {
 		intpart = mantissa[:dloc]
-		decpart = mantissa[dloc:]
+		decpart = mantissa[dloc+1:]
 	}
 
-	rem := len(intpart) % 3
+	// fake return value
+	sb.WriteString(intpart)
+	sb.WriteString(".")
+	sb.WriteString(decpart)
+	sb.WriteString("e")
+	sb.WriteString(exponent)
 
-	sb.WriteString(intpart[:rem])
-	sb.WriteString(" ")
+	// return fmt.Sprintf("%s.%se%s", intpart, decpart, exponent)
+	/*
+		rem := len(intpart) % 3
 
-	for i := rem; i < len(intpart); i++ {
-		if i%3 == 0 {
-			sb.WriteByte(intpart[i])
-			sb.WriteString(" ")
-		}
+		sb.WriteString(intpart[:rem])
+		sb.WriteString(" ")
 
-	}
+		for i := rem; i < len(intpart); i++ {
+			if i%3 == 0 {
+				sb.WriteByte(intpart[i])
+				sb.WriteString(" ")
+			}
+
+		}*/
 	return sb.String()
+
 }
 
 /* python version
