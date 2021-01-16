@@ -81,6 +81,13 @@ func BenchmarkReverse5(b *testing.B) {
 	}
 }
 
+func BenchmarkReverseRune(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		ReverseRune("12345")
+		ReverseRune(input)
+	}
+}
+
 // BenchmarkNumSpaces-8   	 2261641	       520 ns/op	      80 B/op	      12 allocs/op
 
 func BenchmarkNumSpaces(b *testing.B) {
@@ -129,8 +136,8 @@ func TestReverse(t *testing.T) {
 			}
 		})
 		t.Run(tt.name, func(t *testing.T) {
-			if got := Reverse5(tt.args.s); got != tt.want {
-				t.Errorf("Reverse5() = %v, want %v", got, tt.want)
+			if got := ReverseRune(tt.args.s); got != tt.want {
+				t.Errorf("ReverseRune() = %v, want %v", got, tt.want)
 			}
 		})
 	}

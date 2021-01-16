@@ -3,9 +3,6 @@ package format
 
 import (
 	"strings"
-	"unicode/utf8"
-
-	"github.com/skeptycal/util/datatools/runebuilder"
 )
 
 type stringWriter struct {
@@ -127,21 +124,46 @@ func Reverse4(s string) string {
 
 }
 
+// func Reverse5(s string) string {
+// 	rb := runebuilder.Builder{}
+// 	for i := len(s) - 1; i > -1; i-- {
+// 		rb.WriteRune(r)
+// 	}
+// 	return rb.String()
+// }
+
+// func Reverse6(s string) string {
+// 	rb := runebuilder.Builder{}
+// 	size := utf8.RuneCountInString(s)
+// 	for i := size - 1; i >= 0; i-- {
+// 		utf8.DecodeRuneInString(s)
+// 		rb.WriteRune()
+// 	}
+// 	return rb.String()
+// }
+
+// Reverse5 returns a string with the bytes of s in reverse order.
 func Reverse5(s string) string {
-	rb := runebuilder.Builder{}
-	for i := len(s) - 1; i > -1; i-- {
-		rb.WriteRune(r)
+	var b strings.Builder
+	b.Grow(len(s))
+	for i := len(s) - 1; i >= 0; i-- {
+		b.WriteByte(s[i])
 	}
-	return rb.String()
+	return b.String()
 }
 
-func Reverse(s string) string {
-	rb := runebuilder.Builder{}
-	size := utf8.RuneCountInString(s)
-	for i := size - 1; i >= 0; i-- {
-		rb.WriteRune(s[i])
+// ReverseRune returns a string with the runes of s in reverse order.
+// Invalid UTF-8 sequences, if any, will be reversed byte by byte.
+func ReverseRune(s string) string {
+	res := make([]byte, len(s))
+	prevPos, resPos := 0, len(s)
+	for pos := range s {
+		resPos -= pos - prevPos
+		copy(res[resPos:], s[prevPos:pos])
+		prevPos = pos
 	}
-	return ret
+	copy(res[0:], s[prevPos:])
+	return string(res)
 }
 
 // NumSpace formats numeric values for readability by adding
