@@ -34,11 +34,30 @@ func (w *stringWriter) parse(value string) {
 		w.intpart = mantissa[:dloc]
 		w.decpart = mantissa[dloc+1:]
 	}
+
 	w.loadString()
 }
 func (w *stringWriter) loadString() {
-	w.WriteString(w.intpart)
+
+	rem := len(w.intpart) % 3
+	if w.intpart[0] == '=' {
+		rem++
+	}
+	for i := 0; i < len(w.intpart); i++ {
+		w.WriteByte(w.intpart[i])
+		if i%3 == 0 {
+			w.space()
+		}
+	}
+
 	if w.decpart != "" {
+		for i := 0; i < len(w.decpart); i++ {
+			w.WriteByte(w.decpart[i])
+			if i%3 == 0 {
+				w.space()
+			}
+
+		}
 		w.dot()
 	}
 	if w.exponent != "" {

@@ -17,7 +17,7 @@ func TestNumSpace(t *testing.T) {
 		{"1", args{"1"}, "1"},
 		{"-1", args{"-1"}, "-1"},
 		{"0.123", args{"0.123"}, "0.123"},
-		{"1", args{"1"}, "1"},
+		{"-43.3234e-105", args{"-43.3234e-105"}, "-43.3234e-105"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
