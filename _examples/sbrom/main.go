@@ -6,25 +6,33 @@ package main
 
 import (
 	"fmt"
-
-	"github.com/skeptycal/util/stringutils/ansi"
+	"strings"
 )
 
 const (
-	sample          = "\xbd\xb2\x3d\xbc\x20\xe2\x8c\x98"
-	sample2         = `bdb23dbc20e28c98`
-	sampleint int32 = 0b1010101010101010101010
+	sample           = "\xbd\xb2\x3d\xbc\x20\xe2\x8c\x98"
+	sample2          = `bdb23dbc20e28c98`
+	sampleint int32  = 0b1010101010101010101010
+	ansi7fmt  string = "\033[%dm"
 )
 
-func green() string {
-	return ansi.Ansi.Build(ansi.Bold, ansi.Yellow, ansi.GreenBackground)
+var sb = strings.Builder{}
+
+func ansi(a ...int) string {
+	defer sb.Reset()
+	for i := range a {
+		sb.WriteString(fmt.Sprintf(ansi7fmt, i))
+	}
+	return sb.String()
 }
 
 func main() {
 	fmt.Println()
 	fmt.Println()
 	fmt.Println()
-	fmt.Printf("%v", green())
+
+	fmt.Println(ansi(32))
+
 	fmt.Println(sample)
 	fmt.Println(sample2)
 	fmt.Println(sampleint)
