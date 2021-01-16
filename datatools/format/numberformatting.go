@@ -3,6 +3,7 @@ package format
 
 import (
 	"strings"
+	"unicode/utf8"
 
 	"github.com/skeptycal/util/datatools/runebuilder"
 )
@@ -128,29 +129,19 @@ func Reverse4(s string) string {
 
 func Reverse5(s string) string {
 	rb := runebuilder.Builder{}
-	// rb.WriteString(s)
-	// for i := len(s) - 1; i > -1; i-- {
-	// 	rb.WriteRune(r)
-	// }
-	buf := make([]rune, len(s))
-	for _, r := range s {
-
-		buf = append(buf, r)
+	for i := len(s) - 1; i > -1; i-- {
+		rb.WriteRune(r)
 	}
-
-	x := len(s) - 1
-	for i := 0; i < x; i++ {
-		rb.WriteRune(s[x-i])
-	}
-	// for i, r := range s {
-	// 	if i > x {
-	// 		break
-	// 	}
-	// 	r, size := utf8.DecodeLastRuneInString(s)
-	// 	_, _ = rb.WriteRune(r)
-	// 	s = s[:x-size]
-	// }
 	return rb.String()
+}
+
+func Reverse(s string) string {
+	rb := runebuilder.Builder{}
+	size := utf8.RuneCountInString(s)
+	for i := size - 1; i >= 0; i-- {
+		rb.WriteRune(s[i])
+	}
+	return ret
 }
 
 // NumSpace formats numeric values for readability by adding
