@@ -21,8 +21,17 @@ const (
 
 var (
 	defaultAnsiFmt string = a.Build(33, 44, 1)
-	a              ANSI   = &Ansi{33, 44, 1, os.Stdout}
 )
+
+func NewANSI(fg,bg,ef int, w bufio.Writer) ANSI {
+    return &{
+        fg:fg,
+        bg:bg,
+        ef:ef,
+        bufio.Writer:w,
+        sb: strings.Builder{},
+    }
+}
 
 type ANSI interface {
 	Build([]byte) string
@@ -36,14 +45,15 @@ type Ansi struct {
 	bg []byte
 	ef []byte
 	bufio.Writer
+	sb strings.Builder
 }
 
-func (a *Ansi) Build(b ...byte) string {
-	defer sb.Reset()
-	for i := range a {
-		sb.WriteString(fmt.Sprintf(ansi7fmt, a[i]))
+func (a *Ansi) Build(b []byte) string {
+	defer a.sb.Reset()
+	for i := range b {
+		sb.WriteString(fmt.Sprintf(ansi7fmt, b[i]))
 	}
-	return sb.String()
+	return a.sb.String()
 }
 
 func hr(n int) {
