@@ -11,6 +11,8 @@ import (
 	"unicode/utf8"
 )
 
+// User implements the User interface to manage and store user
+// demographic information.
 type User interface {
 	New() (User, error)
 	Unmarshal(data []byte, v interface{}) error
@@ -29,10 +31,6 @@ type UserInfo struct {
 
 func (u *UserInfo) New() (User, error) {
 	return &UserInfo{}, nil
-}
-
-func (u *UserInfo) Set(k, v string) error {
-    u.
 }
 
 func (u *UserInfo) Copyright() string {
