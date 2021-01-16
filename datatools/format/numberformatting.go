@@ -14,7 +14,7 @@ type stringWriter struct {
 
 func (w *stringWriter) space() { w.WriteString(" ") }
 func (w *stringWriter) dot()   { w.WriteString(".") }
-func (w *stringWriter) exp()   { w.WriteString("e" + w.exponent) }
+func (w *stringWriter) exp()   { w.WriteString(" e" + w.exponent) }
 func (w *stringWriter) parse(value string) {
 	value = strings.TrimSpace(value)
 	value = strings.ToLower(value)
@@ -39,15 +39,22 @@ func (w *stringWriter) parse(value string) {
 }
 func (w *stringWriter) loadString() {
 
-	rem := len(w.intpart) % 3
+	start := 0
 	if w.intpart[0] == '=' {
 		w.WriteByte(w.intpart[0])
-		rem++
+		w.intpart = w.intpart[1:]
 	}
-	for i := rem; i < len(w.intpart)-1; i++ {
-		w.WriteByte(w.intpart[i])
-		if i%3 == 0 {
-			w.space()
+
+	rem := len(w.intpart)%3 - 2
+
+	if len(w.intpart) < 4 {
+		w.WriteString(w.intpart)
+	} else {
+		for i := start; i < len(w.intpart)-1; i++ {
+			w.WriteByte(w.intpart[i])
+			if (i+rem)%3 == 0 {
+				w.space()
+			}
 		}
 	}
 	w.WriteByte(w.intpart[len(w.intpart)-1])
@@ -57,7 +64,7 @@ func (w *stringWriter) loadString() {
 
 		for i := 0; i < len(w.decpart); i++ {
 			w.WriteByte(w.decpart[i])
-			if i%3 == 0 {
+			if (i+1)%3 == 0 {
 				w.space()
 			}
 
