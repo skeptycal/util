@@ -29,6 +29,11 @@ type Builder struct {
 	buf  []rune
 }
 
+// Link provides access to a pointer to the internal buffer.
+func (b *Builder) Link() *[]rune {
+    return &b.buf
+}
+
 func (b *Builder) Put(r rune, i int) {
 	b.buf[i] = r
 }
@@ -87,7 +92,7 @@ func (b *Builder) Reset() {
 // grow copies the buffer to a new, larger buffer so that there are at least n
 // bytes of capacity beyond len(b.buf).
 func (b *Builder) grow(n int) {
-	b.buf = b.buf.
+	b.buf = b.buf
 	buf := make([]rune, len(b.buf), 2*cap(b.buf)+n)
 	copy(buf, b.buf)
     b.buf = buf
