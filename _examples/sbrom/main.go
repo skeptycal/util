@@ -15,7 +15,7 @@ const (
 	sample           = "\xbd\xb2\x3d\xbc\x20\xe2\x8c\x98"
 	sample2          = `bdb23dbc20e28c98`
 	sampleint int32  = 0b1010101010101010101010
-	ansi7fmt  string = "\033[%dm"
+	ansi7fmt  string = "\033[%vm"
 	hrChar    string = "="
 )
 
@@ -24,12 +24,12 @@ var (
 	defaultAnsiFmt string = ansi.Build(33, 44, 1)
 )
 
-func NewANSIWriter(fg, bg, ef []byte) ANSI {
+func NewANSIWriter(fg, bg, ef byte) ANSI {
 	w := bufio.NewWriter(os.Stdout)
 	return &Ansi{
-		fg: fg,
-		bg: bg,
-		ef: ef,
+		fg: ansiFormat(fg),
+		bg: ansiFormat(bg),
+		ef: ansiFormat(ef),
 		w:  bufio.NewWriter(w),
 		sb: &strings.Builder{},
 	}
@@ -43,19 +43,29 @@ type ANSI interface {
 }
 
 type Ansi struct {
-	fg []byte
-	bg []byte
-	ef []byte
+	fg string
+	bg string
+	ef string
 	w  *bufio.Writer
 	sb *strings.Builder
 }
 
 func (a *Ansi) Build(b ...byte) string {
 	defer a.sb.Reset()
-	for i, n := range b {
+	for _, n := range b {
 		a.sb.WriteString(fmt.Sprintf(ansi7fmt, n))
 	}
 	return a.sb.String()
+}
+
+func (a *Ansi) Print(v ...interface{}) (int, error) {
+	fmt.Fprint(a.w, v...)
+	for _, s := range v {
+		if b, ok := s.(byte); ok {
+
+		}
+	}
+	return fmt.Print(a.Build(v...))
 }
 
 func (a *Ansi) Unmarshal(data []byte, v interface{}) error {
@@ -87,8 +97,11 @@ func br() {
 	fmt.Println("")
 }
 
+func ansiFormat(n byte) string {
+	return fmt.Sprintf(ansi7fmt, n)
+}
 func aPrint(a ...byte) {
-	fmt.Print(ansi.Build(a))
+	fmt.Print(ansi.Build(a...))
 }
 
 func Echo(a ...interface{}) {
