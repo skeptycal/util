@@ -26,18 +26,17 @@ import (
 func NumSpace(n float64) string {
 	sb := strings.Builder{}
 	mantissa := fmt.Sprintf("%g", n)
-	exponent := ""
-
-	parts := strings.Split(mantissa, "e")
-	if len(parts) > 1 {
-		mantissa = parts[0]
-		exponent = parts[1]
-	}
-
 	intpart := mantissa
+	exponent := ""
 	decpart := ""
 
-	parts = strings.Split(intpart, ".")
+	eloc := strings.Index(mantissa, "e")
+	if eloc > 0 {
+		intpart = mantissa[:eloc]
+		exponent = mantissa[eloc:]
+	}
+
+	dloc = strings.Split(intpart, ".")
 	if len(parts) > 1 {
 		intpart = parts[0]
 		decpart = parts[1]
