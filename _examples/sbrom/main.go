@@ -7,6 +7,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"os"
 	"strings"
 )
 
@@ -19,11 +20,12 @@ const (
 )
 
 var (
-	defaultAnsiFmt string = a.Build(33, 44, 1)
+	ansi           ANSI   = NewANSIWriter(33, 44, 1)
+	defaultAnsiFmt string = ansi.Build(33, 44, 1)
 )
 
 func NewANSIWriter(fg, bg, ef []byte) ANSI {
-	w := bufio.NewWriter(w)
+	w := bufio.NewWriter(os.Stdout)
 	return &Ansi{
 		fg: fg,
 		bg: bg,
@@ -34,7 +36,7 @@ func NewANSIWriter(fg, bg, ef []byte) ANSI {
 }
 
 type ANSI interface {
-	Build([]byte) string
+	Build(b ...byte) string
 	Write([]byte) (int, error)
 	WriteString(string) (int, error)
 	String() string
@@ -48,12 +50,20 @@ type Ansi struct {
 	sb *strings.Builder
 }
 
-func (a *Ansi) Build(b []byte) string {
+func (a *Ansi) Build(b ...byte) string {
 	defer a.sb.Reset()
 	for i, n := range b {
 		a.sb.WriteString(fmt.Sprintf(ansi7fmt, n))
 	}
 	return a.sb.String()
+}
+
+func (a *Ansi) Unmarshal(data []byte, v interface{}) error {
+	return nil
+}
+
+func (a *Ansi) Marshal(v interface{}) ([]byte, error) {
+	return nil, nil
 }
 
 func (a *Ansi) String() string {
@@ -77,8 +87,8 @@ func br() {
 	fmt.Println("")
 }
 
-func aPrint(a ...int) {
-	fmt.Print(a.Build(a...))
+func aPrint(a ...byte) {
+	fmt.Print(ansi.Build(a))
 }
 
 func Echo(a ...interface{}) {
