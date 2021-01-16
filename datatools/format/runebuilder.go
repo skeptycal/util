@@ -8,6 +8,7 @@
 package format
 
 import (
+	"fmt"
 	"unicode/utf8"
 	"unsafe"
 )
@@ -106,8 +107,15 @@ func (b *Builder) Write(p []byte) (int, error) {
 // The returned error is always nil.
 func (b *Builder) WriteByte(c byte) error {
 	b.copyCheck()
-	b.buf = append(b.buf, c)
-	return nil
+	r, size := utf8.DecodeRune([]byte{c})
+	if r == utf8.RuneError {
+		if size == 0 {
+			return fmt.Errorf("invalid rune (byte empty): %v", c)
+		}
+		return fmt.Errorf("invalid rune encoding: %v", c)
+	}
+	_, err := b.WriteRune(r)
+	return err
 }
 
 // WriteRune appends the UTF-8 encoding of Unicode code point r to b's buffer.
