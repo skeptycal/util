@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	log "github.com/sirupsen/logrus"
-	"github.com/skeptycal/util/gofile"
 	. "github.com/skeptycal/util/stringutils/ansi"
 )
 
@@ -60,11 +59,11 @@ func GetRecentTagHash() (string, error) {
 
 func GitVersionTag() string {
 	tag, err := GetRecentTagHash()
-	if gofile.DoOrDie(err) != nil {
+	if Err(err) != nil {
 		return ""
 	}
 	out, err := Shell(fmt.Sprintf("git describe --tags %s", tag))
-	if gofile.DoOrDie(err) != nil {
+	if Err(err) != nil {
 		return ""
 	}
 	return out
@@ -158,7 +157,7 @@ func Out(command string) string {
 	out, err := cmd.Output()
 
 	if err != nil {
-		_ = gofile.DoOrDie(fmt.Errorf("%verror during command %v: %v", errorColor, command, err))
+		_ = Err(fmt.Errorf("%verror during command %v: %v", errorColor, command, err))
 		return ""
 	}
 
@@ -197,7 +196,7 @@ func PipeIn(command string, stdInString string) (string, error) {
 	// return shell(command, os.Stdin, nil, nil)
 	cmd := CmdPrep(command)
 	stdin, err := cmd.StdinPipe()
-	if gofile.DoOrDie(err) != nil {
+	if Err(err) != nil {
 		return "", err
 	}
 
@@ -207,7 +206,7 @@ func PipeIn(command string, stdInString string) (string, error) {
 	}()
 
 	out, err := cmd.CombinedOutput()
-	if gofile.DoOrDie(err) != nil {
+	if Err(err) != nil {
 		return string(out), err
 	}
 

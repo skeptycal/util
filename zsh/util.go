@@ -9,7 +9,7 @@ import (
 	"syscall"
 
 	log "github.com/sirupsen/logrus"
-	"github.com/skeptycal/util/gofile"
+	"github.com/skeptycal/util/gofile/redlogger"
 )
 
 type TrueMap map[string]bool
@@ -17,7 +17,7 @@ type TrueMap map[string]bool
 func (a TrueMap) String() string {
 	sb := strings.Builder{}
 	for k, v := range a {
-		if v == true {
+		if v {
 			sb.WriteString(k)
 			sb.WriteString(",")
 		}
@@ -27,7 +27,7 @@ func (a TrueMap) String() string {
 
 func (a TrueMap) List() (s []string) {
 	for k, v := range a {
-		if v == true {
+		if v {
 			s = append(s, k)
 		}
 	}
@@ -39,13 +39,14 @@ type Stringer interface {
 }
 
 func Tree(pathname string) []string {
-
+	// TODO stuff
+	return nil
 }
 
 func Dir(pathname string) (files []os.FileInfo, err error) {
 	return files, filepath.Walk(pathname,
 		func(path string, info os.FileInfo, err error) error {
-            if
+
 			files = append(files, info)
 			return nil
 		})
@@ -53,11 +54,11 @@ func Dir(pathname string) (files []os.FileInfo, err error) {
 
 // Err calls error handling and logging routines
 func Err(err error) error {
-	return gofile.DoOrDie(err)
+	return redlogger.DoOrDie(err)
 }
 
-// isAlphaNum reports whether the byte is an ASCII letter, number, or underscore
-func isAlphaNum(c uint8) bool {
+// IsAlphaNum reports whether the byte is an ASCII letter, number, or underscore
+func IsAlphaNum(c uint8) bool {
 	return 'a' <= c && c <= 'z' || '0' <= c && c <= '9' || 'A' <= c && c <= 'Z' || c == '_'
 }
 
@@ -160,9 +161,9 @@ func NameSplit(filename string) (string, string) {
 }
 
 // Name returns the name of file without path information.
-func Base(filename string) string {
+func Name(filename string) string {
 	ns, _ := NameSplit(filename)
-	return NameSplit[1]
+	return ns
 }
 
 // AbsPath returns the absolute path of file.

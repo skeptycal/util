@@ -11,9 +11,9 @@ const (
 )
 
 func SampleScript() string {
-	b, err := getpage.GetPage(sampleChromeDriverPort)
+	s, err := getpage.GetPage(sampleChromeDriverPort)
 	if err != nil {
 		log.Error(err)
 	}
-	return b.String()
+	return s
 }

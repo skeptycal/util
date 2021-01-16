@@ -1,3 +1,5 @@
+// Package userinfo implements the User interface to manage
+// and store user demographic information.
 package userinfo
 
 import (

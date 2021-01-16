@@ -7,7 +7,7 @@ import (
 	"path"
 
 	log "github.com/sirupsen/logrus"
-	"github.com/skeptycal/util/zsh"
+	"github.com/skeptycal/util/gofile"
 )
 
 const (
@@ -36,12 +36,12 @@ func init() {
 
 // name returns the name of this file
 func me() string {
-	return zsh.Base(os.Args[0])
+	return gofile.Base(os.Args[0])
 }
 
 // here returns the location of this file
 func here() string {
-	return zsh.AbsPath(os.Args[0])
+	return gofile.Abs(os.Args[0])
 }
 
 // OsArgs returns the slice of strings returned by os.Args[1:]
@@ -95,8 +95,8 @@ func main() {
 			continue
 		}
 
-		fileName := AbsPath(sourceFileStat.Name())
-		baseName, extension := NameSplit(fileName)
+		fileName := gofile.Abs(sourceFileStat.Name())
+		baseName, extension := zsh.NameSplit(fileName)
 		log.Info("fileName: ", fileName)
 		log.Info("baseName: ", baseName)
 		log.Info("extension: ", extension)
