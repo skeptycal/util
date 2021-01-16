@@ -1,6 +1,30 @@
 // Package format contains functions that format numeric values.
 package format
 
+import (
+	"fmt"
+	"strings"
+)
+
+func NumSpace(n float64) string {
+	s := fmt.Sprintf("%g", n)
+	mantissa := s
+	exp := ""
+	num := ""
+	dec := ""
+
+	parts := strings.Split(s, "e")
+	if len(parts) > 1 {
+		num = parts[0]
+		exp = parts[1]
+	}
+
+	parts := strings.Split(num, ".")
+	if len(parts) > 1 {
+
+	}
+}
+
 /* python version
 # Take a very large number and pretty print it in triplets of 3 digits, each triplet separated by a space.
 def pnum_spc(n): print(' '.join([''.join(list(str(n))[::-1][i:i+3]) for i in range(0, len(str(n)), 3)][::-1]))
