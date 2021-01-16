@@ -2,7 +2,6 @@
 package format
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -17,7 +16,31 @@ func (w *stringWriter) space() { w.WriteString(" ") }
 func (w *stringWriter) dot()   { w.WriteString(".") }
 func (w *stringWriter) exp()   { w.WriteString("e" + w.exponent) }
 func (w *stringWriter) parse(value string) {
-	w.exponent = value[strings.Index(value, "e")+1:]
+	value = strings.TrimSpace(value)
+	value = strings.ToLower(value)
+	mantissa := value
+
+	eloc := strings.Index(value, "e")
+	if eloc != -1 {
+		mantissa = value[:eloc]
+		w.exponent = value[eloc:]
+	}
+
+	w.intpart = mantissa
+	w.decpart = ""
+
+	dloc := strings.Index(mantissa, ".")
+	if dloc > 0 {
+		w.intpart = mantissa[:dloc]
+		w.decpart = mantissa[dloc+1:]
+	}
+	w.loadString()
+}
+func (w *stringWriter) loadString() {
+	w.WriteString(w.intpart)
+	w.dot()
+	w.WriteString(w.decpart)
+	w.exp()
 }
 
 // NumSpace formats numeric values for readability by adding
@@ -39,45 +62,7 @@ func (w *stringWriter) parse(value string) {
 // finally, add any exponent back to the mantissa
 func NumSpace(s string) string {
 
-	mantissa := s
-	exponent := ""
-
-	eloc := strings.Index(s, "E")
-	if eloc != -1 {
-		mantissa = s[:eloc]
-		exponent = s[eloc:]
-	}
-
-	intpart := mantissa
-	decpart := ""
-
-	dloc := strings.Index(intpart, ".")
-	if dloc > -1 {
-		intpart = mantissa[:dloc]
-		decpart = mantissa[dloc+1:]
-	}
-
-	sb := &stringWriter{
-		strings.Builder{},
-		intpart,
-		decpart,
-		exponent,
-	}
-
-	rem := len(intpart) % 3
-
-	retval += intpart[:rem]
-	retval += " "
-
-	for i := rem; i < len(intpart); i++ {
-		if i%3 == 0 {
-			retval += string(intpart[i])
-			retval += " "
-		}
-
-	}
-	return intpart + ":" + decpart
-	return fmt.Sprintf("%s.%se%s", intpart, decpart, exponent)
+	sb := &stringWriter{strings.Builder{}}
 
 	return sb.String()
 
