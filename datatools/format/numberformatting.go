@@ -13,7 +13,7 @@ type stringWriter struct {
 }
 
 func (w *stringWriter) space() { w.WriteString(" ") }
-func (w *stringWriter) dot()   { w.WriteString(".") }
+func (w *stringWriter) dot()   { w.WriteString("." + w.decpart) }
 func (w *stringWriter) exp()   { w.WriteString("e" + w.exponent) }
 func (w *stringWriter) parse(value string) {
 	value = strings.TrimSpace(value)
@@ -23,7 +23,7 @@ func (w *stringWriter) parse(value string) {
 	eloc := strings.Index(value, "e")
 	if eloc != -1 {
 		mantissa = value[:eloc]
-		w.exponent = value[eloc:]
+		w.exponent = value[eloc+1:]
 	}
 
 	w.intpart = mantissa
@@ -38,9 +38,12 @@ func (w *stringWriter) parse(value string) {
 }
 func (w *stringWriter) loadString() {
 	w.WriteString(w.intpart)
-	w.dot()
-	w.WriteString(w.decpart)
-	w.exp()
+	if w.decpart != "" {
+		w.dot()
+	}
+	if w.exponent != "" {
+		w.exp()
+	}
 }
 
 // NumSpace formats numeric values for readability by adding
@@ -62,7 +65,8 @@ func (w *stringWriter) loadString() {
 // finally, add any exponent back to the mantissa
 func NumSpace(s string) string {
 
-	sb := &stringWriter{strings.Builder{}}
+	sb := &stringWriter{strings.Builder{}, "", "", ""}
+	sb.parse(s)
 
 	return sb.String()
 
