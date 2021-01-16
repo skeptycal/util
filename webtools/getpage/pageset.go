@@ -17,7 +17,7 @@ var (
 
 func init() {
 	if pageSet == nil {
-		pageSet = NewPageSet()
+		pageSet = NewPageSet("pageset", 30)
 	}
 }
 
@@ -30,12 +30,11 @@ func NewPageSet(name string, cacheTime time.Duration) *SafePageSet {
 
 	if cacheTime == 0 {
 		cacheTime = defaultMaxPageCacheAge
-    }
+	}
 
 	return &SafePageSet{
-		name:      fmt.Sprintf("pageset%v", time.Time()),
-        cacheTime: defaultMaxPageCacheAge,
-        cacheFunc: func(){return }
+		name:      fmt.Sprintf("pageset%v", time.Now()),
+		cacheTime: defaultMaxPageCacheAge,
 		pages:     make(map[string]*strings.Builder, defaultInitialPageCount),
 	}
 }

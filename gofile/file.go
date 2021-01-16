@@ -24,7 +24,7 @@ func CheckStat(file string) os.FileInfo {
 func Mode(file string) os.FileMode { return CheckStat(file).Mode() }
 
 // Create creates a file and returns an io.ReadCloser on success else error
-func Create(filename string) (io.ReadCloser, error) {
+func Create(filename string) (io.ReadWriteCloser, error) {
 	file, err := os.Create(filename)
 	if err != nil {
 		return nil, fmt.Errorf("failed creating file (%s): %v", filename, err)
@@ -33,7 +33,7 @@ func Create(filename string) (io.ReadCloser, error) {
 }
 
 // CreateSafe creates a file and returns a ReadCloser on success else error
-func CreateSafe(filename string) (io.ReadCloser, error) {
+func CreateSafe(filename string) (io.ReadWriteCloser, error) {
 	if Exists(filename) {
 		return nil, fmt.Errorf("file already exists (%s): %v", filename, os.ErrExist)
 	}

@@ -1,11 +1,19 @@
+// Package chromedriver implements Chromedriver
 package chromedriver
 
-import "net/http"
-
-const (
-	ChromeDriverPort = `http://localhost:9515/`
+import (
+	log "github.com/sirupsen/logrus"
+	"github.com/skeptycal/util/webtools/getpage"
 )
 
-func Get(url string) string {
-	http.Get(url)
+const (
+	sampleChromeDriverPort = `http://localhost:9515/`
+)
+
+func SampleScript() string {
+	b, err := getpage.GetPage(sampleChromeDriverPort)
+	if err != nil {
+		log.Error(err)
+	}
+	return b.String()
 }
