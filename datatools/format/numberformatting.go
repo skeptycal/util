@@ -40,8 +40,8 @@ func NumSpace(n float64) string {
 
 	dloc := strings.Index(intpart, ".")
 	if dloc > -1 {
-		intpart = parts
-		decpart = parts[1]
+		intpart = mantissa[:dloc]
+		decpart = mantissa[dloc:]
 	}
 
 	rem := len(intpart) % 3
