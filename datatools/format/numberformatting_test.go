@@ -36,7 +36,10 @@ const (
 // 	}
 // }
 
+// using []byte variable and string conversion
 // BenchmarkReverse-8   	18962943	        60.7 ns/op	      16 B/op	       2 allocs/op
+// using strings.Builder
+// BenchmarkReverse-8     	29489194	        38.7 ns/op	       8 B/op	       1 allocs/op
 func BenchmarkReverse(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		Reverse("12345")

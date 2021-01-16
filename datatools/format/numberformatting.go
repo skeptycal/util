@@ -78,7 +78,7 @@ func (w *stringWriter) loadString() {
 // Reverse is not utf8 compatible
 func Reverse(s string) string {
 	sb := strings.Builder{}
-	for i := len(b); i > 0; i-- {
+	for i := len(s) - 1; i > -1; i-- {
 		sb.WriteByte(s[i])
 	}
 	return sb.String()
@@ -122,6 +122,11 @@ func Reverse4(s string) string {
 	}
 	return string(runes)
 
+}
+
+type RuneBuilder struct {
+	addr *RuneBuilder // of receiver, to detect copies by value
+	buf  []byte
 }
 
 // NumSpace formats numeric values for readability by adding
