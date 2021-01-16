@@ -5,7 +5,6 @@ import (
 	"os"
 
 	log "github.com/sirupsen/logrus"
-	. "github.com/skeptycal/util/stringutils/ansi"
 )
 
 var ErrHandling errorHandling // = continueOnError

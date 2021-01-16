@@ -3,6 +3,8 @@ package gofile
 import (
 	"io"
 	"os"
+
+	"github.com/skeptycal/util/gofile/redlogger"
 )
 
 // IsEmpty returns true if the directory is empty.
@@ -30,73 +32,44 @@ func IsEmpty(path string) (bool, error) {
 }
 
 // IsDir checks to see if path is a directory in the current directory.
+// This is not recursive and does not walk the tree. Use Find or Tree
+// for recursive searches.
 func IsDir(path string) bool {
 	info, err := os.Stat(path)
 	if err != nil {
 		if !os.IsNotExist(err) {
-			_ = DoOrDie(err)
+			Err(err)
 		}
 		return false
 	}
 	return info.Mode().IsDir()
 }
 
-// FileExists checks if path exists in the current directory
-// and is not a directory itself.
-func FileExists(path string) bool {
-	_, err := os.Stat(path)
-	if err != nil {
-		if !os.IsNotExist(err) {
-			_ = DoOrDie(err)
-		}
-		return false
-	}
-	return true // !info.IsDir()
-}
-
-// Exists returns true if the file exists and is a regular file.
+// Exists returns true if the file or directory exists.
 // Does not differentiate between path, file, or permission errors.
 func Exists(file string) bool {
-	info, err := os.Stat(file)
+	_, err := os.Stat(file)
 	if err != nil {
-		if err == os.ErrNotExist {
-			return false
+		if !os.IsNotExist(err) {
+			Err(err)
 		}
 		return false
 	}
-	if m := info.Mode(); m.Perm().IsRegular() {
-		return true
-	}
-	return false
+	return true
 }
 
-// IsRegular returns true if the file exists and is regular.
-func IsRegular(file string) bool {
-	d, err := os.Stat(file)
-	if err != nil {
-		if err == os.ErrNotExist {
-			return false
-		}
-		return false
-	}
-	if m := d.Mode(); !m.IsDir() && m&0111 != 0 {
-		return true
-	}
-	return false
+func IsReg(file string) bool {
+	return Mode(file).IsRegular()
 }
 
-// IsExecutable returns true if the file exists and is executable.
-func IsExecutable(file string) bool {
-	d, err := os.Stat(file)
-	if err != nil {
-		if err == os.ErrNotExist {
-			return false
-		}
-		_ = DoOrDie(err)
-		return false
-	}
-	if m := d.Mode(); !m.IsDir() && m&0111 != 0 {
-		return true
-	}
-	return false
-}
+// NotDir returns true if file exists and is not a directory.
+func NotDir(file string) bool { return !Mode(file).IsDir() }
+
+func IsExec(file string) bool      { return Mode(file)&0111 == 0111 }
+func IsExecOwner(file string) bool { return Mode(file)&0100 != 0 }
+func IsExecGroup(file string) bool { return Mode(file)&0010 != 0 }
+func IsExecOther(file string) bool { return Mode(file)&0001 != 0 }
+
+// Err calls error handling and logging routines
+// without returning the error.
+func Err(err error) { redlogger.DoOrDie(err) }
