@@ -1,3 +1,4 @@
+// Package http contains utilities for http requests.
 package http
 
 import (
@@ -15,7 +16,7 @@ func DownloadURL(url, filename string) error {
 	}
 	defer resp.Body.Close()
 
-	f, err := gofile.CreateFileTruncate(filename)
+	f, err := gofile.Create(filename)
 	if err != nil {
 		return err
 	}

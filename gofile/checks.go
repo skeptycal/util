@@ -58,13 +58,10 @@ func Exists(file string) bool {
 	return true
 }
 
-func IsReg(file string) bool {
-	return Mode(file).IsRegular()
-}
-
 // NotDir returns true if file exists and is not a directory.
 func NotDir(file string) bool { return !Mode(file).IsDir() }
 
+func IsReg(file string) bool       { return Mode(file).IsRegular() }
 func IsExec(file string) bool      { return Mode(file)&0111 == 0111 }
 func IsExecOwner(file string) bool { return Mode(file)&0100 != 0 }
 func IsExecGroup(file string) bool { return Mode(file)&0010 != 0 }

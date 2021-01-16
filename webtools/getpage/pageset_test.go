@@ -1,7 +1,6 @@
 package getpage
 
 import (
-	"fmt"
 	"strings"
 	"sync"
 	"testing"
@@ -13,15 +12,11 @@ var (
 
 type testPages SafePageSet
 
-func (t testPages) Add(url string) {
-    t.
-}
-
-func (t testPages) addFakePages(n int) {
-	for i := 0; i < n; i++ {
-		t.Add(fmt.Sprintf("FakeURL%n", i))
-	}
-}
+// func (t testPages) addFakePages(n int) {
+// 	for i := 0; i < n; i++ {
+// 		t.Add(fmt.Sprintf("FakeURL%n", i))
+// 	}
+// }
 
 func TestSafePageSet_Len(t *testing.T) {
 	type fields struct {

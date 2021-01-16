@@ -13,7 +13,7 @@ import (
 // of the Go standard library code (from Go 1.15.5)
 const (
 	defaultMaxPageCacheAge   time.Duration = 30 * time.Second
-	defaultPageBufferSize    int64         = 0xFFFF
+	defaultPageBufferSize    int           = 0xFFFF
 	minReadBufferSize                      = 16
 	smallBufferSize                        = 64
 	defaultBufSize                         = 4096
@@ -81,14 +81,16 @@ func GetPage(url string) (*bytes.Buffer, error) {
 	}
 	defer resp.Body.Close()
 
-	size := resp.ContentLength
+	size := int(resp.ContentLength)
 	if size < 0 {
 		size = defaultPageBufferSize
 	}
 
-	// sb :=
 	var sb = pageSet.New(url)
-	// defer sb.Reset()
+	defer sb.Reset()
+	if sb.Cap() < size {
+		sb.Grow(size)
+	}
 
 	// sb.Grow(size)
 
