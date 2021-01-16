@@ -3,6 +3,8 @@ package format
 
 import (
 	"strings"
+
+	"github.com/skeptycal/util/datatools/runebuilder"
 )
 
 type stringWriter struct {
@@ -164,6 +166,18 @@ func ReverseRune(s string) string {
 	}
 	copy(res[0:], s[prevPos:])
 	return string(res)
+}
+
+func Reverse8(s string) string {
+    rb := runebuilder.Builder{}
+
+    rb.
+	size := len(s) - 1
+	retval := make([]rune, size+1)
+	for i, r := range s {
+		retval[size-i] = r
+	}
+	return string(retval)
 }
 
 // NumSpace formats numeric values for readability by adding

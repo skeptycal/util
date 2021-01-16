@@ -81,6 +81,13 @@ func BenchmarkReverse5(b *testing.B) {
 	}
 }
 
+func BenchmarkReverse8(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		Reverse8("12345")
+		Reverse8(input)
+	}
+}
+
 func BenchmarkReverseRune(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		ReverseRune("12345")
