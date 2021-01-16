@@ -40,12 +40,12 @@ const (
 // BenchmarkReverse-8   	18962943	        60.7 ns/op	      16 B/op	       2 allocs/op
 // using strings.Builder
 // BenchmarkReverse-8     	29489194	        38.7 ns/op	       8 B/op	       1 allocs/op
-func BenchmarkReverse(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		Reverse("12345")
-		Reverse(input)
-	}
-}
+// func BenchmarkReverse(b *testing.B) {
+// 	for i := 0; i < b.N; i++ {
+// 		Reverse("12345")
+// 		Reverse(input)
+// 	}
+// }
 
 // BenchmarkReverse2-8   	13703583	        83.6 ns/op	       8 B/op	       1 allocs/op
 
@@ -105,11 +105,11 @@ func TestReverse(t *testing.T) {
 		{input, args{input}, Reverse4(input)},
 	}
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := Reverse(tt.args.s); got != tt.want {
-				t.Errorf("Reverse() = %v, want %v", got, tt.want)
-			}
-		})
+		// t.Run(tt.name, func(t *testing.T) {
+		// 	if got := Reverse(tt.args.s); got != tt.want {
+		// 		t.Errorf("Reverse() = %v, want %v", got, tt.want)
+		// 	}
+		// })
 
 		t.Run(tt.name, func(t *testing.T) {
 			if got := Reverse2(tt.args.s); got != tt.want {

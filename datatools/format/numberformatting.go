@@ -79,13 +79,13 @@ func (w *stringWriter) loadString() {
 }
 
 // Reverse is not utf8 compatible
-func Reverse(s string) string {
-	sb := strings.Builder{}
-	for i := len(s) - 1; i > -1; i-- {
-		sb.WriteByte(s[i])
-	}
-	return sb.String()
-}
+// func Reverse(s string) string {
+// 	sb := strings.Builder{}
+// 	for i := len(s) - 1; i > -1; i-- {
+// 		sb.WriteByte(s[i])
+// 	}
+// 	return sb.String()
+// }
 
 // Reverse2 Reference: https://stackoverflow.com/questions/1752414/how-to-reverse-a-string-in-go
 func Reverse2(s string) string {

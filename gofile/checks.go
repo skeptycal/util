@@ -7,6 +7,10 @@ import (
 	"github.com/skeptycal/util/gofile/redlogger"
 )
 
+func DoOrDie(err error) error {
+	return redlogger.DoOrDie(err)
+}
+
 // IsEmpty returns true if the directory is empty.
 // If path is the empty string, the current directory is tested.
 //
