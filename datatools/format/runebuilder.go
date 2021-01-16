@@ -75,7 +75,7 @@ func (b *Builder) Reset() {
 // grow copies the buffer to a new, larger buffer so that there are at least n
 // bytes of capacity beyond len(b.buf).
 func (b *Builder) grow(n int) {
-	buf := make([]byte, len(b.buf), 2*cap(b.buf)+n)
+	buf := make([]rune, len(b.buf), 2*cap(b.buf)+n)
 	copy(buf, b.buf)
 	b.buf = buf
 }
@@ -97,6 +97,7 @@ func (b *Builder) Grow(n int) {
 // Write always returns len(p), nil.
 func (b *Builder) Write(p []byte) (int, error) {
 	b.copyCheck()
+
 	b.buf = append(b.buf, p...)
 	return len(p), nil
 }
@@ -114,7 +115,7 @@ func (b *Builder) WriteByte(c byte) error {
 func (b *Builder) WriteRune(r rune) (int, error) {
 	b.copyCheck()
 	if r < utf8.RuneSelf {
-		b.buf = append(b.buf, byte(r))
+		b.buf = append(b.buf, r)
 		return 1, nil
 	}
 	l := len(b.buf)
