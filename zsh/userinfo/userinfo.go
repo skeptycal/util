@@ -12,7 +12,9 @@ import (
 )
 
 type User interface {
-	Copyright() string
+	New() (User, error)
+	Unmarshal(data []byte, v interface{}) error
+	Marshal(v interface{}) ([]byte, error)
 }
 
 type UserInfo struct {
@@ -23,6 +25,14 @@ type UserInfo struct {
 	Github         string  `json:"Github,omitempty"`
 	Website        string  `json:"Website,omitempty"`
 	TwitterURL     string  `json:"TwitterURL,omitempty"`
+}
+
+func (u *UserInfo) New() (User, error) {
+	return &UserInfo{}, nil
+}
+
+func (u *UserInfo) Set(k, v string) error {
+    u.
 }
 
 func (u *UserInfo) Copyright() string {
