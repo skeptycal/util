@@ -93,6 +93,37 @@ func Reverse2(s string) string {
 	return string(runes)
 }
 
+// Reference: https://stackoverflow.com/a/1754209
+func Reverse3(input string) string {
+	// Get Unicode code points.
+	n := 0
+	rune := make([]rune, len(input))
+	for _, r := range input {
+		rune[n] = r
+		n++
+	}
+	rune = rune[0:n]
+	// Reverse
+	for i := 0; i < n/2; i++ {
+		rune[i], rune[n-1-i] = rune[n-1-i], rune[i]
+	}
+	// Convert back to UTF-8.
+	return string(rune)
+}
+
+// Reverse4 combines the best from SO answers
+// (Reverse2 and Reverse3)
+func Reverse4(s string) string {
+	runes := []rune(s)
+	n := len(runes)
+	// Reverse
+	for i := 0; i < n/2; i++ {
+		runes[i], runes[n-1-i] = runes[n-1-i], runes[i]
+	}
+	return string(runes)
+
+}
+
 // NumSpace formats numeric values for readability by adding
 // spaces every three digits.
 //

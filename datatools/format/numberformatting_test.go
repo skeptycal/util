@@ -5,6 +5,10 @@ import (
 	"testing"
 )
 
+const (
+	input = "The quick brown 狐 jumped over the lazy 犬"
+)
+
 func TestNumSpace(t *testing.T) {
 	type args struct {
 		n string
@@ -46,6 +50,14 @@ func BenchmarkReverse2(b *testing.B) {
 	}
 }
 
+// BenchmarkReverse3-8   	10324681	       108 ns/op	      40 B/op	       2 allocs/op
+
+func BenchmarkReverse3(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		Reverse3("12345")
+	}
+}
+
 // BenchmarkNumSpaces-8   	 2261641	       520 ns/op	      80 B/op	      12 allocs/op
 
 func BenchmarkNumSpaces(b *testing.B) {
@@ -72,6 +84,26 @@ func TestReverse(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := Reverse(tt.args.s); got != tt.want {
 				t.Errorf("Reverse() = %v, want %v", got, tt.want)
+			}
+		})
+
+		t.Run(tt.name, func(t *testing.T) {
+			if got := Reverse2(tt.args.s); got != tt.want {
+				t.Errorf("Reverse2() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := Reverse3(tt.args.s); got != tt.want {
+				t.Errorf("Reverse3() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := Reverse4(tt.args.s); got != tt.want {
+				t.Errorf("Reverse4() = %v, want %v", got, tt.want)
 			}
 		})
 	}
