@@ -33,6 +33,10 @@ func (b *Builder) Put(r rune, i int) {
 	b.buf[i] = r
 }
 
+func (b *Builder) ReSize(i int) {
+	b.buf = make([]rune, i, i+i)
+}
+
 // noescape hides a pointer from escape analysis.  noescape is
 // the identity function but escape analysis doesn't think the
 // output depends on the input. noescape is inlined and currently
@@ -94,6 +98,7 @@ func (b *Builder) Grow(n int) {
 	if n < 0 {
 		panic("runeBuilder.Grow: negative count")
 	}
+	fmt.Printf("n: %d   cap: %d    len: %d", n, cap(b.buf), len(b.buf))
 	if cap(b.buf)-len(b.buf) < n {
 		b.grow(n)
 	}

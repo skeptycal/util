@@ -172,6 +172,7 @@ func ReverseRune(s string) string {
 func Reverse8(s string) string {
 
 	rb := runebuilder.Builder{}
+	rb.ReSize(len(s))
 	rb.Grow(len(s))
 	fmt.Println("len: ", rb.Len())
 

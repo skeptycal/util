@@ -103,6 +103,10 @@ func BenchmarkNumSpaces(b *testing.B) {
 	}
 }
 
+func TestReverse8(t *testing.T) {
+
+}
+
 func TestReverse(t *testing.T) {
 	type args struct {
 		s string
@@ -119,11 +123,11 @@ func TestReverse(t *testing.T) {
 		{input, args{input}, Reverse4(input)},
 	}
 	for _, tt := range tests {
-		// t.Run(tt.name, func(t *testing.T) {
-		// 	if got := Reverse(tt.args.s); got != tt.want {
-		// 		t.Errorf("Reverse() = %v, want %v", got, tt.want)
-		// 	}
-		// })
+		t.Run(tt.name, func(t *testing.T) {
+			if got := Reverse8(tt.args.s); got != tt.want {
+				t.Errorf("Reverse8() = %v, want %v", got, tt.want)
+			}
+		})
 
 		t.Run(tt.name, func(t *testing.T) {
 			if got := Reverse2(tt.args.s); got != tt.want {
