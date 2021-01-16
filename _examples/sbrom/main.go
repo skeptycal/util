@@ -7,7 +7,6 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"os"
 	"strings"
 )
 
@@ -23,14 +22,15 @@ var (
 	defaultAnsiFmt string = a.Build(33, 44, 1)
 )
 
-func NewANSI(fg,bg,ef int, w bufio.Writer) ANSI {
-    return &{
-        fg:fg,
-        bg:bg,
-        ef:ef,
-        bufio.Writer:w,
-        sb: strings.Builder{},
-    }
+func NewANSIWriter(fg, bg, ef []byte) ANSI {
+	w := bufio.NewWriter(w)
+	return &Ansi{
+		fg:           fg,
+		bg:           bg,
+		ef:           ef,
+		bufio.Writer: *bufio.NewWriter(w),
+		sb:           strings.Builder{},
+	}
 }
 
 type ANSI interface {
