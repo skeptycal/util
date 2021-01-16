@@ -18,65 +18,75 @@ const (
 )
 
 var (
-    sb = strings.Builder{}
-    defaultAnsiFmt := ansi(33,44,1)
+	sb                    = strings.Builder{}
+	defaultAnsiFmt string = ansi(33, 44, 1)
 )
 
 func hr(n int) {
 	fmt.Println(strings.Repeat(hrChar, n))
 }
 
-func ansi(a ...int) {
+func br() {
+	fmt.Println("")
+}
+
+func ansi(a ...int) string {
 	defer sb.Reset()
 	for i := range a {
 		sb.WriteString(fmt.Sprintf(ansi7fmt, a[i]))
 	}
-	fmt.Print(sb.String())
+	return sb.String()
 }
 
-func Echo(fmt string, a ...interface{}) {
+func aPrint(a ...int) {
+	fmt.Print(ansi(a...))
+}
 
-    if fmtString, ok := a[0].(string); ok {
-        if
-    }
-    if a[0].string
-
+func Echo(a ...interface{}) {
+	fmtString := "%v\n"
 	fmt.Print(defaultAnsiFmt)
 
-	fmt.Print(39, 49, 0)
+	if fs, ok := a[0].(string); ok {
+		if strings.Contains(fmtString, "%") {
+			fmt.Printf(fs, a[1:])
+		} else {
+			fmt.Println(a...)
+		}
+	}
+	aPrint(39, 49, 0)
 }
 
 func main() {
-	fmt.Println()
+	br()
 
-	ansi(33, 44, 1)
+	// aPrint(33, 44, 1)
 
 	hr(30)
-	fmt.Println()
-	fmt.Println()
-	fmt.Println(sample)
-	fmt.Println(sample2)
-	fmt.Println(sampleint)
+	br()
+	br()
+	Echo(sample)
+	Echo(sample2)
+	Echo(sampleint)
 
 	// fake some spacing ...
 	for i := 0; i < len(sample); i++ {
-		fmt.Printf("%x ", sample[i])
+		Echo("%x ", sample[i])
 	}
-	fmt.Println()
+	Echo()
 
 	// or ... just use this built-in feature
-	fmt.Printf("% x\n", sample)
-	fmt.Printf("% b\n", sampleint)
-	fmt.Printf("%X\n", sample)
+	Echo("% x\n", sample)
+	Echo("% b\n", sampleint)
+	Echo("%X\n", sample)
 
 	// escape any non-printable characters
-	fmt.Printf("%q\n", sample)
+	Echo("%q\n", sample)
 
-	fmt.Println()
-	fmt.Println()
-	ansi(0)
+	br()
+	br()
+	aPrint(0)
 	hr(30)
 
-	fmt.Println()
+	br()
 
 }
