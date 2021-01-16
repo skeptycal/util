@@ -4,7 +4,11 @@
 // anyway ... I digress
 package main
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/skeptycal/util/stringutils/ansi"
+)
 
 const (
 	sample          = "\xbd\xb2\x3d\xbc\x20\xe2\x8c\x98"
@@ -12,8 +16,15 @@ const (
 	sampleint int32 = 0b1010101010101010101010
 )
 
-func main() {
+func green() string {
+	return ansi.Ansi.Build(ansi.Bold, ansi.Yellow, ansi.GreenBackground)
+}
 
+func main() {
+	fmt.Println()
+	fmt.Println()
+	fmt.Println()
+	fmt.Printf("%v", green())
 	fmt.Println(sample)
 	fmt.Println(sample2)
 	fmt.Println(sampleint)
@@ -31,5 +42,9 @@ func main() {
 
 	// escape any non-printable characters
 	fmt.Printf("%q\n", sample)
+
+	fmt.Println()
+	fmt.Println()
+	fmt.Println()
 
 }
