@@ -25,11 +25,11 @@ var (
 func NewANSIWriter(fg, bg, ef []byte) ANSI {
 	w := bufio.NewWriter(w)
 	return &Ansi{
-		fg:           fg,
-		bg:           bg,
-		ef:           ef,
-		bufio.Writer: *bufio.NewWriter(w),
-		sb:           strings.Builder{},
+		fg: fg,
+		bg: bg,
+		ef: ef,
+		w:  bufio.NewWriter(w),
+		sb: &strings.Builder{},
 	}
 }
 
@@ -44,16 +44,29 @@ type Ansi struct {
 	fg []byte
 	bg []byte
 	ef []byte
-	bufio.Writer
-	sb strings.Builder
+	w  *bufio.Writer
+	sb *strings.Builder
 }
 
 func (a *Ansi) Build(b []byte) string {
 	defer a.sb.Reset()
-	for i := range b {
-		sb.WriteString(fmt.Sprintf(ansi7fmt, b[i]))
+	for i, n := range b {
+		a.sb.WriteString(fmt.Sprintf(ansi7fmt, n))
 	}
 	return a.sb.String()
+}
+
+func (a *Ansi) String() string {
+	defer a.sb.Reset()
+	return a.sb.String()
+}
+
+func (a *Ansi) Write(b []byte) (int, error) {
+	return a.w.Write(b)
+}
+
+func (a *Ansi) WriteString(s string) (int, error) {
+	return a.w.WriteString(s)
 }
 
 func hr(n int) {
@@ -65,7 +78,7 @@ func br() {
 }
 
 func aPrint(a ...int) {
-	fmt.Print(ansi(a...))
+	fmt.Print(a.Build(a...))
 }
 
 func Echo(a ...interface{}) {
