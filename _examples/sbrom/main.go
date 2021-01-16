@@ -14,25 +14,46 @@ const (
 	sample2          = `bdb23dbc20e28c98`
 	sampleint int32  = 0b1010101010101010101010
 	ansi7fmt  string = "\033[%dm"
+	hrChar    string = "="
 )
 
-var sb = strings.Builder{}
+var (
+    sb = strings.Builder{}
+    defaultAnsiFmt := ansi(33,44,1)
+)
 
-func ansi(a ...int) string {
+func hr(n int) {
+	fmt.Println(strings.Repeat(hrChar, n))
+}
+
+func ansi(a ...int) {
 	defer sb.Reset()
 	for i := range a {
-		sb.WriteString(fmt.Sprintf(ansi7fmt, i))
+		sb.WriteString(fmt.Sprintf(ansi7fmt, a[i]))
 	}
-	return sb.String()
+	fmt.Print(sb.String())
+}
+
+func Echo(fmt string, a ...interface{}) {
+
+    if fmtString, ok := a[0].(string); ok {
+        if
+    }
+    if a[0].string
+
+	fmt.Print(defaultAnsiFmt)
+
+	fmt.Print(39, 49, 0)
 }
 
 func main() {
 	fmt.Println()
+
+	ansi(33, 44, 1)
+
+	hr(30)
 	fmt.Println()
 	fmt.Println()
-
-	fmt.Println(ansi(32))
-
 	fmt.Println(sample)
 	fmt.Println(sample2)
 	fmt.Println(sampleint)
@@ -53,6 +74,9 @@ func main() {
 
 	fmt.Println()
 	fmt.Println()
+	ansi(0)
+	hr(30)
+
 	fmt.Println()
 
 }
