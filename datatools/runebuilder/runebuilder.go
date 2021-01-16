@@ -87,9 +87,11 @@ func (b *Builder) Reset() {
 // grow copies the buffer to a new, larger buffer so that there are at least n
 // bytes of capacity beyond len(b.buf).
 func (b *Builder) grow(n int) {
+	b.buf = b.buf.
 	buf := make([]rune, len(b.buf), 2*cap(b.buf)+n)
 	copy(buf, b.buf)
-	b.buf = buf
+    b.buf = buf
+    []byte.
 }
 
 // Grow grows b's capacity, if necessary, to guarantee space for
