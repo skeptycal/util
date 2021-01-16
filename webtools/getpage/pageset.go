@@ -49,8 +49,8 @@ type PageSet interface {
 //
 // Reference: https://tour.golang.org/concurrency/9
 type SafePageSet struct {
-	name      string        `default:"pageset"`
-	cacheTime time.Duration `default=defaultMaxPageCacheAge`
+	name      string `default:"pageset"`
+	cacheTime time.Duration
 	mu        sync.Mutex
 	pages     map[string]*strings.Builder
 }

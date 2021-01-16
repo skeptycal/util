@@ -1,8 +1,9 @@
+// Package getpage gets webpage information.
 package getpage
 
 import (
 	"bytes"
-	"context"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"strings"
@@ -73,11 +74,11 @@ type resp struct {
 }
 
 // GetPage - return result from url
-func GetPage(url string) (*bytes.Buffer, error) {
+func GetPage(url string) (string, error) {
 
 	resp, err := http.Get(url)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	defer resp.Body.Close()
 
@@ -88,15 +89,7 @@ func GetPage(url string) (*bytes.Buffer, error) {
 
 	var sb = pageSet.New(url)
 	defer sb.Reset()
-	if sb.Cap() < size {
-		sb.Grow(size)
-	}
 
-	// sb.Grow(size)
-
-	// ioutil.readall()
-
-	var buf bytes.Buffer
 	// If the buffer overflows, we will get bytes.ErrTooLarge.
 	// Return that as an error. Any other panic remains.
 	defer func() {
@@ -110,20 +103,17 @@ func GetPage(url string) (*bytes.Buffer, error) {
 			panic(e)
 		}
 	}()
-	if int64(int(size)) == size {
-		buf.Grow(int(size))
-	}
-	_, err = buf.ReadFrom(r)
-	// return buf.Bytes(), err
-	// ioutil.readall
 
-	// body, err := ioutil.ReadAll(resp.Body)
+	if sb.Cap() < size {
+		sb.Grow(size)
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
-	return nil, nil
-}
 
-func GetBuilder(ctx context.Context, b PageBuilder) (Builder, error) {
-	return nil, nil
+	sb.Write(body)
+
+	return sb.String(), nil
 }
