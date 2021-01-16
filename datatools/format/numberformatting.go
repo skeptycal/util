@@ -178,7 +178,7 @@ func Reverse8(s string) string {
 
 	size := len(s) - 1
 	for i, r := range s {
-		fmt.Printf("i: %d    r: %v", i, r)
+		// fmt.Printf("i: %d    r: %v", i, r)
 		rb.Put(r, size-i)
 	}
 	return rb.String()

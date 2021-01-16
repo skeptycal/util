@@ -33,6 +33,8 @@ func (b *Builder) Put(r rune, i int) {
 	b.buf[i] = r
 }
 
+// ReSize creates a new buffer of size i and cap 2 * i
+// Any data in the buffer is lost.
 func (b *Builder) ReSize(i int) {
 	b.buf = make([]rune, i, i+i)
 }
@@ -98,7 +100,7 @@ func (b *Builder) Grow(n int) {
 	if n < 0 {
 		panic("runeBuilder.Grow: negative count")
 	}
-	fmt.Printf("n: %d   cap: %d    len: %d", n, cap(b.buf), len(b.buf))
+	// fmt.Printf("(rb.Grow(n) n: %d   cap: %d    len: %d", n, cap(b.buf), len(b.buf))
 	if cap(b.buf)-len(b.buf) < n {
 		b.grow(n)
 	}
