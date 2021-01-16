@@ -7,20 +7,30 @@ import (
 )
 
 func NumSpace(n float64) string {
-	s := fmt.Sprintf("%g", n)
-	mantissa := s
-	exp := ""
-	num := ""
-	dec := ""
+	sb := strings.Builder{}
+	mantissa := fmt.Sprintf("%g", n)
+	exponent := ""
 
-	parts := strings.Split(s, "e")
+	parts := strings.Split(mantissa, "e")
 	if len(parts) > 1 {
-		num = parts[0]
-		exp = parts[1]
+		mantissa = parts[0]
+		exponent = parts[1]
 	}
 
-	parts := strings.Split(num, ".")
+	intpart := mantissa
+	decpart := ""
+
+	parts = strings.Split(intpart, ".")
 	if len(parts) > 1 {
+		intpart = parts[0]
+		decpart = parts[1]
+	}
+
+	for i := 0; i < len(intpart); i++ {
+		if i%3 == 0 {
+			sb.WriteString(" ")
+			sb.WriteString(intpart[i])
+		}
 
 	}
 }
