@@ -2,7 +2,10 @@
 package format
 
 import (
+	"fmt"
 	"strings"
+
+	"github.com/skeptycal/util/datatools/runebuilder"
 )
 
 type stringWriter struct {
@@ -84,7 +87,7 @@ func Reverse(s string) string {
 	return sb.String()
 }
 
-// Reference: https://stackoverflow.com/questions/1752414/how-to-reverse-a-string-in-go
+// Reverse2 Reference: https://stackoverflow.com/questions/1752414/how-to-reverse-a-string-in-go
 func Reverse2(s string) string {
 	runes := []rune(s)
 	for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
@@ -93,7 +96,7 @@ func Reverse2(s string) string {
 	return string(runes)
 }
 
-// Reference: https://stackoverflow.com/a/1754209
+// Reverse3 Reference: https://stackoverflow.com/a/1754209
 func Reverse3(input string) string {
 	// Get Unicode code points.
 	n := 0
@@ -124,9 +127,19 @@ func Reverse4(s string) string {
 
 }
 
-type RuneBuilder struct {
-	addr *RuneBuilder // of receiver, to detect copies by value
-	buf  []byte
+func Reverse5(s string) string {
+	rb := runebuilder.Builder{}
+	// rb.WriteString(s)
+	// for i := len(s) - 1; i > -1; i-- {
+	// 	rb.WriteRune(r)
+	// }
+	x := len(s) - 1
+	k := 0
+	for i := range s {
+		k = x - k
+		fmt.Println(s[len(s)-1-i])
+	}
+	return rb.String()
 }
 
 // NumSpace formats numeric values for readability by adding
