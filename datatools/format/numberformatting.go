@@ -75,10 +75,22 @@ func (w *stringWriter) loadString() {
 	}
 }
 
-func Reverse(s string) (ret string) {
-	for i := len(s); i > 0; i-- {
-		ret += s[i]
+func Reverse(s string) string {
+	var ret []byte
+	b := []byte(s)
+	for i := len(b); i > 0; i-- {
+		ret = append(ret, b[i-1])
 	}
+	return string(ret)
+}
+
+// Reference: https://stackoverflow.com/questions/1752414/how-to-reverse-a-string-in-go
+func Reverse2(s string) string {
+	runes := []rune(s)
+	for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
+		runes[i], runes[j] = runes[j], runes[i]
+	}
+	return string(runes)
 }
 
 // NumSpace formats numeric values for readability by adding
