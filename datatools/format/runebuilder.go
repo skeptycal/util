@@ -103,8 +103,8 @@ func (b *Builder) Write(p []byte) (int, error) {
 	return len(p), nil
 }
 
-// WriteByte appends the byte c to b's buffer.
-// The returned error is always nil.
+// WriteByte decodes the byte c to a valid utf8 rune
+// and writes it to b's runeBuffer or returns any error.
 func (b *Builder) WriteByte(c byte) error {
 	b.copyCheck()
 	r, size := utf8.DecodeRune([]byte{c})
@@ -122,17 +122,20 @@ func (b *Builder) WriteByte(c byte) error {
 // It returns the length of r and a nil error.
 func (b *Builder) WriteRune(r rune) (int, error) {
 	b.copyCheck()
+	// fast path for length 1 runes
 	if r < utf8.RuneSelf {
 		b.buf = append(b.buf, r)
 		return 1, nil
 	}
-	l := len(b.buf)
-	if cap(b.buf)-l < utf8.UTFMax {
-		b.grow(utf8.UTFMax)
-	}
-	n := utf8.EncodeRune(b.buf[l:l+utf8.UTFMax], r)
-	b.buf = b.buf[:l+n]
-	return n, nil
+	// todo - append takes care of this anyway ... ??
+	// size := len(b.buf)
+	// if cap(b.buf)-size < utf8.UTFMax {
+	// 	b.grow(utf8.UTFMax + utf8.UTFMax)
+	// 	//todo - is this enough? is it better in situations to grow x2
+	// 	//todo - and make it half as often??
+	// }
+	b.buf = append(b.buf, r)
+	return utf8.RuneLen(r), nil
 }
 
 // WriteString appends the contents of s to b's buffer.
