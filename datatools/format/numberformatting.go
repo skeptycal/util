@@ -25,20 +25,22 @@ import (
 // finally, add any exponent back to the mantissa
 func NumSpace(n float64) string {
 	sb := strings.Builder{}
-	mantissa := fmt.Sprintf("%g", n)
-	intpart := mantissa
+	s := fmt.Sprintf("%g", n)
+	mantissa := s
 	exponent := ""
-	decpart := ""
 
 	eloc := strings.Index(mantissa, "e")
 	if eloc > 0 {
-		intpart = mantissa[:eloc]
-		exponent = mantissa[eloc:]
+		mantissa = s[:eloc]
+		exponent = s[eloc:]
 	}
 
-	dloc = strings.Split(intpart, ".")
-	if len(parts) > 1 {
-		intpart = parts[0]
+	intpart := mantissa
+	decpart := ""
+
+	dloc := strings.Index(intpart, ".")
+	if dloc > -1 {
+		intpart = parts
 		decpart = parts[1]
 	}
 
@@ -54,6 +56,7 @@ func NumSpace(n float64) string {
 		}
 
 	}
+	return sb.String()
 }
 
 /* python version
