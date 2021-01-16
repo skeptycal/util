@@ -39,25 +39,25 @@ func (w *stringWriter) parse(value string) {
 }
 func (w *stringWriter) loadString() {
 
-	start := 0
 	if w.intpart[0] == '=' {
 		w.WriteByte(w.intpart[0])
 		w.intpart = w.intpart[1:]
 	}
 
-	rem := len(w.intpart)%3 - 2
+	rem := len(w.intpart)%3 + 2
 
-	if len(w.intpart) < 4 {
-		w.WriteString(w.intpart)
-	} else {
-		for i := start; i < len(w.intpart)-1; i++ {
-			w.WriteByte(w.intpart[i])
-			if (i+rem)%3 == 0 {
-				w.space()
-			}
+	t := ""
+	j := len(w.intpart) - 1
+	for i := j; i >= 0; i-- {
+		t += string(w.intpart[i])
+		// w.WriteByte(w.intpart[i])
+		if (i+rem)%3 == 0 && i < len(w.intpart) {
+			t += " "
+			// w.space()
 		}
 	}
-	w.WriteByte(w.intpart[len(w.intpart)-1])
+
+	// w.WriteByte(w.intpart[len(w.intpart)-1])
 
 	if w.decpart != "" {
 		w.dot()
@@ -72,6 +72,12 @@ func (w *stringWriter) loadString() {
 	}
 	if w.exponent != "" {
 		w.exp()
+	}
+}
+
+func Reverse(s string) (ret string) {
+	for i := len(s); i > 0; i-- {
+		ret += s[i]
 	}
 }
 
