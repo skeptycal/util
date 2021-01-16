@@ -75,13 +75,13 @@ func (w *stringWriter) loadString() {
 	}
 }
 
+// Reverse is not utf8 compatible
 func Reverse(s string) string {
-	var ret []byte
-	b := []byte(s)
+	sb := strings.Builder{}
 	for i := len(b); i > 0; i-- {
-		ret = append(ret, b[i-1])
+		sb.WriteByte(s[i])
 	}
-	return string(ret)
+	return sb.String()
 }
 
 // Reference: https://stackoverflow.com/questions/1752414/how-to-reverse-a-string-in-go
@@ -97,18 +97,18 @@ func Reverse2(s string) string {
 func Reverse3(input string) string {
 	// Get Unicode code points.
 	n := 0
-	rune := make([]rune, len(input))
+	runes := make([]rune, len(input))
 	for _, r := range input {
-		rune[n] = r
+		runes[n] = r
 		n++
 	}
-	rune = rune[0:n]
+	runes = runes[0:n]
 	// Reverse
 	for i := 0; i < n/2; i++ {
-		rune[i], rune[n-1-i] = rune[n-1-i], rune[i]
+		runes[i], runes[n-1-i] = runes[n-1-i], runes[i]
 	}
 	// Convert back to UTF-8.
-	return string(rune)
+	return string(runes)
 }
 
 // Reverse4 combines the best from SO answers
