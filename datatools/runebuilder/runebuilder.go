@@ -1,11 +1,12 @@
-// RuneBuilder implements a heavily copied version of
-// strings.Builder from the Go standard library.
-//
 // Copyright 2017 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package format
+// Package runebuilder implements a heavily copied version of
+// strings.Builder from the Go standard library that has been
+// refactored to support runes.
+//
+package runebuilder
 
 import (
 	"fmt"
@@ -87,7 +88,7 @@ func (b *Builder) grow(n int) {
 func (b *Builder) Grow(n int) {
 	b.copyCheck()
 	if n < 0 {
-		panic("strings.Builder.Grow: negative count")
+		panic("runeBuilder.Grow: negative count")
 	}
 	if cap(b.buf)-len(b.buf) < n {
 		b.grow(n)
@@ -98,9 +99,11 @@ func (b *Builder) Grow(n int) {
 // Write always returns len(p), nil.
 func (b *Builder) Write(p []byte) (int, error) {
 	b.copyCheck()
+	return b.WriteString(string(p))
 
-	b.buf = append(b.buf, p...)
-	return len(p), nil
+	//todo - is this the best way?
+	// b.buf = append(b.buf, p...)
+	// return len(p), nil
 }
 
 // WriteByte decodes the byte c to a valid utf8 rune
@@ -123,10 +126,11 @@ func (b *Builder) WriteByte(c byte) error {
 func (b *Builder) WriteRune(r rune) (int, error) {
 	b.copyCheck()
 	// fast path for length 1 runes
-	if r < utf8.RuneSelf {
-		b.buf = append(b.buf, r)
-		return 1, nil
-	}
+	// todo - is this really needed? benchmark it
+	// if r < utf8.RuneSelf {
+	// 	b.buf = append(b.buf, r)
+	// 	return 1, nil
+	// }
 	// todo - append takes care of this anyway ... ??
 	// size := len(b.buf)
 	// if cap(b.buf)-size < utf8.UTFMax {
@@ -135,13 +139,16 @@ func (b *Builder) WriteRune(r rune) (int, error) {
 	// 	//todo - and make it half as often??
 	// }
 	b.buf = append(b.buf, r)
-	return utf8.RuneLen(r), nil
+	return utf8.RuneLen(r), nil //todo do we need to do this? benchmark
 }
 
 // WriteString appends the contents of s to b's buffer.
 // It returns the length of s and a nil error.
 func (b *Builder) WriteString(s string) (int, error) {
 	b.copyCheck()
-	b.buf = append(b.buf, s...)
+	// b.buf = append(b.buf, s...) //todo - is this the best way?
+	for _, r := range s {
+		b.buf = append(b.buf, r)
+	}
 	return len(s), nil
 }
