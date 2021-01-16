@@ -5,7 +5,9 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"os"
 	"strings"
 )
 
@@ -18,9 +20,31 @@ const (
 )
 
 var (
-	sb                    = strings.Builder{}
-	defaultAnsiFmt string = ansi(33, 44, 1)
+	defaultAnsiFmt string = a.Build(33, 44, 1)
+	a              ANSI   = &Ansi{33, 44, 1, os.Stdout}
 )
+
+type ANSI interface {
+	Build([]byte) string
+	Write([]byte) (int, error)
+	WriteString(string) (int, error)
+	String() string
+}
+
+type Ansi struct {
+	fg []byte
+	bg []byte
+	ef []byte
+	bufio.Writer
+}
+
+func (a *Ansi) Build(b ...byte) string {
+	defer sb.Reset()
+	for i := range a {
+		sb.WriteString(fmt.Sprintf(ansi7fmt, a[i]))
+	}
+	return sb.String()
+}
 
 func hr(n int) {
 	fmt.Println(strings.Repeat(hrChar, n))
@@ -28,14 +52,6 @@ func hr(n int) {
 
 func br() {
 	fmt.Println("")
-}
-
-func ansi(a ...int) string {
-	defer sb.Reset()
-	for i := range a {
-		sb.WriteString(fmt.Sprintf(ansi7fmt, a[i]))
-	}
-	return sb.String()
 }
 
 func aPrint(a ...int) {
