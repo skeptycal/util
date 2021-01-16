@@ -6,6 +6,23 @@ import (
 	"strings"
 )
 
+// NumSpace formats numeric values for readability by adding
+// spaces every three digits.
+//
+// e.g.
+//
+//    12345678.87654321 e-42
+// first, split off any exponent from the mantissa
+//
+//    12345678.87654321  and  e-42
+// next, split off any decimal part from the integer part
+//    12345678   and    .87654321
+//
+// next, add spaces between digits in the integer part
+//
+//    12 345 678  and    .876 543 21
+//
+// finally, add any exponent back to the mantissa
 func NumSpace(n float64) string {
 	sb := strings.Builder{}
 	mantissa := fmt.Sprintf("%g", n)
@@ -26,10 +43,15 @@ func NumSpace(n float64) string {
 		decpart = parts[1]
 	}
 
-	for i := 0; i < len(intpart); i++ {
+	rem := len(intpart) % 3
+
+	sb.WriteString(intpart[:rem])
+	sb.WriteString(" ")
+
+	for i := rem; i < len(intpart); i++ {
 		if i%3 == 0 {
+			sb.WriteByte(intpart[i])
 			sb.WriteString(" ")
-			sb.WriteString(intpart[i])
 		}
 
 	}
