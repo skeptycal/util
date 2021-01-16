@@ -2,8 +2,8 @@
 package format
 
 import (
-	"fmt"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/skeptycal/util/datatools/runebuilder"
 )
@@ -134,10 +134,13 @@ func Reverse5(s string) string {
 	// 	rb.WriteRune(r)
 	// }
 	x := len(s) - 1
-	k := 0
 	for i := range s {
-		k = x - k
-		fmt.Println(s[len(s)-1-i])
+		if i > x {
+			break
+		}
+		r, size := utf8.DecodeLastRuneInString(s)
+		_, _ = rb.WriteRune(r)
+		s = s[:x-size]
 	}
 	return rb.String()
 }

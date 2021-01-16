@@ -43,6 +43,7 @@ const (
 func BenchmarkReverse(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		Reverse("12345")
+		Reverse(input)
 	}
 }
 
@@ -51,6 +52,7 @@ func BenchmarkReverse(b *testing.B) {
 func BenchmarkReverse2(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		Reverse2("12345")
+		Reverse2(input)
 	}
 }
 
@@ -59,6 +61,7 @@ func BenchmarkReverse2(b *testing.B) {
 func BenchmarkReverse3(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		Reverse3("12345")
+		Reverse3(input)
 	}
 }
 
@@ -67,6 +70,14 @@ func BenchmarkReverse3(b *testing.B) {
 func BenchmarkReverse4(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		Reverse4("12345")
+		Reverse4(input)
+	}
+}
+
+func BenchmarkReverse5(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		Reverse5("12345")
+		Reverse5(input)
 	}
 }
 
@@ -115,6 +126,11 @@ func TestReverse(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := Reverse4(tt.args.s); got != tt.want {
 				t.Errorf("Reverse4() = %v, want %v", got, tt.want)
+			}
+		})
+		t.Run(tt.name, func(t *testing.T) {
+			if got := Reverse5(tt.args.s); got != tt.want {
+				t.Errorf("Reverse5() = %v, want %v", got, tt.want)
 			}
 		})
 	}
