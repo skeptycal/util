@@ -23,13 +23,12 @@ import (
 //    12 345 678  and    .876 543 21
 //
 // finally, add any exponent back to the mantissa
-func NumSpace(n float64) string {
-	sb := strings.Builder{}
-	s := fmt.Sprintf("%g", n)
+func NumSpace(s string) string {
+	var sb strings.Builder{}
 	mantissa := s
 	exponent := ""
 
-	eloc := strings.Index(s, "e")
+	eloc := strings.Index(s, "E")
 	if eloc != -1 {
 		mantissa = s[:eloc]
 		exponent = s[eloc:]
@@ -44,28 +43,22 @@ func NumSpace(n float64) string {
 		decpart = mantissa[dloc+1:]
 	}
 
-	// fake return value
-	sb.WriteString(intpart)
-	sb.WriteString(".")
-	sb.WriteString(decpart)
-	sb.WriteString("e")
-	sb.WriteString(exponent)
+	rem := len(intpart) % 3
 
-	// return fmt.Sprintf("%s.%se%s", intpart, decpart, exponent)
-	/*
-		rem := len(intpart) % 3
+	retval += intpart[:rem]
+	retval += " "
 
-		sb.WriteString(intpart[:rem])
-		sb.WriteString(" ")
+	for i := rem; i < len(intpart); i++ {
+		if i%3 == 0 {
+			retval += string(intpart[i])
+			retval += " "
+		}
 
-		for i := rem; i < len(intpart); i++ {
-			if i%3 == 0 {
-				sb.WriteByte(intpart[i])
-				sb.WriteString(" ")
-			}
+	}
+	return intpart + ":" + decpart
+	return fmt.Sprintf("%s.%se%s", intpart, decpart, exponent)
 
-		}*/
-	return sb.String()
+	// return sb.String()
 
 }
 
