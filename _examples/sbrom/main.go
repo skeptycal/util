@@ -9,12 +9,14 @@ import "fmt"
 const (
 	sample          = "\xbd\xb2\x3d\xbc\x20\xe2\x8c\x98"
 	sample2         = `bdb23dbc20e28c98`
-	sampleint int32 = 0x1 << 16
+	sampleint int32 = 0b1010101010101010101010
 )
 
 func main() {
 
 	fmt.Println(sample)
+	fmt.Println(sample2)
+	fmt.Println(sampleint)
 
 	// fake some spacing ...
 	for i := 0; i < len(sample); i++ {
@@ -24,5 +26,10 @@ func main() {
 
 	// or ... just use this built-in feature
 	fmt.Printf("% x\n", sample)
+	fmt.Printf("% b\n", sampleint)
+	fmt.Printf("%X\n", sample)
+
+	// escape any non-printable characters
+	fmt.Printf("%q\n", sample)
 
 }
