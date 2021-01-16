@@ -29,6 +29,10 @@ type Builder struct {
 	buf  []rune
 }
 
+func (b *Builder) Put(r rune, i int) {
+	b.buf[i] = r
+}
+
 // noescape hides a pointer from escape analysis.  noescape is
 // the identity function but escape analysis doesn't think the
 // output depends on the input. noescape is inlined and currently

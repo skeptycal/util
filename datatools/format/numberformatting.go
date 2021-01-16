@@ -2,6 +2,7 @@
 package format
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/skeptycal/util/datatools/runebuilder"
@@ -169,15 +170,17 @@ func ReverseRune(s string) string {
 }
 
 func Reverse8(s string) string {
-    rb := runebuilder.Builder{}
 
-    rb.
+	rb := runebuilder.Builder{}
+	rb.Grow(len(s))
+	fmt.Println("len: ", rb.Len())
+
 	size := len(s) - 1
-	retval := make([]rune, size+1)
 	for i, r := range s {
-		retval[size-i] = r
+		fmt.Printf("i: %d    r: %v", i, r)
+		rb.Put(r, size-i)
 	}
-	return string(retval)
+	return rb.String()
 }
 
 // NumSpace formats numeric values for readability by adding
