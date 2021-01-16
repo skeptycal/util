@@ -21,7 +21,7 @@ func TestUserInfo(t *testing.T) {
 	}
 }
 
-func ExampleUserInfo(t *testing.T) {
+func ExampleUserInfo() {
 	s := UserInfo()
 	fmt.Println(s)
 

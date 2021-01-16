@@ -2,8 +2,8 @@ package gofile
 
 import "fmt"
 
-/*A FileMode represents a file's mode and permission bits.
-The bits have the same definition on all systems, so that
+// A FileMode represents a file's mode and permission bits.
+/*The bits have the same definition on all systems, so that
 information about files can be moved from one system
 to another portably. Not all bits apply to all systems.
 
@@ -37,7 +37,7 @@ Mask for the type bits. For regular files, none will be set.
 	ModePerm FileMode = 0777 // Unix permission bits
 )
 */
-const c_FileMode = ""
+const cFileMode = ""
 
 // type bufio.Writer struct
 /* fields
@@ -58,7 +58,7 @@ const c_FileMode = ""
    func (b *Writer) WriteByte(c byte) error
    func (b *Writer) WriteRune(r rune) (size int, err error)
    func (b *Writer) WriteString(s string) (int, error)*/
-const c_bufioWriter = ""
+const cbufioWriter = ""
 
 // type File (for build aix darwin dragonfly freebsd js,wasm linux netbsd openbsd solaris)
 /* pfd         poll.FD
@@ -67,7 +67,7 @@ const c_bufioWriter = ""
    nonblock    bool     // whether we set nonblocking mode
    stdoutOrErr bool     // whether this is stdout or stderr
    appendMode  bool     // whether file is opened for appending*/
-const c_File_unix_darwin_wasm = ""
+const cFileunixdarwinwasm = ""
 
 // type FileInfo interface {
 /* Name() string       // base name of the file
@@ -76,7 +76,7 @@ const c_File_unix_darwin_wasm = ""
    ModTime() time.Time // modification time
    IsDir() bool        // abbreviation for Mode().IsDir()
    Sys() interface{}   // underlying data source (can return nil)*/
-const c_FileInfo = ""
+const cFileInfo = ""
 
 // type File
 /* func Create(name string) (*File, error)
@@ -105,12 +105,12 @@ const c_FileInfo = ""
    func (f *File) Write(b []byte) (n int, err error)
    func (f *File) WriteAt(b []byte, off int64) (n int, err error)
    func (f *File) WriteString(s string) (n int, err error)*/
-const c_File_Methods = ""
+const cFileMethods = ""
 
 func ShowDocs() {
-	fmt.Println(c_bufioWriter)
-	fmt.Println(c_FileInfo)
-	fmt.Println(c_File_Methods)
-	fmt.Println(c_File_unix_darwin_wasm)
-	fmt.Println(c_FileMode)
+	fmt.Println(cbufioWriter)
+	fmt.Println(cFileInfo)
+	fmt.Println(cFileMethods)
+	fmt.Println(cFileunixdarwinwasm)
+	fmt.Println(cFileMode)
 }
