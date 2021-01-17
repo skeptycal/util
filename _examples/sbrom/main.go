@@ -21,18 +21,17 @@ const (
 )
 
 var (
-	ansi           ANSI   = NewANSIWriter(33, 44, 1)
-	defaultAnsiFmt string = ansi.Build(33, 44, 1)
+	sb             strings.Builder = strings.Builder{}
+	ansi           ANSI            = NewANSIWriter(33, 44, 1)
+	defaultAnsiFmt string          = ansi.Build(33, 44, 1)
 )
 
-func NewANSIWriter(fg, bg, ef byte) ANSI {
-	w := bufio.NewWriter(os.Stdout)
+func NewANSIWriter(fg, bg, ef byte, w io.Writer) ANSI {
 	return &Ansi{
 		fg: ansiFormat(fg),
 		bg: ansiFormat(bg),
 		ef: ansiFormat(ef),
-		// w:  bufio.NewWriter(w),
-		sb: &strings.Builder{},
+		bufio.NewWriter(w),
 	}
 }
 
@@ -47,17 +46,18 @@ type Ansi struct {
 	fg string
 	bg string
 	ef string
-	// w  *bufio.Writer
-	sb *strings.Builder
+	bufio.Writer
+	// sb *strings.Builder
 }
 
 // Build encodes a variadic list of bytes into ANSI 7 bit escape codes.
 func (a *Ansi) Build(b ...byte) string {
-	defer a.sb.Reset()
+	defer a.Reset()
 	for _, n := range b {
-		a.sb.WriteString(fmt.Sprintf(ansi7fmt, n))
+		a.WriteString(fmt.Sprintf(ansi7fmt, n))
 	}
-	return a.sb.String()
+	a.Flush()
+	return a.String()
 }
 
 // Set accepts, encodes, and prints a variadic argument list of bytes
