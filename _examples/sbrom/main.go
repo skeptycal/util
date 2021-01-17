@@ -22,7 +22,8 @@ const (
 
 var (
 	ansi            ANSI      = NewANSIWriter(33, 44, 1)
-	defaultAnsiFmt  string    = ansi.Build(33, 44, 1)
+	AnsiFmt         string    = ansi.Build(1, 33, 44)
+	AnsiReset       string    = ansi.Build(0, 39, 49)
 	defaultioWriter io.Writer = os.Stdout
 )
 
@@ -78,28 +79,6 @@ func (a *Ansi) Set(b ...byte) (int, error) {
 	return fmt.Fprint(os.Stdout, a.Build(b...))
 }
 
-// String returns the contents of the underlying strings.Builder and
-// resets the buffer to nil in preparation for the next call.
-func (a *Ansi) String() string {
-	defer a.sb.Reset()
-	fmt.Fprint(os.Stdout, a.sb.String())
-	return a.sb.String()
-}
-
-// Write implements io.Writer and writes the byte slice to the underlying
-// strings.Builder
-func (a *Ansi) Write(b []byte) (int, error) {
-	// defer fmt.Fprint(os.Stdout, a.String())
-	return a.sb.Write(b)
-}
-
-// WriteString implements io.StringWriter and writes the string contents
-// to the underlying strings.Builder
-func (a *Ansi) WriteString(s string) (int, error) {
-	// defer fmt.Fprint(os.Stdout, a.String())
-	return a.sb.WriteString(s)
-}
-
 func hr(n int) {
 	fmt.Println(strings.Repeat(hrChar, n))
 }
@@ -108,25 +87,24 @@ func br() {
 	fmt.Println("")
 }
 
-func ansiFormat(n byte) string {
-	return fmt.Sprintf(ansi7fmt, n)
-}
-func aPrint(a ...byte) {
-	fmt.Print(ansi.Build(a...))
-}
+// func ansiFormat(n byte) string {
+// 	return fmt.Sprintf(ansi7fmt, n)
+// }
+// func aPrint(a ...byte) {
+// 	fmt.Print(ansi.Build(a...))
+// }
 
 func Echo(a ...interface{}) {
-	fmtString := "%v\n"
-	fmt.Print(defaultAnsiFmt)
+	fmt.Print(AnsiFmt)
 
 	if fs, ok := a[0].(string); ok {
-		if strings.Contains(fmtString, "%") {
+		if strings.Contains(fs, "%") {
 			fmt.Printf(fs, a[1:])
 		} else {
 			fmt.Println(a...)
 		}
 	}
-	aPrint(39, 49, 0)
+	fmt.Print(AnsiReset)
 }
 
 func main() {
