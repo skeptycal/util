@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	logColor = Ansi.Build(Bold, RedBackground)
+	logColor = AnsiWriter.Build(Bold, RedBackground)
 )
 
 func init() {

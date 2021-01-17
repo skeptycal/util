@@ -54,7 +54,7 @@ func Test_itoa(t *testing.T) {
 func Test_ansi_String(t *testing.T) {
 	tests := []struct {
 		name string
-		a    Ansi
+		a    AnsiWriter
 		want string
 	}{
 		// TODO: Add test cases.
@@ -72,19 +72,19 @@ func Test_ansi_String(t *testing.T) {
 }
 
 func TestAnsi_Build(t *testing.T) {
-	var ansi Ansi
+	var ansi AnsiWriter
 	type args struct {
-		list []Ansi
+		list []AnsiWriter
 	}
 	tests := []struct {
 		name string
-		a    Ansi
+		a    AnsiWriter
 		args args
 		want string
 	}{
 		// TODO: Add test cases.
-		{"Blue", ansi, args{[]Ansi{Ansi(Blue)}}, "/x1b[34;"},
-		{"Blue and Bold", ansi, args{[]Ansi{Ansi(34), Ansi(Bold)}}, "/x1b[34;/x1b[1;"},
+		{"Blue", ansi, args{[]AnsiWriter{AnsiWriter(Blue)}}, "/x1b[34;"},
+		{"Blue and Bold", ansi, args{[]AnsiWriter{AnsiWriter(34), AnsiWriter(Bold)}}, "/x1b[34;/x1b[1;"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

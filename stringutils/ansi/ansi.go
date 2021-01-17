@@ -33,18 +33,15 @@ var (
 // NewANSIWriter returns a new ANSI Writer for use in terminal output.
 // If w is nil, the default (os.Stdout) is used.
 func NewANSIWriter(fg, bg, ef byte, w io.Writer) ANSI {
+	// if w is not a writer, use the default
 	wr, ok := w.(io.Writer)
 	if !ok || w == nil {
 		w = defaultioWriter
 	}
 
-	return &Ansi{
+	return &AnsiWriter{
 		*bufio.NewWriter(wr),
-        defaultAnsiFmt
-		ansiFormat(fg),
-		ansiFormat(bg),
-		ansiFormat(ef),
-		// sb: strings.Builder{}
+		DefaultAnsiFmt,
 	}
 }
 
@@ -54,16 +51,13 @@ type ANSI interface {
 	Build(b ...byte) string
 }
 
-type Ansi struct {
+type AnsiWriter struct {
 	bufio.Writer
-	fg string
-	bg string
-	ef string
-	// sb *strings.Builder
+	ansiString string // default colors and effects
 }
 
 // Build encodes a variadic list of bytes into ANSI 7 bit escape codes.
-func (a *Ansi) Build(b ...byte) string {
+func (a *AnsiWriter) Build(b ...byte) string {
 	sb := strings.Builder{}
 	defer sb.Reset()
 	for _, n := range b {
@@ -74,7 +68,7 @@ func (a *Ansi) Build(b ...byte) string {
 
 // Set accepts, encodes, and prints a variadic argument list of bytes
 // that represent ANSI colors.
-func (a *Ansi) Set(b ...byte) (int, error) {
+func (a *AnsiWriter) Set(b ...byte) (int, error) {
 	return fmt.Fprint(os.Stdout, a.Build(b...))
 }
 
@@ -96,12 +90,12 @@ func (a AnsiOld) String() string {
 
 // Build returns a string containing multiple ANSI
 // color escape sequences.
-func (a AnsiOld) Build(list ...Ansi) string {
+func (a AnsiOld) Build(list ...AnsiWriter) string {
 	var sb strings.Builder
 	defer sb.Reset()
 
 	for _, v := range list {
-		sb.WriteString(Ansi(v).String())
+		sb.WriteString(AnsiWriter(v).String())
 	}
 
 	return sb.String()

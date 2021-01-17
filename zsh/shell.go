@@ -36,8 +36,8 @@ type version struct {
 
 var (
 	DefaultContext = context.Background()
-	errorColor     = Ansi.Build(Black, Bold, RedBackground)
-	reset          = Ansi(Normal).String()
+	errorColor     = AnsiWriter.Build(Black, Bold, RedBackground)
+	reset          = AnsiWriter(Normal).String()
 )
 
 const defaultGetStdinArgs = `Example: tr lowercase to UpperCase`
