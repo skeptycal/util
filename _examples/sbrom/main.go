@@ -7,6 +7,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"os"
 	"strings"
 )
@@ -30,23 +31,23 @@ func NewANSIWriter(fg, bg, ef byte) ANSI {
 		fg: ansiFormat(fg),
 		bg: ansiFormat(bg),
 		ef: ansiFormat(ef),
-		w:  bufio.NewWriter(w),
+		// w:  bufio.NewWriter(w),
 		sb: &strings.Builder{},
 	}
 }
 
 type ANSI interface {
+	io.Writer
+	io.StringWriter
+	fmt.Stringer
 	Build(b ...byte) string
-	Write([]byte) (int, error)
-	WriteString(string) (int, error)
-	String() string
 }
 
 type Ansi struct {
 	fg string
 	bg string
 	ef string
-	w  *bufio.Writer
+	// w  *bufio.Writer
 	sb *strings.Builder
 }
 
@@ -62,7 +63,7 @@ func (a *Ansi) Build(b ...byte) string {
 // Set accepts, encodes, and prints a variadic argument list of bytes
 // that represent ANSI colors.
 func (a *Ansi) Set(v ...byte) (int, error) {
-	return fmt.Fprint(a.w, a.Build(v...))
+	return fmt.Fprint(a.sb, a.Build(v...))
 }
 
 // String returns the contents of the underlying strings.Builder and
@@ -75,13 +76,15 @@ func (a *Ansi) String() string {
 // Write implements io.Writer and writes the byte slice to the underlying
 // strings.Builder
 func (a *Ansi) Write(b []byte) (int, error) {
-	return a.w.Write(b)
+	defer fmt.Fprint(os.Stdout, a.String())
+	return a.sb.Write(b)
 }
 
 // WriteString implements io.StringWriter and writes the string contents
 // to the underlying strings.Builder
 func (a *Ansi) WriteString(s string) (int, error) {
-	return a.w.WriteString(s)
+	defer fmt.Fprint(os.Stdout, a.String())
+	return a.sb.WriteString(s)
 }
 
 func hr(n int) {
