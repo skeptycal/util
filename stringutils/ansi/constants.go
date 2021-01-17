@@ -1,27 +1,39 @@
 package ansi
 
-// Format Strings for Ansi printf commands.
-/*
-8-bit
-As 256-color lookup tables became common on graphic cards, escape sequences were added to select from a pre-defined set of 256 colors:[citation needed]
-
-    ESC[ 38;5;⟨n⟩ m Select foreground color
-    ESC[ 48;5;⟨n⟩ m Select background color
-
-    0-  7:  standard colors (as in ESC [ 30–37 m)
-    8- 15:  high intensity colors (as in ESC [ 90–97 m)
-    16-231:  6 × 6 × 6 cube (216 colors): 16 + 36 × r + 6 × g + b (0 ≤ r, g, b ≤ 5)
-    232-255:  grayscale from black to white in 24 steps
-*/
+// Ansi basic color codes
+// Reference: https://en.wikipedia.org/wiki/ANSI_escape_code
 const (
-	HrChar  string = "="
-	FMT7bit string = "\033[%vm"
-	FMTbright
+	ResetString    string = "\033[0m"
+	RedString      string = "\033[31m"
+	GreenString    string = "\033[32m"
+	YellowString   string = "\033[33m"
+	BlueString     string = "\033[34m"
+	PurpleString   string = "\033[35m"
+	CyanString     string = "\033[36m"
+	WhiteString    string = "\033[37m"
+	BgRedString    string = "\033[41m"
+	BgGreenString  string = "\033[42m"
+	BgYellowString string = "\033[43m"
+	BgBlueString   string = "\033[44m"
+	BgPurpleString string = "\033[45m"
+	BgCyanString   string = "\033[46m"
+	BgWhiteString  string = "\033[47m"
 )
-const (
-	// ESC[⟨x⟩8:5:⟨n⟩m Select color (x in [ 3, 4 ]) (n in [0..255])
-	FMT8bit string = "\033[%v8;5;%vm"
 
+// Format Strings for Ansi printf commands.
+const (
+	// Character used for HR function
+	HrChar string = "="
+
+	// basic Ansi colors
+	FMTansi string = "\033[%vm;"
+	// basic Ansi "bright" colors
+	FMTbright string = "\033[1;%vm;"
+	// basic Ansi "dim" colors
+	FMTdim string = "\033[2;%vm;"
+
+	// ESC[⟨x⟩8:5:⟨n⟩m Select 8 bit color (x in [ 3, 4 ]) (n in [0..255])
+	FMT8bit string = "\033[%v8;5;%vm"
 	// ESC[ 38:5:⟨n⟩ m Select foreground color (n in [0..255])
 	FMT8bitFG = "\033[38;5;%vm;"
 	// ESC[ 48:5:⟨n⟩ m Select background color (n in [0..255])
@@ -117,7 +129,6 @@ const (
 	DefaultColorsString    = "\033[39;49m"
 	DefaultTextString      = "\033[22;39m" // Normal text color and intensity
 	NormalTextString       = "\033[0m"     // Turn off all attributes
-	ResetString            = "\033[0m"     // alias of NormalText
 	BlackTextString        = "\033[30m"
 	RedTextString          = "\033[31m"
 	GreenTextString        = "\033[32m"
@@ -167,26 +178,6 @@ const (
 	TSM  = 18 // TABULATION STOP MODE
 	GRCM = 21 // GRAPHIC RENDITION COMBINATION
 	ZDM  = 22 // ZERO DEFAULT MODE (see F.4.2 in annex F)
-)
-
-// Ansi 7-bit color codes
-// Reference: https://en.wikipedia.org/wiki/ANSI_escape_code
-const (
-	ResetString    string = "\033[0m"
-	RedString      string = "\033[31m"
-	GreenString    string = "\033[32m"
-	YellowString   string = "\033[33m"
-	BlueString     string = "\033[34m"
-	PurpleString   string = "\033[35m"
-	CyanString     string = "\033[36m"
-	WhiteString    string = "\033[37m"
-	BgRedString    string = "\033[41m"
-	BgGreenString  string = "\033[42m"
-	BgYellowString string = "\033[43m"
-	BgBlueString   string = "\033[44m"
-	BgPurpleString string = "\033[45m"
-	BgCyanString   string = "\033[46m"
-	BgWhiteString  string = "\033[47m"
 )
 
 // --------------------------------------------------
