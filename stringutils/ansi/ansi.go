@@ -2,12 +2,26 @@
 // MIT License
 
 // Package ansi provides fast ansi escape sequence processing based on strings.Builder.
-/*
-The standard is defined by the ECMA-48 standard "Control Functions for Coded Character Sets - Fifth Edition"
+// The standard is defined by the ECMA-48 standard "Control Functions for Coded Character Sets - Fifth Edition"
+package ansi
 
-CSI sequences
+import (
+	"fmt"
+	"strconv"
+	"strings"
+)
 
-For CSI, or "Control Sequence Introducer" commands, the ESC [ is followed by any number (including none) of "parameter bytes" in the range 0x30–0x3F (ASCII 0–9:;<=>?), then by any number of "intermediate bytes" in the range 0x20–0x2F (ASCII space and !"#$%&'()*+,-./), then finally by a single "final byte" in the range 0x40–0x7E (ASCII @A–Z[\]^_`a–z{|}~).[5]:5.4
+/*CSI sequences
+
+For CSI, or "Control Sequence Introducer" commands, the ESC [ is followed by any number (including none) of "parameter bytes" in the range
+
+ 0x30–0x3F (ASCII 0–9:;<=>?)
+
+then by any number of "intermediate bytes" in the range
+
+ 0x20–0x2F (ASCII space and !"#$%&'()*+,-./)
+
+then finally by a single "final byte" in the range 0x40–0x7E (ASCII @A–Z[\]^_`a–z{|}~).[5]:5.4
 
 All common sequences just use the parameters as a series of semicolon-separated numbers such as 1;2;3. Missing numbers are treated as 0 (1;;3 acts like the middle number is 0, and no parameters at all in ESC[m acts like a 0 reset code). Some sequences (such as CUU) treat 0 as 1 in order to make missing parameters useful.[5]:F.4.2
 
@@ -66,13 +80,6 @@ CSI 6n	        DSR	        Device Status Report	    Reports the cursor position 
                                                         (as though typed at the keyboard) ESC[n;mR, where n is
                                                         the row and m is the column.)
 */
-package ansi
-
-import (
-	"fmt"
-	"strconv"
-	"strings"
-)
 
 type Ansi uint8
 
