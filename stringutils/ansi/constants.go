@@ -1,9 +1,16 @@
 package ansi
 
+const (
+	// Character used for HR function
+	HrChar string = "="
+)
+
 // Ansi basic color codes
 // Reference: https://en.wikipedia.org/wiki/ANSI_escape_code
 const (
-	ResetString    string = "\033[0m"
+	DefaultAll     string = "\033[39;49m"
+	DefaultText    string = "\033[22;39m" // Normal text color and intensity
+	Reset          string = "\033[0m"     // Turn off all attributes
 	RedString      string = "\033[31m"
 	GreenString    string = "\033[32m"
 	YellowString   string = "\033[33m"
@@ -22,9 +29,6 @@ const (
 
 // Format Strings for Ansi printf commands.
 const (
-	// Character used for HR function
-	HrChar string = "="
-
 	// basic Ansi colors
 	FMTansi string = "\033[%vm;"
 	// basic Ansi "bright" colors
@@ -47,17 +51,16 @@ const (
 	FMT24bitBG = "\033[48;2;%v;%v;%vm;"
 )
 
+//SGR parameters
 /*
-SGR parameters
-
 SGR (Select Graphic Rendition) sets display attributes. Several attributes can be set in the same sequence, separated by semicolons. Each display attribute remains in effect until a following occurrence of SGR resets it. If no codes are given, CSI m is treated as CSI 0 m (reset / normal).
 
 In ECMA-48 SGR is called "Select Graphic Rendition". In Linux manual pages the term "Set Graphics Rendition" is used.
 */
 const (
-	Normal = iota
-	Bold   // bold or increased intensity
-	Faint  // faint, decreased intensity or second color
+	Normal byte = iota
+	Bold        // bold or increased intensity
+	Faint       // faint, decreased intensity or second color
 	Italics
 	Underline
 	Blink
@@ -125,36 +128,35 @@ const (
 	Subscript               = 74
 )
 
+// premade common ansi text colors
 const (
-	DefaultColorsString    = "\033[39;49m"
-	DefaultTextString      = "\033[22;39m" // Normal text color and intensity
-	NormalTextString       = "\033[0m"     // Turn off all attributes
-	BlackTextString        = "\033[30m"
-	RedTextString          = "\033[31m"
-	GreenTextString        = "\033[32m"
-	YellowTextString       = "\033[33m"
-	BlueTextString         = "\033[34m"
-	MagentaTextString      = "\033[35m"
-	CyanTextString         = "\033[36m"
-	WhiteTextString        = "\033[37m"
-	DefaultColorTextString = "\033[39m" // Normal text color
-	BoldTextString         = "\033[1m"
-	BoldBlackTextString    = "\033[1;30m"
-	BoldRedTextString      = "\033[1;31m"
-	BoldGreenTextString    = "\033[1;32m"
-	BoldYellowTextString   = "\033[1;33m"
-	BoldBlueTextString     = "\033[1;34m"
-	BoldMagentaTextString  = "\033[1;35m"
-	BoldCyanTextString     = "\033[1;36m"
-	FaintTextString        = "\033[2m"
-	FaintBlackTextString   = "\033[2;30m"
-	FaintRedTextString     = "\033[2;31m"
-	FaintGreenTextString   = "\033[2;32m"
-	FaintYellowTextString  = "\033[2;33m"
-	FaintBlueTextString    = "\033[2;34m"
-	FaintMagentaTextString = "\033[2;35m"
-	FaintCyanTextString    = "\033[2;36m"
-	FaintWhiteTextString   = "\033[2;37m"
+	BlackText        string = "\033[30m"
+	RedText          string = "\033[31m"
+	GreenText        string = "\033[32m"
+	YellowText       string = "\033[33m"
+	BlueText         string = "\033[34m"
+	MagentaText      string = "\033[35m"
+	CyanText         string = "\033[36m"
+	WhiteText        string = "\033[37m"
+	DefaultColorText string = "\033[39m" // Normal text color
+	BoldText         string = "\033[1m"
+	BoldBlackText    string = "\033[1;30m"
+	BoldRedText      string = "\033[1;31m"
+	BoldGreenText    string = "\033[1;32m"
+	BoldYellowText   string = "\033[1;33m"
+	BoldBlueText     string = "\033[1;34m"
+	BoldMagentaText  string = "\033[1;35m"
+	BoldCyanText     string = "\033[1;36m"
+	BoldWhiteText    string = "\033[1;37m"
+	FaintText        string = "\033[2m"
+	FaintBlackText   string = "\033[2;30m"
+	FaintRedText     string = "\033[2;31m"
+	FaintGreenText   string = "\033[2;32m"
+	FaintYellowText  string = "\033[2;33m"
+	FaintBlueText    string = "\033[2;34m"
+	FaintMagentaText string = "\033[2;35m"
+	FaintCyanText    string = "\033[2;36m"
+	FaintWhiteText   string = "\033[2;37m"
 )
 
 const (
