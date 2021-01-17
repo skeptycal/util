@@ -63,27 +63,28 @@ func (a *Ansi) Build(b ...byte) string {
 // Set accepts, encodes, and prints a variadic argument list of bytes
 // that represent ANSI colors.
 func (a *Ansi) Set(v ...byte) (int, error) {
-	return fmt.Fprint(a.sb, a.Build(v...))
+	return fmt.Fprint(os.Stdout, a.Build(v...))
 }
 
 // String returns the contents of the underlying strings.Builder and
 // resets the buffer to nil in preparation for the next call.
 func (a *Ansi) String() string {
 	defer a.sb.Reset()
+	fmt.Fprint(os.Stdout, a.sb.String())
 	return a.sb.String()
 }
 
 // Write implements io.Writer and writes the byte slice to the underlying
 // strings.Builder
 func (a *Ansi) Write(b []byte) (int, error) {
-	defer fmt.Fprint(os.Stdout, a.String())
+	// defer fmt.Fprint(os.Stdout, a.String())
 	return a.sb.Write(b)
 }
 
 // WriteString implements io.StringWriter and writes the string contents
 // to the underlying strings.Builder
 func (a *Ansi) WriteString(s string) (int, error) {
-	defer fmt.Fprint(os.Stdout, a.String())
+	// defer fmt.Fprint(os.Stdout, a.String())
 	return a.sb.WriteString(s)
 }
 
