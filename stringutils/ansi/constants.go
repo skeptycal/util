@@ -1,25 +1,37 @@
 package ansi
 
+// Format Strings for Ansi printf commands.
 /*
 8-bit
 As 256-color lookup tables became common on graphic cards, escape sequences were added to select from a pre-defined set of 256 colors:[citation needed]
 
-ESC[ 38;5;⟨n⟩ m Select foreground color
-ESC[ 48;5;⟨n⟩ m Select background color
-  0-  7:  standard colors (as in ESC [ 30–37 m)
-  8- 15:  high intensity colors (as in ESC [ 90–97 m)
- 16-231:  6 × 6 × 6 cube (216 colors): 16 + 36 × r + 6 × g + b (0 ≤ r, g, b ≤ 5)
-232-255:  grayscale from black to white in 24 steps
+    ESC[ 38;5;⟨n⟩ m Select foreground color
+    ESC[ 48;5;⟨n⟩ m Select background color
+
+    0-  7:  standard colors (as in ESC [ 30–37 m)
+    8- 15:  high intensity colors (as in ESC [ 90–97 m)
+    16-231:  6 × 6 × 6 cube (216 colors): 16 + 36 × r + 6 × g + b (0 ≤ r, g, b ≤ 5)
+    232-255:  grayscale from black to white in 24 steps
 */
 const (
-	// ESC[ 38:5:⟨n⟩ m Select foreground color
-	FMT8bitFG = "\033[38:5:%vm;"
-	// ESC[ 48:5:⟨n⟩ m Select background color
-	FMT8bitBG = "\033[48:5:%vm;"
+	HrChar  string = "="
+	FMT7bit string = "\033[%vm"
+	FMTbright
+)
+const (
+	// ESC[⟨x⟩8:5:⟨n⟩m Select color (x in [ 3, 4 ]) (n in [0..255])
+	FMT8bit string = "\033[%v8;5;%vm"
 
-	// ESC[ 38;2;⟨r⟩;⟨g⟩;⟨b⟩ m Select RGB foreground color
+	// ESC[ 38:5:⟨n⟩ m Select foreground color (n in [0..255])
+	FMT8bitFG = "\033[38;5;%vm;"
+	// ESC[ 48:5:⟨n⟩ m Select background color (n in [0..255])
+	FMT8bitBG = "\033[48;5;%vm;"
+
+	// ESC[⟨x⟩8;2;⟨r⟩;⟨g⟩;⟨b⟩ m     Select RGB color  (x in [ 3, 4 ])
+	FMT24bit = "\033[%v8;2;%v;%v;%vm;"
+	// ESC[ 38;2;⟨r⟩;⟨g⟩;⟨b⟩ m      Select RGB foreground color
 	FMT24bitFG = "\033[38;2;%v;%v;%vm;"
-	// ESC[ 48;2;⟨r⟩;⟨g⟩;⟨b⟩ m Select RGB background color
+	// ESC[ 48;2;⟨r⟩;⟨g⟩;⟨b⟩ m      Select RGB background color
 	FMT24bitBG = "\033[48;2;%v;%v;%vm;"
 )
 
@@ -102,36 +114,36 @@ const (
 )
 
 const (
-	DefaultColors    = "\033[39;49m"
-	DefaultText      = "\033[22;39m" // Normal text color and intensity
-	NormalText       = "\033[0m"     // Turn off all attributes
-	Reset            = "\033[0m"     // alias of NormalText
-	BlackText        = "\033[30m"
-	RedText          = "\033[31m"
-	GreenText        = "\033[32m"
-	YellowText       = "\033[33m"
-	BlueText         = "\033[34m"
-	MagentaText      = "\033[35m"
-	CyanText         = "\033[36m"
-	WhiteText        = "\033[37m"
-	DefaultColorText = "\033[39m" // Normal text color
-	BoldText         = "\033[1m"
-	BoldBlackText    = "\033[1;30m"
-	BoldRedText      = "\033[1;31m"
-	BoldGreenText    = "\033[1;32m"
-	BoldYellowText   = "\033[1;33m"
-	BoldBlueText     = "\033[1;34m"
-	BoldMagentaText  = "\033[1;35m"
-	BoldCyanText     = "\033[1;36m"
-	FaintText        = "\033[2m"
-	FaintBlackText   = "\033[2;30m"
-	FaintRedText     = "\033[2;31m"
-	FaintGreenText   = "\033[2;32m"
-	FaintYellowText  = "\033[2;33m"
-	FaintBlueText    = "\033[2;34m"
-	FaintMagentaText = "\033[2;35m"
-	FaintCyanText    = "\033[2;36m"
-	FaintWhiteText   = "\033[2;37m"
+	DefaultColorsString    = "\033[39;49m"
+	DefaultTextString      = "\033[22;39m" // Normal text color and intensity
+	NormalTextString       = "\033[0m"     // Turn off all attributes
+	ResetString            = "\033[0m"     // alias of NormalText
+	BlackTextString        = "\033[30m"
+	RedTextString          = "\033[31m"
+	GreenTextString        = "\033[32m"
+	YellowTextString       = "\033[33m"
+	BlueTextString         = "\033[34m"
+	MagentaTextString      = "\033[35m"
+	CyanTextString         = "\033[36m"
+	WhiteTextString        = "\033[37m"
+	DefaultColorTextString = "\033[39m" // Normal text color
+	BoldTextString         = "\033[1m"
+	BoldBlackTextString    = "\033[1;30m"
+	BoldRedTextString      = "\033[1;31m"
+	BoldGreenTextString    = "\033[1;32m"
+	BoldYellowTextString   = "\033[1;33m"
+	BoldBlueTextString     = "\033[1;34m"
+	BoldMagentaTextString  = "\033[1;35m"
+	BoldCyanTextString     = "\033[1;36m"
+	FaintTextString        = "\033[2m"
+	FaintBlackTextString   = "\033[2;30m"
+	FaintRedTextString     = "\033[2;31m"
+	FaintGreenTextString   = "\033[2;32m"
+	FaintYellowTextString  = "\033[2;33m"
+	FaintBlueTextString    = "\033[2;34m"
+	FaintMagentaTextString = "\033[2;35m"
+	FaintCyanTextString    = "\033[2;36m"
+	FaintWhiteTextString   = "\033[2;37m"
 )
 
 const (
@@ -155,14 +167,6 @@ const (
 	TSM  = 18 // TABULATION STOP MODE
 	GRCM = 21 // GRAPHIC RENDITION COMBINATION
 	ZDM  = 22 // ZERO DEFAULT MODE (see F.4.2 in annex F)
-)
-
-// Format Strings for Ansi printf commands.
-const (
-	FMT256  string = "\033[38;5;%vm"
-	HrChar  string = "="
-	FMT7bit string = "\033[%vm"
-	FMTbright
 )
 
 // Ansi 7-bit color codes
