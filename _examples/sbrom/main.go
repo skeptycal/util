@@ -13,16 +13,18 @@ import (
 )
 
 const (
-	sample           = "\xbd\xb2\x3d\xbc\x20\xe2\x8c\x98"
-	sample2          = `bdb23dbc20e28c98`
-	sampleint int32  = 0b1010101010101010101010
-	ansi7fmt  string = "\033[%vm"
-	hrChar    string = "="
+	sample            = "\xbd\xb2\x3d\xbc\x20\xe2\x8c\x98"
+	sample2           = `bdb23dbc20e28c98`
+	sampleint  int32  = 0b1010101010101010101010
+	ansi256fmt string = "\033[38;5;%vm"
+	hrChar     string = "="
 )
 
-//Ansi 7-bit color codes
+// Ansi 7-bit color codes
+// Reference: https://en.wikipedia.org/wiki/ANSI_escape_code
 const (
-	Reset string = "\033[0m"
+	ansi7fmt string = "\033[%vm"
+	Reset    string = "\033[0m"
 
 	Red    string = "\033[31m"
 	Green  string = "\033[32m"
