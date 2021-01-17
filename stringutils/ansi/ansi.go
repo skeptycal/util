@@ -6,7 +6,10 @@
 package ansi
 
 import (
+	"bufio"
 	"fmt"
+	"io"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -28,6 +31,7 @@ const (
 
 	Delimiter = ";"
 
+	// LegalRange
 	/*
 	   All common sequences just use the parameters as a series of semicolon-separated numbers such as 1;2;3. Missing numbers are treated as 0 (1;;3 acts like the middle number is 0, and no parameters at all in ESC[m acts like a 0 reset code). Some sequences (such as CUU) treat 0 as 1 in order to make missing parameters useful.
 
@@ -35,6 +39,7 @@ const (
 	*/
 	LegalRange = "0x20-0x7E"
 
+	// IllegalRange
 	/*
 	   The behavior of the terminal is undefined in the case where a CSI sequence contains any character outside of the range 0x20–0x7E. These illegal characters are either C0 control characters (the range 0–0x1F), DEL (0x7F), or bytes with the high bit set. Possible responses are to ignore the byte, to process it immediately, and furthermore whether to continue with the CSI sequence, to abort it immediately, or to ignore the rest of it.*/
 	IllegalRange = "0-0x1F,0x7F,0x80-0xFF"
@@ -61,9 +66,11 @@ const (
 		                                                                                              well as CSI 17;H is the same as CSI 17H and CSI 17;1H
 	*/
 
-	// CSI n J	        ED	        Erase in Display Clears part of the screen. If n is 0 (or missing), clear from cursor to end of screen. If n is 1, clear from cursor to beginning of the screen. If n is 2, clear entire screen (and moves cursor to upper left on DOS ANSI.SYS). If n is 3, clear entire screen and delete all lines saved in the scrollback buffer (this feature was added for xterm and is supported by other terminal applications).*/
-	CSIclear = "CSI 2 J" // This clears the screen and, on some devices, locates the cursor to the y,x position 1,1 (upper left corner).
+	// CSI n J
+	// ED - Erase in Display Clears part of the screen. If n is 0 (or missing), clear from cursor to end of screen. If n is 1, clear from cursor to beginning of the screen. If n is 2, clear entire screen (and moves cursor to upper left on DOS ANSI.SYS). If n is 3, clear entire screen and delete all lines saved in the scrollback buffer (this feature was added for xterm and is supported by other terminal applications).*/
+	CSIclear = "CSI 2 J"
 
+	// CSI functions
 	/*
 		CSI n K	        EL	        Erase in Line	            Erases part of the line. If n is 0 (or missing), clear
 		                                                        from cursor to the end of the line. If n is 1, clear
@@ -89,17 +96,146 @@ const (
 
 )
 
-type Ansi uint8
+// --------------------------------------------------
+
+const (
+	FMT256 string = "\033[38;5;%vm"
+	HrChar string = "="
+)
+
+// Ansi 7-bit color codes
+// Reference: https://en.wikipedia.org/wiki/ANSI_escape_code
+const (
+	ansi7fmt string = "\033[%vm"
+	Reset    string = "\033[0m"
+
+	Red    string = "\033[31m"
+	Green  string = "\033[32m"
+	Yellow string = "\033[33m"
+	Blue   string = "\033[34m"
+	Purple string = "\033[35m"
+	Cyan   string = "\033[36m"
+	White  string = "\033[37m"
+
+	BgRed    string = "\033[41m"
+	BgGreen  string = "\033[42m"
+	BgYellow string = "\033[43m"
+	BgBlue   string = "\033[44m"
+	BgPurple string = "\033[45m"
+	BgCyan   string = "\033[46m"
+	BgWhite  string = "\033[47m"
+)
+
+var (
+	ansi            ANSI      = NewANSIWriter(33, 44, 1)
+	AnsiFmt         string    = ansi.Build(1, 33, 44)
+	AnsiReset       string    = ansi.Build(0, 39, 49)
+	defaultioWriter io.Writer = os.Stdout
+)
+
+// todo - create a pool of stringbuilders that can go when ready?
+// type sbSync struct {
+// 	strings.Builder
+// 	mu sync.Mutex
+// }
+
+// NewANSIWriter returns a new ANSI Writer for use in terminal output.
+// If w is nil, the default (os.Stdout) is used.
+func NewANSIWriter(fg, bg, ef byte, w io.Writer) ANSI {
+	if wr, ok := w.(io.Writer); !ok || w == nil {
+		w = defaultioWriter
+	}
+
+	return &Ansi{
+		fg: ansiFormat(fg),
+		bg: ansiFormat(bg),
+		ef: ansiFormat(ef),
+		bufio.NewWriter(w),
+		// sb: strings.Builder{}
+	}
+}
+
+type ANSI interface {
+	io.Writer
+	io.StringWriter
+	Build(b ...byte) string
+}
+
+type Ansi struct {
+	bufio.Writer
+	fg string
+	bg string
+	ef string
+	// sb *strings.Builder
+}
+
+// Build encodes a variadic list of bytes into ANSI 7 bit escape codes.
+func (a *Ansi) Build(b ...byte) string {
+	sb := strings.Builder{}
+	defer sb.Reset()
+	for _, n := range b {
+		sb.WriteString(fmt.Sprintf(ansi7fmt, n))
+	}
+	return sb.String()
+}
+
+// Set accepts, encodes, and prints a variadic argument list of bytes
+// that represent ANSI colors.
+func (a *Ansi) Set(b ...byte) (int, error) {
+	return fmt.Fprint(os.Stdout, a.Build(b...))
+}
+
+func hr(n int) {
+	fmt.Println(strings.Repeat(hrChar, n))
+}
+
+func br() {
+	fmt.Println("")
+}
+
+// func ansiFormat(n byte) string {
+// 	return fmt.Sprintf(ansi7fmt, n)
+// }
+// func aPrint(a ...byte) {
+// 	fmt.Print(ansi.Build(a...))
+// }
+
+// Echo is a helper function that wraps printing to stdout
+// in Ansi color escape sequences.
+//
+// If the first argument is is a string that contains a %
+// character, it is used as a format string for fmt.Printf,
+// otherwise fmt.Println is used for all arguments.
+//
+// AnsiFmt is the current text color.
+//
+// AnsiReset is the Ansi reset code.
+//
+func Echo(a ...interface{}) {
+	fmt.Print(AnsiFmt)
+
+	if fs, ok := a[0].(string); ok {
+		if strings.Contains(fs, "%") {
+			fmt.Printf(fs, a[1:])
+		} else {
+			fmt.Println(a...)
+		}
+	}
+	fmt.Print(AnsiReset)
+}
+
+// --------------------------------------------------
+type AnsiOld uint8
 
 // String returns the string representation of an Ansi
 // value as a color escape sequence.
-func (a Ansi) String() string {
+func (a AnsiOld) String() string {
 	return fmt.Sprintf("/x1b[%d;", a)
 }
 
 // Build returns a string containing multiple ANSI
 // color escape sequences.
-func (a Ansi) Build(list ...Ansi) string {
+func (a AnsiOld) Build(list ...Ansi) string {
 	var sb strings.Builder
 	defer sb.Reset()
 
@@ -108,10 +244,6 @@ func (a Ansi) Build(list ...Ansi) string {
 	}
 
 	return sb.String()
-}
-
-func MarshalAnsi(s string) ([]byte, error) {
-	return []byte{}, nil
 }
 
 // itoa converts the integer value n into an ascii byte slice.
