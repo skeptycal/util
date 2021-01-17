@@ -15,10 +15,13 @@ import (
 )
 
 var (
-	ansi            ANSI      = NewANSIWriter(33, 44, 1)
-	AnsiFmt         string    = ansi.Build(1, 33, 44)
-	AnsiReset       string    = ansi.Build(0, 39, 49)
 	defaultioWriter io.Writer = os.Stdout
+	ansi            ANSI      = NewANSIWriter(33, 44, 1, defaultioWriter)
+
+	// Bold, Yellow Text, Blue Background
+	DefaultAnsiFmt string = ansi.Build(1, 33, 44)
+	// Reset Text Effects; Set Default Foreground; Default Background
+	AnsiReset string = ansi.Build(0, 39, 49)
 )
 
 // todo - create a pool of stringbuilders that can go when ready?
@@ -30,15 +33,17 @@ var (
 // NewANSIWriter returns a new ANSI Writer for use in terminal output.
 // If w is nil, the default (os.Stdout) is used.
 func NewANSIWriter(fg, bg, ef byte, w io.Writer) ANSI {
-	if wr, ok := w.(io.Writer); !ok || w == nil {
+	wr, ok := w.(io.Writer)
+	if !ok || w == nil {
 		w = defaultioWriter
 	}
 
 	return &Ansi{
-		fg: ansiFormat(fg),
-		bg: ansiFormat(bg),
-		ef: ansiFormat(ef),
-		bufio.NewWriter(w),
+		*bufio.NewWriter(wr),
+        defaultAnsiFmt
+		ansiFormat(fg),
+		ansiFormat(bg),
+		ansiFormat(ef),
 		// sb: strings.Builder{}
 	}
 }
