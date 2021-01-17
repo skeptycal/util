@@ -11,23 +11,32 @@ import (
 	"strings"
 )
 
+// CSI sequences
+// For CSI, or "Control Sequence Introducer" commands, the ESC [ is followed by any number (including none) of
 const (
-/*CSI sequences
 
-For CSI, or "Control Sequence Introducer" commands, the ESC [ is followed by any number (including none) of
-//
-// "parameter bytes" in the range 0x30–0x3F (ASCII 0–9:;<=>?)
-parameterBytes = "0x30–0x3F (ASCII 0–9:;<=>?)"
+	// "parameter bytes" in the range 0x30–0x3F (ASCII 0–9:;<=>?)
+	parameterBytes = "0x30–0x3F (ASCII 0–9:;<=>?)"
 
-then by any number of "intermediate bytes" in the range 0x20–0x2F (ASCII space and !"#$%&'()*+,-./)
-0x20–0x2F (ASCII space and !"#$%&'()*+,-./)
+	// then by any number of
+	// "intermediate bytes" in the range 0x20–0x2F (ASCII space and !"#$%&'()*+,-./)
+	intermediateBytes = `0x20–0x2F (ASCII space and !"#$%&'()*+,-./)`
 
-then finally by a single "final byte" in the range 0x40–0x7E (ASCII @A–Z[\]^_`a–z{|}~).[5]:5.4
+	// then finally by a single "final byte" in the range 0x40–0x7E (ASCII @A–Z[\]^_`a–z{|}~)
+	finalBytes = "0x40–0x7E (ASCII @A–Z[\\]^_`a–z{|}~)"
 
-All common sequences just use the parameters as a series of semicolon-separated numbers such as 1;2;3. Missing numbers are treated as 0 (1;;3 acts like the middle number is 0, and no parameters at all in ESC[m acts like a 0 reset code). Some sequences (such as CUU) treat 0 as 1 in order to make missing parameters useful.[5]:F.4.2
+	ansiDelimiter = ";"
 
-A subset of arrangements was declared "private" so that terminal manufacturers could insert their own sequences without conflicting with the standard. Sequences containing the parameter bytes <=>? or the final bytes 0x70–0x7E (p–z{|}~) are private.
+	/*
+	   All common sequences just use the parameters as a series of semicolon-separated numbers such as 1;2;3. Missing numbers are treated as 0 (1;;3 acts like the middle number is 0, and no parameters at all in ESC[m acts like a 0 reset code). Some sequences (such as CUU) treat 0 as 1 in order to make missing parameters useful.
 
+	   A subset of arrangements was declared "private" so that terminal manufacturers could insert their own sequences without conflicting with the standard. Sequences containing the parameter bytes <=>? or the final bytes 0x70–0x7E (p–z{|}~) are private.
+	*/
+	ansiLegalRange = "0x20-0x7E"
+
+	ansiIllegalRange = "0-0x1F,0x7F,0x80-0xFF"
+
+/*
 The behavior of the terminal is undefined in the case where a CSI sequence contains any character outside of the range 0x20–0x7E. These illegal characters are either C0 control characters (the range 0–0x1F), DEL (0x7F), or bytes with the high bit set. Possible responses are to ignore the byte, to process it immediately, and furthermore whether to continue with the CSI sequence, to abort it immediately, or to ignore the rest of it.
 
 Reference: https://en.wikipedia.org/wiki/ANSI_escape_code
@@ -81,6 +90,8 @@ CSI 6n	        DSR	        Device Status Report	    Reports the cursor position 
                                                         (as though typed at the keyboard) ESC[n;mR, where n is
                                                         the row and m is the column.)
 */
+
+)
 
 type Ansi uint8
 
