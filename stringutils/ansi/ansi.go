@@ -185,44 +185,12 @@ func (a *Ansi) Set(b ...byte) (int, error) {
 	return fmt.Fprint(os.Stdout, a.Build(b...))
 }
 
-func hr(n int) {
-	fmt.Println(strings.Repeat(hrChar, n))
-}
-
-func br() {
-	fmt.Println("")
-}
-
 // func ansiFormat(n byte) string {
 // 	return fmt.Sprintf(ansi7fmt, n)
 // }
 // func aPrint(a ...byte) {
 // 	fmt.Print(ansi.Build(a...))
 // }
-
-// Echo is a helper function that wraps printing to stdout
-// in Ansi color escape sequences.
-//
-// If the first argument is is a string that contains a %
-// character, it is used as a format string for fmt.Printf,
-// otherwise fmt.Println is used for all arguments.
-//
-// AnsiFmt is the current text color.
-//
-// AnsiReset is the Ansi reset code.
-//
-func Echo(a ...interface{}) {
-	fmt.Print(AnsiFmt)
-
-	if fs, ok := a[0].(string); ok {
-		if strings.Contains(fs, "%") {
-			fmt.Printf(fs, a[1:])
-		} else {
-			fmt.Println(a...)
-		}
-	}
-	fmt.Print(AnsiReset)
-}
 
 // --------------------------------------------------
 type AnsiOld uint8
