@@ -91,6 +91,16 @@ CSI 6n	        DSR	        Device Status Report	    Reports the cursor position 
                                                         the row and m is the column.)
 */
 
+/*
+SGR parameters
+SGR (Select Graphic Rendition) sets display attributes. Several attributes can be set in the same sequence, separated by semicolons. Each display attribute remains in effect until a following occurrence of SGR resets it. If no codes are given, CSI m is treated as CSI 0 m (reset / normal).
+
+In ECMA-48 SGR is called "Select Graphic Rendition". In Linux manual pages the term "Set Graphics Rendition" is used.
+
+
+
+*/
+
 )
 
 type Ansi uint8
@@ -166,8 +176,8 @@ const (
 	Magenta
 	Cyan
 	White
-	Reserved38 // intended for setting character foreground color as specified in ISO 8613-6 [CCITT Recommendation T.416]
-	Default    // default display color (implementation-defined)
+	SetForeground     // Next arguments are 5;n or 2;r;g;b, see below
+	DefaultForeground // default display color (implementation-defined)
 	BlackBackground
 	RedBackground
 	GreenBackground
@@ -176,9 +186,9 @@ const (
 	MagentaBackground
 	CyanBackground
 	WhiteBackground
-	Reserved48        // reserved for future standardization; intended for setting character background color as specified in ISO 8613-6 [CCITT Recommendation T.416]
-	DefaultBackground // default background color (implementation-defined)
-	Reserved50        // reserved for cancelling the effect of the rendering aspect established by parameter value 26
+	SetBackground              // Next arguments are 5;n or 2;r;g;b, see below
+	DefaultBackground          // default background color (implementation-defined)
+	DisableProportionalSpacing // reserved for cancelling the effect of parameter value 26
 	Framed
 	Encircled
 	Overlined
@@ -186,15 +196,16 @@ const (
 	NotOverlined
 	Reserved56
 	Reserved57
-	Reserved58
-	Reserved59
+	SetUnderlineColor // Next arguments are 5;n or 2;r;g;b, see below
+	DefaultUnderlineColor
 	IdeogramUnderline       // ideogram underline or right side line
 	IdeogramDoubleUnderline // ideogram double underline or double line on the right side
 	IdeogramOverline        // ideogram overline or left side line
 	IdeogramDoubleOverline  // ideogram double overline or double line on the left side
 	IdeogramStress          // ideogram stress marking
 	IdeogramCancel          // cancels the effect of the rendition aspects established by parameter values IdeogramUnderline to IdeogramStress
-
+	Superscript             = 73
+	Subscript               = 74
 )
 
 const (
