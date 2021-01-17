@@ -11,15 +11,16 @@ import (
 	"strings"
 )
 
+const (
 /*CSI sequences
 
-For CSI, or "Control Sequence Introducer" commands, the ESC [ is followed by any number (including none) of "parameter bytes" in the range
+For CSI, or "Control Sequence Introducer" commands, the ESC [ is followed by any number (including none) of
+//
+// "parameter bytes" in the range 0x30–0x3F (ASCII 0–9:;<=>?)
+parameterBytes = "0x30–0x3F (ASCII 0–9:;<=>?)"
 
- 0x30–0x3F (ASCII 0–9:;<=>?)
-
-then by any number of "intermediate bytes" in the range
-
- 0x20–0x2F (ASCII space and !"#$%&'()*+,-./)
+then by any number of "intermediate bytes" in the range 0x20–0x2F (ASCII space and !"#$%&'()*+,-./)
+0x20–0x2F (ASCII space and !"#$%&'()*+,-./)
 
 then finally by a single "final byte" in the range 0x40–0x7E (ASCII @A–Z[\]^_`a–z{|}~).[5]:5.4
 
