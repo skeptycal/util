@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"strconv"
 	"strings"
 )
 
@@ -19,9 +18,9 @@ var (
 	ansi            ANSI      = NewANSIWriter(33, 44, 1, defaultioWriter)
 
 	// Bold, Yellow Text, Blue Background
-	DefaultAnsiFmt string = ansi.Build(1, 33, 44)
-	// Reset Text Effects; Set Default Foreground; Default Background
-	AnsiReset string = ansi.Build(0, 39, 49)
+	DefaultAnsiFmt string = BuildAnsi(1, 33, 44)
+	// Reset Effects; Default Foreground; Default Background
+	AnsiReset string = BuildAnsi(0, 39, 49)
 )
 
 // todo - create a pool of stringbuilders that can go when ready?
@@ -57,13 +56,8 @@ type AnsiWriter struct {
 }
 
 // Build encodes a variadic list of bytes into ANSI 7 bit escape codes.
-func (a *AnsiWriter) Build(b ...byte) string {
-	sb := strings.Builder{}
-	defer sb.Reset()
-	for _, n := range b {
-		sb.WriteString(fmt.Sprintf(FMT7bit, n))
-	}
-	return sb.String()
+func (a *AnsiWriter) Build(b ...byte) {
+	a.WriteString(BuildAnsi(b...))
 }
 
 // Set accepts, encodes, and prints a variadic argument list of bytes
@@ -72,44 +66,13 @@ func (a *AnsiWriter) Set(b ...byte) (int, error) {
 	return fmt.Fprint(os.Stdout, a.Build(b...))
 }
 
-// return a basic (3/4 bit) ANSI format string
-func ansiFormat(n byte) string {
-	return fmt.Sprintf(FMTansi, n)
-}
-
-func Build(b ...byte)
-
-// func aPrint(a ...byte) {
-// 	fmt.Print(ansi.Build(a...))
-// }
-
-// --------------------------------------------------
-type AnsiOld uint8
-
-// String returns the string representation of an Ansi
-// value as a color escape sequence.
-func (a AnsiOld) String() string {
-	return fmt.Sprintf("/x1b[%d;", a)
-}
-
-// Build returns a string containing multiple ANSI
-// color escape sequences.
-func (a AnsiOld) Build(list ...AnsiWriter) string {
-	var sb strings.Builder
+// returns a basic (3/4 bit) ANSI format code
+// from a variadic argument list of bytes
+func BuildAnsi(b ...byte) string {
+	sb := strings.Builder{}
 	defer sb.Reset()
-
-	for _, v := range list {
-		sb.WriteString(AnsiWriter(v).String())
+	for _, n := range b {
+		sb.WriteString(fmt.Sprintf(FMTansi, n))
 	}
-
 	return sb.String()
-}
-
-// itoa converts the integer value n into an ascii byte slice.
-// Negative values produce an empty slice.
-func itoa(n int) []byte {
-	if n < 0 {
-		return []byte{}
-	}
-	return []byte(strconv.Itoa(n))
 }

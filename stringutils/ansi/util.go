@@ -3,8 +3,15 @@ package ansi
 import (
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 )
+
+// APrint prints a basic ansi string based on the
+// variadic argument list of bytes
+func APrint(a ...byte) {
+	fmt.Print(BuildAnsi(a...))
+}
 
 func Cls() {
 	fmt.Fprintf(os.Stdout, "\\033c")
@@ -41,4 +48,35 @@ func Echo(a ...interface{}) {
 		}
 	}
 	fmt.Print(AnsiReset)
+}
+
+// --------------------------------------------------
+type AnsiOld uint8
+
+// String returns the string representation of an Ansi
+// value as a color escape sequence.
+func (a AnsiOld) String() string {
+	return fmt.Sprintf("/x1b[%d;", a)
+}
+
+// Build returns a string containing multiple ANSI
+// color escape sequences.
+func (a AnsiOld) Build(list ...AnsiWriter) string {
+	var sb strings.Builder
+	defer sb.Reset()
+
+	for _, v := range list {
+		sb.WriteString(AnsiWriter(v).String())
+	}
+
+	return sb.String()
+}
+
+// itoa converts the integer value n into an ascii byte slice.
+// Negative values produce an empty slice.
+func itoa(n int) []byte {
+	if n < 0 {
+		return []byte{}
+	}
+	return []byte(strconv.Itoa(n))
 }
