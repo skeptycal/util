@@ -91,16 +91,6 @@ CSI 6n	        DSR	        Device Status Report	    Reports the cursor position 
                                                         the row and m is the column.)
 */
 
-/*
-SGR parameters
-SGR (Select Graphic Rendition) sets display attributes. Several attributes can be set in the same sequence, separated by semicolons. Each display attribute remains in effect until a following occurrence of SGR resets it. If no codes are given, CSI m is treated as CSI 0 m (reset / normal).
-
-In ECMA-48 SGR is called "Select Graphic Rendition". In Linux manual pages the term "Set Graphics Rendition" is used.
-
-
-
-*/
-
 )
 
 type Ansi uint8
@@ -137,6 +127,13 @@ func itoa(n int) []byte {
 	return []byte(strconv.Itoa(n))
 }
 
+/*
+SGR parameters
+
+SGR (Select Graphic Rendition) sets display attributes. Several attributes can be set in the same sequence, separated by semicolons. Each display attribute remains in effect until a following occurrence of SGR resets it. If no codes are given, CSI m is treated as CSI 0 m (reset / normal).
+
+In ECMA-48 SGR is called "Select Graphic Rendition". In Linux manual pages the term "Set Graphics Rendition" is used.
+*/
 const (
 	Normal = iota
 	Bold   // bold or increased intensity
@@ -146,7 +143,7 @@ const (
 	Blink
 	FastBlink
 	Inverse
-	Hidden
+	Conceal
 	Strikeout
 	PrimaryFont
 	AltFont1
@@ -203,14 +200,16 @@ const (
 	IdeogramOverline        // ideogram overline or left side line
 	IdeogramDoubleOverline  // ideogram double overline or double line on the left side
 	IdeogramStress          // ideogram stress marking
-	IdeogramCancel          // cancels the effect of the rendition aspects established by parameter values IdeogramUnderline to IdeogramStress
+	IdeogramCancel          // reset the effects of all of 60–64
 	Superscript             = 73
 	Subscript               = 74
 )
 
 const (
-	NormalText       = "\033[0m" // Turn off all attributes
-	Reset            = "\033[0m" // alias of NormalText
+	DefaultColors    = "\033[39;49m"
+	DefaultText      = "\033[22;39m" // Normal text color and intensity
+	NormalText       = "\033[0m"     // Turn off all attributes
+	Reset            = "\033[0m"     // alias of NormalText
 	BlackText        = "\033[30m"
 	RedText          = "\033[31m"
 	GreenText        = "\033[32m"
@@ -237,8 +236,33 @@ const (
 	FaintMagentaText = "\033[2;35m"
 	FaintCyanText    = "\033[2;36m"
 	FaintWhiteText   = "\033[2;37m"
-	DefaultText      = "\033[22;39m" // Normal text color and intensity
 )
+
+/*
+8-bit
+As 256-color lookup tables became common on graphic cards, escape sequences were added to select from a pre-defined set of 256 colors:[citation needed]
+
+ESC[ 38;5;⟨n⟩ m Select foreground color
+ESC[ 48;5;⟨n⟩ m Select background color
+  0-  7:  standard colors (as in ESC [ 30–37 m)
+  8- 15:  high intensity colors (as in ESC [ 90–97 m)
+ 16-231:  6 × 6 × 6 cube (216 colors): 16 + 36 × r + 6 × g + b (0 ≤ r, g, b ≤ 5)
+232-255:  grayscale from black to white in 24 steps
+*/
+const (
+	// ESC[ 38:5:⟨n⟩ m Select foreground color
+	ansi8bitFGfmt = "\033[38:5:%vm;"
+	// ESC[ 48:5:⟨n⟩ m Select background color
+	ansi8bitBGfmt = "\033[48:5:%vm;"
+)
+
+const (
+	ansi24bitFGfmt = "\033[38;2;%v;%v;%vm;"
+	// ESC[ 38;2;⟨r⟩;⟨g⟩;⟨b⟩ m Select RGB foreground color
+	ansi24bitBGfmt = "\033[48;2;%v;%v;%vm;"
+	// ESC[ 48;2;⟨r⟩;⟨g⟩;⟨b⟩ m Select RGB background color
+)
+
 const (
 	GATM = 1  // GUARDED AREA TRANSFER MODE
 	KAM  = 2  // KEYBOARD ACTION MODE
