@@ -10,7 +10,6 @@ import (
 	"io"
 	"os"
 	"strings"
-	"sync"
 )
 
 const (
@@ -22,22 +21,24 @@ const (
 )
 
 var (
-	sb              strings.Builder = strings.Builder{}
-	ansi            ANSI            = NewANSIWriter(33, 44, 1)
-	defaultAnsiFmt  string          = ansi.Build(33, 44, 1)
-	defaultioWriter io.Writer       = os.Stdout
+	ansi            ANSI      = NewANSIWriter(33, 44, 1)
+	defaultAnsiFmt  string    = ansi.Build(33, 44, 1)
+	defaultioWriter io.Writer = os.Stdout
 )
 
-type sb struct {
-	strings.Builder
-	mu sync.Mutex
-}
+// todo - create a pool of stringbuilders that can go when ready?
+// type sbSync struct {
+// 	strings.Builder
+// 	mu sync.Mutex
+// }
 
 // NewANSIWriter returns a new ANSI Writer for use in terminal output.
+// If w is nil, the default (os.Stdout) is used.
 func NewANSIWriter(fg, bg, ef byte, w io.Writer) ANSI {
-	if w == nil {
+	if wr, ok := w.(io.Writer); !ok || w == nil {
 		w = defaultioWriter
 	}
+
 	return &Ansi{
 		fg: ansiFormat(fg),
 		bg: ansiFormat(bg),
@@ -63,17 +64,18 @@ type Ansi struct {
 
 // Build encodes a variadic list of bytes into ANSI 7 bit escape codes.
 func (a *Ansi) Build(b ...byte) string {
+	sb := strings.Builder{}
 	defer sb.Reset()
 	for _, n := range b {
-		a.WriteString(fmt.Sprintf(ansi7fmt, n))
+		sb.WriteString(fmt.Sprintf(ansi7fmt, n))
 	}
 	return sb.String()
 }
 
 // Set accepts, encodes, and prints a variadic argument list of bytes
 // that represent ANSI colors.
-func (a *Ansi) Set(v ...byte) (int, error) {
-	return fmt.Fprint(os.Stdout, a.Build(v...))
+func (a *Ansi) Set(b ...byte) (int, error) {
+	return fmt.Fprint(os.Stdout, a.Build(b...))
 }
 
 // String returns the contents of the underlying strings.Builder and
