@@ -72,9 +72,13 @@ func (a *AnsiWriter) Set(b ...byte) (int, error) {
 	return fmt.Fprint(os.Stdout, a.Build(b...))
 }
 
-// func ansiFormat(n byte) string {
-// 	return fmt.Sprintf(FMT7bit, n)
-// }
+// return a basic (3/4 bit) ANSI format string
+func ansiFormat(n byte) string {
+	return fmt.Sprintf(FMTansi, n)
+}
+
+func Build(b ...byte)
+
 // func aPrint(a ...byte) {
 // 	fmt.Print(ansi.Build(a...))
 // }

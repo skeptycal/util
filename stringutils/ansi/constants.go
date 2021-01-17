@@ -240,28 +240,28 @@ const (
 	// ED - Erase in Display Clears part of the screen. If n is 0 (or missing), clear from cursor to end of screen. If n is 1, clear from cursor to beginning of the screen. If n is 2, clear entire screen (and moves cursor to upper left on DOS ANSI.SYS). If n is 3, clear entire screen and delete all lines saved in the scrollback buffer (this feature was added for xterm and is supported by other terminal applications).*/
 	CSIclear = "CSI 2 J"
 
-	// CSI functions
-	/*
-		CSI n K	        EL	        Erase in Line	            Erases part of the line. If n is 0 (or missing), clear
-		                                                        from cursor to the end of the line. If n is 1, clear
-		                                                        from cursor to beginning of the line. If n is 2, clear
-		                                                        entire line. Cursor position does not change.
-		CSI n S	        SU	        Scroll Up	                Scroll whole page up by n (default 1) lines. New lines
-		                                                        are added at the bottom. (not ANSI.SYS)
-		CSI n T	        SD	        Scroll Down	                Scroll whole page down by n (default 1) lines. New lines
-		                                                        are added at the top. (not ANSI.SYS)
-		CSI n ; m f	    HVP	        Horizontal Vertical Pos	    Same as CUP, but counts as a format effector function
-		                                                        (like CR or LF) rather than an editor function (like CUD
-		                                                        or CNL). This can lead to different handling in certain
-		                                                        terminal modes.[5]:Annex A
-		CSI n m	        SGR	        Select Graphic Rendition	Sets the appearance of the following characters, see
-		                                                        SGR parameters below.
-		CSI 5i		                    AUX Port On	            Enable aux serial port usually for local serial printer
-		CSI 4i		                    AUX Port Off	        Disable aux serial port usually for local serial printer
+// CSI functions
+/*
+	CSI n K	        EL	        Erase in Line	            Erases part of the line. If n is 0 (or missing), clear
+	                                                        from cursor to the end of the line. If n is 1, clear
+	                                                        from cursor to beginning of the line. If n is 2, clear
+	                                                        entire line. Cursor position does not change.
+	CSI n S	        SU	        Scroll Up	                Scroll whole page up by n (default 1) lines. New lines
+	                                                        are added at the bottom. (not ANSI.SYS)
+	CSI n T	        SD	        Scroll Down	                Scroll whole page down by n (default 1) lines. New lines
+	                                                        are added at the top. (not ANSI.SYS)
+	CSI n ; m f	    HVP	        Horizontal Vertical Pos	    Same as CUP, but counts as a format effector function
+	                                                        (like CR or LF) rather than an editor function (like CUD
+	                                                        or CNL). This can lead to different handling in certain
+	                                                        terminal modes.[5]:Annex A
+	CSI n m	        SGR	        Select Graphic Rendition	Sets the appearance of the following characters, see
+	                                                        SGR parameters below.
+	CSI 5i		                    AUX Port On	            Enable aux serial port usually for local serial printer
+	CSI 4i		                    AUX Port Off	        Disable aux serial port usually for local serial printer
 
-		CSI 6n	        DSR	        Device Status Report	    Reports the cursor position (CPR) to the application as
-		                                                        (as though typed at the keyboard) ESC[n;mR, where n is
-		                                                        the row and m is the column.)
-	*/
+	CSI 6n	        DSR	        Device Status Report	    Reports the cursor position (CPR) to the application as
+	                                                        (as though typed at the keyboard) ESC[n;mR, where n is
+	                                                        the row and m is the column.)
+*/
 
 )
