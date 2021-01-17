@@ -20,6 +20,27 @@ const (
 	hrChar    string = "="
 )
 
+//Ansi 7-bit color codes
+const (
+	Reset string = "\033[0m"
+
+	Red    string = "\033[31m"
+	Green  string = "\033[32m"
+	Yellow string = "\033[33m"
+	Blue   string = "\033[34m"
+	Purple string = "\033[35m"
+	Cyan   string = "\033[36m"
+	White  string = "\033[37m"
+
+	BgRed    string = "\033[41m"
+	BgGreen  string = "\033[42m"
+	BgYellow string = "\033[43m"
+	BgBlue   string = "\033[44m"
+	BgPurple string = "\033[45m"
+	BgCyan   string = "\033[46m"
+	BgWhite  string = "\033[47m"
+)
+
 var (
 	ansi            ANSI      = NewANSIWriter(33, 44, 1)
 	AnsiFmt         string    = ansi.Build(1, 33, 44)
@@ -94,6 +115,17 @@ func br() {
 // 	fmt.Print(ansi.Build(a...))
 // }
 
+// Echo is a helper function that wraps printing to stdout
+// in Ansi color escape sequences.
+//
+// If the first argument is is a string that contains a %
+// character, it is used as a format string for fmt.Printf,
+// otherwise fmt.Println is used for all arguments.
+//
+// AnsiFmt is the current text color.
+//
+// AnsiReset is the Ansi reset code.
+//
 func Echo(a ...interface{}) {
 	fmt.Print(AnsiFmt)
 
@@ -107,6 +139,8 @@ func Echo(a ...interface{}) {
 	fmt.Print(AnsiReset)
 }
 
+// Example code for printing Ansi color text.
+// Reference:
 func main() {
 	br()
 
