@@ -19,7 +19,8 @@ func br() {
 }
 
 // Echo is a helper function that wraps printing to stdout
-// in Ansi color escape sequences.
+// in a default precompiled Ansi color escape sequence without
+// the need to nstantiate a new ANSI color object.
 //
 // If the first argument is is a string that contains a %
 // character, it is used as a format string for fmt.Printf,
