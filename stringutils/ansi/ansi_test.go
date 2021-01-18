@@ -196,8 +196,8 @@ func TestAnsiWriter_Build(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			a := &AnsiWriter{
-				Writer:     tt.fields.Writer,
-				ansiString: tt.fields.ansiString,
+				Writer: tt.fields.Writer,
+				ansi:   tt.fields.ansiString,
 			}
 			a.Build(tt.args.b...)
 		})
