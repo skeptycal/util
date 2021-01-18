@@ -15,14 +15,18 @@ import (
 
 var (
 	defaultioWriter io.Writer = os.Stdout
-	out             ANSI      = NewANSIWriter(defaultioWriter)
+	a               ANSI      = NewANSIWriter(defaultioWriter)
 
 	// Bold, Yellow Text, Blue Background
 	DefaultAnsiFmt string = BuildAnsi(Yellow, BlueBackground, Bold)
 	// Reset Effects; Default Foreground; Default Background
 	AnsiReset string = BuildAnsi(DefaultForeground, DefaultBackground, Normal)
 
-	defaultColorSet AnsiSet = AnsiSet{}
+	defaultAnsiSet AnsiSet = AnsiSet{
+		fg: DefaultForeground,
+		bg: DefaultBackground,
+		ef: Normal,
+	}
 )
 
 type color = byte
@@ -38,7 +42,7 @@ func (a *AnsiSet) Info() string {
 }
 
 func (a *AnsiSet) String() string {
-	return BuildAnsi(a.fg, a.bg, a.ef)
+	return fmt.Sprintf(FMTansiSet, "", a.fg, a.bg, a.ef)
 }
 
 // todo - create a pool of stringbuilders that can go when ready?
@@ -58,14 +62,7 @@ func NewANSIWriter(w io.Writer) ANSI {
 		return wr
 	}
 
-	return &AnsiWriter{
-		*bufio.NewWriter(w),
-		AnsiSet{
-			fg: DefaultForeground,
-			bg: DefaultBackground,
-			ef: Normal,
-		},
-	}
+	return &AnsiWriter{*bufio.NewWriter(w), defaultAnsiSet}
 }
 
 type ANSI interface {

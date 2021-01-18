@@ -36,6 +36,8 @@ const (
 	// basic Ansi "dim" colors
 	FMTdim string = "\033[2;%vm"
 
+	FMTansiSet = "\033[%v;%v;%vm"
+
 	// ESC[⟨x⟩8:5:⟨n⟩m Select 8 bit color (x in [ 3, 4 ]) (n in [0..255])
 	FMT8bit string = "\033[%v8;5;%vm"
 	// ESC[ 38:5:⟨n⟩ m Select foreground color (n in [0..255])
