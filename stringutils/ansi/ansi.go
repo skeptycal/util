@@ -35,7 +35,7 @@ func NewANSIWriter(fg, bg, ef byte, w io.Writer) ANSI {
 	// if w is not a writer, use the default
 	wr, ok := w.(io.Writer)
 	if !ok || w == nil {
-		w = defaultioWriter
+		wr = defaultioWriter
 	}
 
 	return &AnsiWriter{
@@ -49,11 +49,16 @@ type ANSI interface {
 	io.StringWriter
 	Build(b ...byte)
 	Wrap(s string)
+	String() string
 }
 
 type AnsiWriter struct {
 	bufio.Writer
 	ansiString string // default colors and effects
+}
+
+func (a *AnsiWriter) String() string {
+	return fmt.Sprintf("AnsiWriter (buffer: %v/%v)")
 }
 
 // Wrap wraps the string in the default color and effects

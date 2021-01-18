@@ -11,10 +11,10 @@ import (
 func TestNewANSIWriter(t *testing.T) {
 	want := &AnsiWriter{
 		*bufio.NewWriter(os.Stdout),
-		BuildAnsi(33, 44, 1),
+		DefaultAnsiFmt,
 	}
 	t.Run("NewANSIWriter test", func(t *testing.T) {
-		if got := NewANSIWriter(33, 44, 1, defaultioWriter); got != want {
+		if got := NewANSIWriter(44, 33, 1, defaultioWriter); got != want {
 			t.Errorf("NewANSIWriter = %v, want %v", got, want)
 		}
 	})
