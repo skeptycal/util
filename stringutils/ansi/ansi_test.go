@@ -30,17 +30,21 @@ func ExampleANSI_Wrap() {
 func ExampleEcho() {
 	Echo("hello, world!")
 	Echo("hello, %s", "Mike")
+	Echo("hello, Mike ", " and ", "world")
 	// Output:
-	// [44m[33m[1mhello, world!
+	// [44m[33m[1mhello, world![0m[39m[49m
+	// [44m[33m[1mhello, Mike[0m[39m[49m
+	// [44m[33m[1mMike and  world
 	// [0m[39m[49m
-	// [44m[33m[1mhello, Mike!
-	// [0m[39m[49m
+
 }
 
 func ExampleAPrint() {
 	APrint(1, 32)
 	// Output:
 	// [1m[32m
+	// [44m[33m[1mhello, Mike!
+	// [0m[39m[49m
 }
 
 func ExampleANSI_Build() {

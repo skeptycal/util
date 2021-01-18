@@ -16,27 +16,30 @@ func BR()              { fmt.Println("") }
 
 // Echo is a helper function that wraps printing to stdout
 // in a default precompiled Ansi color escape sequence without
-// the need to nstantiate a new ANSI color object.
+// the need to instantiate a new ANSI color object.
 //
-// If the first argument is is a string that contains a %
-// character, it is used as a format string for fmt.Printf,
-// otherwise fmt.Println is used for all arguments.
+// If the first argument contains a % character, it is used as
+// a format string for fmt.Printf, otherwise fmt.Print is used
+// for all arguments.
 //
-// AnsiFmt is the current text color.
+// A newline is added in the final step when ANSI formatting
+// is cleared.
 //
-// AnsiReset is the Ansi reset code.
-//
-func Echo(fmtString string, a ...interface{}) {
+func Echo(fmtStringMaybe interface{}, a ...interface{}) {
 	fmt.Printf("%s", DefaultAnsiFmt)
 
-	if fs, ok := a[0].(string); ok {
-		if strings.Contains(fs, "%") {
-			fmt.Printf(fs, a[1:])
-		} else {
-			fmt.Println(a...)
+	if len(a) > 0 {
+		if fs, ok := fmtStringMaybe.(string); ok {
+			if strings.Contains(fs, "%") {
+				fmt.Printf(fs, a...)
+			} else {
+				fmt.Println(a...)
+			}
 		}
+	} else {
+		fmt.Print(fmtStringMaybe)
 	}
-	fmt.Print(AnsiReset)
+	fmt.Println(AnsiReset)
 }
 
 // itoa converts the integer value n into an ascii byte slice.
