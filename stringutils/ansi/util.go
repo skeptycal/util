@@ -26,8 +26,8 @@ func BR()              { fmt.Println("") }
 //
 // AnsiReset is the Ansi reset code.
 //
-func Echo(a ...interface{}) {
-	fmt.Print(DefaultAnsiFmt)
+func Echo(fmtString string, a ...interface{}) {
+	fmt.Printf("%s", DefaultAnsiFmt)
 
 	if fs, ok := a[0].(string); ok {
 		if strings.Contains(fs, "%") {

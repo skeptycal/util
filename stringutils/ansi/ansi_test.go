@@ -23,14 +23,47 @@ func TestNewANSIWriter(t *testing.T) {
 	})
 }
 
-func ExampleWrap() {
+func ExampleANSI_Wrap() {
 	testWriter.Wrap("wrap this")
 }
 
-func ExampleBuild() {
+func ExampleEcho() {
+	Echo("hello, world!")
+	Echo("hello, %s", "Mike")
+	// Output:
+	// [44m[33m[1mhello, world!
+	// [0m[39m[49m
+	// [44m[33m[1mhello, Mike!
+	// [0m[39m[49m
+}
+
+func ExampleAPrint() {
+	APrint(1, 32)
+	// Output:
+	// [1m[32m
+}
+
+func ExampleANSI_Build() {
 	testWriter.Build(1, 32)
 }
 
+func ExampleCLS() {
+	CLS()
+	// Output:
+	// c
+}
+
+func ExampleHR() {
+	HR(10)
+	// Output:
+	// ==========
+}
+
+func ExampleBR() {
+	BR()
+	// Output:
+	//
+}
 func TestConstants(t *testing.T) {
 	tests := []struct {
 		name string
@@ -38,9 +71,9 @@ func TestConstants(t *testing.T) {
 		want interface{}
 	}{
 		// TODO: Add test cases.
-		{"format string: ansi", fmt.Sprintf(FMTansi, 32), "\033[32m;"},
-		{"format string: bright", fmt.Sprintf(FMTbright, 32), "\033[1;32m;"},
-		{"format string: dim", fmt.Sprintf(FMTdim, 32), "\033[2;32m;"},
+		{"format string: ansi", fmt.Sprintf(FMTansi, 32), "\033[32m"},
+		{"format string: bright", fmt.Sprintf(FMTbright, 32), "\033[1;32m"},
+		{"format string: dim", fmt.Sprintf(FMTdim, 32), "\033[2;32m"},
 		{"Underline", Underline, byte(4)},
 		{"Blue", Blue, byte(34)},
 		{"Bold", Bold, byte(1)},

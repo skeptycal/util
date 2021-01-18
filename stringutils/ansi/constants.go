@@ -30,25 +30,25 @@ const (
 // Format Strings for Ansi printf commands.
 const (
 	// basic Ansi colors
-	FMTansi string = "\033[%vm;"
+	FMTansi string = "\033[%vm"
 	// basic Ansi "bright" colors
-	FMTbright string = "\033[1;%vm;"
+	FMTbright string = "\033[1;%vm"
 	// basic Ansi "dim" colors
-	FMTdim string = "\033[2;%vm;"
+	FMTdim string = "\033[2;%vm"
 
 	// ESC[⟨x⟩8:5:⟨n⟩m Select 8 bit color (x in [ 3, 4 ]) (n in [0..255])
 	FMT8bit string = "\033[%v8;5;%vm"
 	// ESC[ 38:5:⟨n⟩ m Select foreground color (n in [0..255])
-	FMT8bitFG = "\033[38;5;%vm;"
+	FMT8bitFG = "\033[38;5;%vm"
 	// ESC[ 48:5:⟨n⟩ m Select background color (n in [0..255])
-	FMT8bitBG = "\033[48;5;%vm;"
+	FMT8bitBG = "\033[48;5;%vm"
 
 	// ESC[⟨x⟩8;2;⟨r⟩;⟨g⟩;⟨b⟩ m     Select RGB color  (x in [ 3, 4 ])
-	FMT24bit = "\033[%v8;2;%v;%v;%vm;"
+	FMT24bit = "\033[%v8;2;%v;%v;%vm"
 	// ESC[ 38;2;⟨r⟩;⟨g⟩;⟨b⟩ m      Select RGB foreground color
-	FMT24bitFG = "\033[38;2;%v;%v;%vm;"
+	FMT24bitFG = "\033[38;2;%v;%v;%vm"
 	// ESC[ 48;2;⟨r⟩;⟨g⟩;⟨b⟩ m      Select RGB background color
-	FMT24bitBG = "\033[48;2;%v;%v;%vm;"
+	FMT24bitBG = "\033[48;2;%v;%v;%vm"
 )
 
 //SGR parameters
