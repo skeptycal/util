@@ -47,7 +47,8 @@ func NewANSIWriter(fg, bg, ef byte, w io.Writer) ANSI {
 type ANSI interface {
 	io.Writer
 	io.StringWriter
-	Build(b ...byte) string
+	Build(b ...byte)
+	Wrap(s string)
 }
 
 type AnsiWriter struct {
@@ -55,16 +56,21 @@ type AnsiWriter struct {
 	ansiString string // default colors and effects
 }
 
-// Build encodes a variadic list of bytes into ANSI 7 bit escape codes.
+// Wrap wraps the string in the default color and effects
+// set in the AnsiWriter.
+func (a *AnsiWriter) Wrap(s string) {
+	a.WriteString(a.ansiString)
+	a.WriteString(s)
+	a.WriteString(AnsiReset)
+}
+
+// Build encodes a variadic list of bytes into ANSI codes
+// and writes them to the AnsiWriter.
 func (a *AnsiWriter) Build(b ...byte) {
 	a.WriteString(BuildAnsi(b...))
 }
 
-// Set accepts, encodes, and prints a variadic argument list of bytes
-// that represent ANSI colors.
-func (a *AnsiWriter) Set(b ...byte) (int, error) {
-	return fmt.Fprint(os.Stdout, a.Build(b...))
-}
+// ------------------------------------
 
 // returns a basic (3/4 bit) ANSI format code
 // from a variadic argument list of bytes
