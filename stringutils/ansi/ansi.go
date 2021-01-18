@@ -42,7 +42,7 @@ func (a *AnsiSet) Info() string {
 }
 
 func (a *AnsiSet) String() string {
-	return fmt.Sprintf(FMTansiSet, "", a.fg, a.bg, a.ef)
+	return fmt.Sprintf(FMTansiSet, a.fg, a.bg, a.ef)
 }
 
 // todo - create a pool of stringbuilders that can go when ready?
