@@ -15,13 +15,23 @@ import (
 
 var (
 	defaultioWriter io.Writer = os.Stdout
-	ansi            ANSI      = NewANSIWriter(33, 44, 1, defaultioWriter)
+	out             ANSI      = NewANSIWriter(defaultioWriter)
 
 	// Bold, Yellow Text, Blue Background
-	DefaultAnsiFmt string = BuildAnsi(44, 33, 1)
+	DefaultAnsiFmt string = BuildAnsi(Blue, 33, 1)
 	// Reset Effects; Default Foreground; Default Background
 	AnsiReset string = BuildAnsi(0, 39, 49)
+
+	defaultColorSet AnsiSet = AnsiSet{DefaultForeground, DefaultBackground, Normal}
 )
+
+type color = byte
+
+type AnsiSet struct {
+	fg color
+	bg color
+	ef color
+}
 
 // todo - create a pool of stringbuilders that can go when ready?
 // type sbSync struct {
@@ -31,7 +41,7 @@ var (
 
 // NewANSIWriter returns a new ANSI Writer for use in terminal output.
 // If w is nil, the default (os.Stdout) is used.
-func NewANSIWriter(fg, bg, ef byte, w io.Writer) ANSI {
+func NewANSIWriter(w io.Writer) ANSI {
 	// if w is not a writer, use the default
 	if w == nil {
 		w = defaultioWriter
@@ -42,7 +52,10 @@ func NewANSIWriter(fg, bg, ef byte, w io.Writer) ANSI {
 
 	return &AnsiWriter{
 		*bufio.NewWriter(w),
-		BuildAnsi(fg, bg, ef),
+		defaultColorSet,
+		DefaultForeground,
+		DefaultBackground,
+		Normal,
 	}
 }
 
@@ -57,10 +70,11 @@ type ANSI interface {
 
 type AnsiWriter struct {
 	bufio.Writer
-	ansiString string // default colors and effects
+	ansi AnsiSet
 }
 
 func (a *AnsiWriter) String() string {
+	// todo - add color from BuildAnsi(fg, bg, ef)
 	return fmt.Sprintf("AnsiWriter: bytes written:%v, buffer available: %v/%v)", a.Buffered(), a.Available(), a.Size())
 }
 
