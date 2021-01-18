@@ -36,13 +36,12 @@ func NewANSIWriter(fg, bg, ef byte, w io.Writer) ANSI {
 	if w == nil {
 		w = defaultioWriter
 	} else {
-		wr, ok := w.(io.Writer)
-		if !ok {
-			wr = defaultioWriter
+		if _, ok := w.(io.Writer); !ok {
+			w = defaultioWriter
 		}
 	}
 	return &AnsiWriter{
-		*bufio.NewWriter(wr),
+		*bufio.NewWriter(w),
 		DefaultAnsiFmt,
 	}
 }
@@ -51,6 +50,7 @@ type ANSI interface {
 	io.Writer
 	io.StringWriter
 	Build(b ...byte)
+	Flush() error
 	Wrap(s string)
 	String() string
 }

@@ -141,6 +141,7 @@ func TestAnsiWriter_Wrap(t *testing.T) {
 }
 
 func TestAnsiWriter_Build(t *testing.T) {
+	devNull, _ := os.Open("/dev/null")
 	type fields struct {
 		Writer     bufio.Writer
 		ansiString string
@@ -155,7 +156,7 @@ func TestAnsiWriter_Build(t *testing.T) {
 	}{
 		// TODO: Add test cases.
 		{"Wrap: smoke test", fields{*bufio.NewWriter(defaultioWriter), DefaultAnsiFmt}, args{[]byte{33, 44, 1}}},
-		{"Wrap: smoke test", fields{*bufio.NewWriter(nil), DefaultAnsiFmt}, args{[]byte{33, 44, 1}}},
+		{"Wrap: smoke test", fields{*bufio.NewWriter(devNull), DefaultAnsiFmt}, args{[]byte{33, 44, 1}}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
