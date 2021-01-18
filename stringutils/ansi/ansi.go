@@ -33,8 +33,12 @@ type AnsiSet struct {
 	ef color
 }
 
-func (a *AnsiSet) String() string {
+func (a *AnsiSet) Info() string {
 	return fmt.Sprintf("fg: %v, bg: %v, ef %v", a.fg, a.bg, a.ef)
+}
+
+func (a *AnsiSet) String() string {
+	return BuildAnsi(a.fg, a.bg, a.ef)
 }
 
 // todo - create a pool of stringbuilders that can go when ready?
@@ -56,10 +60,11 @@ func NewANSIWriter(w io.Writer) ANSI {
 
 	return &AnsiWriter{
 		*bufio.NewWriter(w),
-		defaultColorSet,
-		DefaultForeground,
-		DefaultBackground,
-		Normal,
+		AnsiSet{
+			fg: DefaultForeground,
+			bg: DefaultBackground,
+			ef: Normal,
+		},
 	}
 }
 
@@ -87,7 +92,7 @@ func (a *AnsiWriter) String() string {
 func (a *AnsiWriter) Wrap(s string) {
 	defer a.Writer.Flush()
 
-	a.WriteString(a.ansiString)
+	a.WriteString(a.ansi.String())
 	a.WriteString(s)
 	a.WriteString(AnsiReset)
 }
