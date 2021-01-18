@@ -18,11 +18,11 @@ var (
 	out             ANSI      = NewANSIWriter(defaultioWriter)
 
 	// Bold, Yellow Text, Blue Background
-	DefaultAnsiFmt string = BuildAnsi(Blue, 33, 1)
+	DefaultAnsiFmt string = BuildAnsi(Yellow, BlueBackground, Bold)
 	// Reset Effects; Default Foreground; Default Background
-	AnsiReset string = BuildAnsi(0, 39, 49)
+	AnsiReset string = BuildAnsi(DefaultForeground, DefaultBackground, Normal)
 
-	defaultColorSet AnsiSet = AnsiSet{DefaultForeground, DefaultBackground, Normal}
+	defaultColorSet AnsiSet = AnsiSet{}
 )
 
 type color = byte
@@ -31,6 +31,10 @@ type AnsiSet struct {
 	fg color
 	bg color
 	ef color
+}
+
+func (a *AnsiSet) String() string {
+	return fmt.Sprintf("fg: %v, bg: %v, ef %v", a.fg, a.bg, a.ef)
 }
 
 // todo - create a pool of stringbuilders that can go when ready?
