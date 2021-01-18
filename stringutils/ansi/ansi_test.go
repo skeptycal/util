@@ -8,16 +8,32 @@ import (
 	"testing"
 )
 
+var testWriter = NewANSIWriter(44, 33, 1, os.Stdout)
+
 func TestNewANSIWriter(t *testing.T) {
 	want := &AnsiWriter{
 		*bufio.NewWriter(os.Stdout),
 		DefaultAnsiFmt,
 	}
+	got := NewANSIWriter(44, 33, 1, os.Stdout)
 	t.Run("NewANSIWriter test", func(t *testing.T) {
-		if got := NewANSIWriter(44, 33, 1, defaultioWriter); got != want {
-			t.Errorf("NewANSIWriter = %v, want %v", got, want)
+		if got.String() != want.String() {
+			t.Errorf("NewANSIWriter = %v, want %v", got.String(), want.String())
 		}
 	})
+}
+
+func ExampleWrap() {
+	testWriter.Wrap("wrap this")
+
+	// Output:
+	// wrap this
+}
+
+func ExampleBuild() {
+	testWriter.Build(1, 32)
+	// Output:
+	// \033[1m;32m
 }
 
 func TestConstants(t *testing.T) {

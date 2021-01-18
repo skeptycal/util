@@ -58,7 +58,7 @@ type AnsiWriter struct {
 }
 
 func (a *AnsiWriter) String() string {
-	return fmt.Sprintf("AnsiWriter (buffer: %v/%v)")
+	return fmt.Sprintf("AnsiWriter: bytes written:%v, buffer available: %v/%v)", a.Buffered(), a.Available(), a.Size())
 }
 
 // Wrap wraps the string in the default color and effects
@@ -77,7 +77,7 @@ func (a *AnsiWriter) Build(b ...byte) {
 
 // ------------------------------------
 
-// returns a basic (3/4 bit) ANSI format code
+// BuildAnsi returns a basic (3/4 bit) ANSI format code
 // from a variadic argument list of bytes
 func BuildAnsi(b ...byte) string {
 	sb := strings.Builder{}
