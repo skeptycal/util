@@ -25,15 +25,10 @@ func TestNewANSIWriter(t *testing.T) {
 
 func ExampleWrap() {
 	testWriter.Wrap("wrap this")
-
-	// Output:
-	// wrap this
 }
 
 func ExampleBuild() {
 	testWriter.Build(1, 32)
-	// Output:
-	// \033[1m;32m
 }
 
 func TestConstants(t *testing.T) {

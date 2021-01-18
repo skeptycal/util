@@ -9,21 +9,10 @@ import (
 
 // APrint prints a basic ansi string based on the
 // variadic argument list of bytes
-func APrint(a ...byte) {
-	fmt.Print(BuildAnsi(a...))
-}
-
-func Cls() {
-	fmt.Fprintf(os.Stdout, "\\033c")
-}
-
-func hr(n int) {
-	fmt.Println(strings.Repeat(HrChar, n))
-}
-
-func br() {
-	fmt.Println("")
-}
+func APrint(a ...byte) { fmt.Print(BuildAnsi(a...)) }
+func CLS()             { fmt.Fprintf(os.Stdout, "\033c") }
+func HR(n int)         { fmt.Println(strings.Repeat(HrChar, n)) }
+func BR()              { fmt.Println("") }
 
 // Echo is a helper function that wraps printing to stdout
 // in a default precompiled Ansi color escape sequence without

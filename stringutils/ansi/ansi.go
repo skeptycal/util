@@ -67,15 +67,15 @@ func (a *AnsiWriter) Wrap(s string) {
 	a.WriteString(a.ansiString)
 	a.WriteString(s)
 	a.WriteString(AnsiReset)
+	a.Writer.Flush()
 }
 
 // Build encodes a variadic list of bytes into ANSI codes
 // and writes them to the AnsiWriter.
 func (a *AnsiWriter) Build(b ...byte) {
 	a.WriteString(BuildAnsi(b...))
+	a.Flush()
 }
-
-// ------------------------------------
 
 // BuildAnsi returns a basic (3/4 bit) ANSI format code
 // from a variadic argument list of bytes

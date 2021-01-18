@@ -4,7 +4,9 @@
 // anyway ... I digress
 package main
 
-import "github.com/skeptycal/util/stringutils/ansi"
+import (
+	. "github.com/skeptycal/util/stringutils/ansi"
+)
 
 const (
 	sample          = "\xbd\xb2\x3d\xbc\x20\xe2\x8c\x98"
@@ -16,14 +18,14 @@ const (
 // Reference:
 func main() {
 
-	ansi.Cls()
-	// br()
+	CLS()
+	BR()
 
-	// aPrint(33, 44, 1)
+	APrint(33, 44, 1)
 
-	// hr(30)
-	// br()
-	// br()
+	HR(30)
+	BR()
+	BR()
 	// Echo(sample)
 	// Echo(sample2)
 	// Echo(sampleint)
