@@ -1,10 +1,24 @@
 package ansi
 
 import (
+	"bufio"
 	"fmt"
+	"os"
 	"reflect"
 	"testing"
 )
+
+func TestNewANSIWriter(t *testing.T) {
+	want := &AnsiWriter{
+		*bufio.NewWriter(os.Stdout),
+		BuildAnsi(33, 44, 1),
+	}
+	t.Run("NewANSIWriter test", func(t *testing.T) {
+		if got := NewANSIWriter(33, 44, 1, defaultioWriter); got != want {
+			t.Errorf("NewANSIWriter = %v, want %v", got, want)
+		}
+	})
+}
 
 func TestConstants(t *testing.T) {
 	tests := []struct {
@@ -13,7 +27,9 @@ func TestConstants(t *testing.T) {
 		want interface{}
 	}{
 		// TODO: Add test cases.
-		{"format string: ansi", fmt.Sprintf(FMTansi, 32), ""},
+		{"format string: ansi", fmt.Sprintf(FMTansi, 32), "\033[32m;"},
+		{"format string: bright", fmt.Sprintf(FMTbright, 32), "\033[1;32m;"},
+		{"format string: dim", fmt.Sprintf(FMTdim, 32), "\033[2;32m;"},
 		{"Underline", Underline, byte(4)},
 		{"Blue", Blue, byte(34)},
 		{"Bold", Bold, byte(1)},

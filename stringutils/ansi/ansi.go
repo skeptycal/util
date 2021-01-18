@@ -18,7 +18,7 @@ var (
 	ansi            ANSI      = NewANSIWriter(33, 44, 1, defaultioWriter)
 
 	// Bold, Yellow Text, Blue Background
-	DefaultAnsiFmt string = BuildAnsi(1, 33, 44)
+	DefaultAnsiFmt string = BuildAnsi(44, 33, 1)
 	// Reset Effects; Default Foreground; Default Background
 	AnsiReset string = BuildAnsi(0, 39, 49)
 )
