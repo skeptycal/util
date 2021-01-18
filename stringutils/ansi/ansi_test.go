@@ -21,6 +21,28 @@ func TestNewANSIWriter(t *testing.T) {
 			t.Errorf("NewANSIWriter = %v, want %v", got.String(), want.String())
 		}
 	})
+	want = &AnsiWriter{
+		*bufio.NewWriter(os.Stdout),
+		DefaultAnsiFmt,
+	}
+	got = NewANSIWriter(0, 0, 0, nil)
+	t.Run("NewANSIWriter test", func(t *testing.T) {
+
+		if got.String() != want.String() {
+			t.Errorf("NewANSIWriter = %v, want %v", got.String(), want.String())
+		}
+	})
+	want = &AnsiWriter{
+		*bufio.NewWriter(os.Stdout),
+		DefaultAnsiFmt,
+	}
+	got = NewANSIWriter(44, 33, 1, os.Stdout)
+	t.Run("NewANSIWriter test", func(t *testing.T) {
+		if got.String() != want.String() {
+			t.Errorf("NewANSIWriter = %v, want %v", got.String(), want.String())
+		}
+	})
+
 }
 
 func ExampleANSI_Wrap() {
