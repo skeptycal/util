@@ -42,9 +42,7 @@ func Echo(fmtStringMaybe interface{}, a ...interface{}) {
 	}
 
 	// default : just print all of the arguments
-	args := []interface{}{fmtStringMaybe}
-	args = Append(args, a...)
-	fmt.Print(fmtStringMaybe, a...)
+	fmt.Print(append([]interface{}{fmtStringMaybe}, a...)...)
 
 }
 
