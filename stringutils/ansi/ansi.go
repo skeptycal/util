@@ -67,10 +67,11 @@ func (a *AnsiWriter) String() string {
 // Wrap wraps the string in the default color and effects
 // set in the AnsiWriter.
 func (a *AnsiWriter) Wrap(s string) {
+	defer a.Writer.Flush()
+
 	a.WriteString(a.ansiString)
 	a.WriteString(s)
 	a.WriteString(AnsiReset)
-	a.Writer.Flush()
 }
 
 // Build encodes a variadic list of bytes into ANSI codes

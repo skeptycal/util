@@ -36,7 +36,7 @@ func TestNewANSIWriter(t *testing.T) {
 		*bufio.NewWriter(os.Stdout),
 		DefaultAnsiFmt,
 	}
-	fakeFile, _ := os.Open("/dev")
+	fakeFile, _ := os.Open("/.file")
 	got = NewANSIWriter(44, 33, 1, fakeFile)
 	t.Run("NewANSIWriter test", func(t *testing.T) {
 		if got.String() != want.String() {
