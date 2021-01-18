@@ -97,8 +97,8 @@ func (a *AnsiWriter) Wrap(s string) {
 // Build encodes a variadic list of bytes into ANSI codes
 // and writes them to the AnsiWriter.
 func (a *AnsiWriter) Build(b ...byte) {
+	defer a.Writer.Flush()
 	a.WriteString(BuildAnsi(b...))
-	a.Flush()
 }
 
 // BuildAnsi returns a basic (3/4 bit) ANSI format code
