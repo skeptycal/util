@@ -27,19 +27,25 @@ func BR()              { fmt.Println("") }
 //
 func Echo(fmtStringMaybe interface{}, a ...interface{}) {
 	fmt.Printf("%s", DefaultAnsiFmt)
+	defer fmt.Println(AnsiReset)
 
-	if len(a) > 0 {
-		if fs, ok := fmtStringMaybe.(string); ok {
-			if strings.Contains(fs, "%") {
-				fmt.Printf(fs, a...)
-			} else {
-				fmt.Println(a...)
-			}
-		}
-	} else {
+	// only first argument is given; cannot be a format string
+	if len(a) == 0 {
 		fmt.Print(fmtStringMaybe)
+		return
 	}
-	fmt.Println(AnsiReset)
+
+	// if first argument is a format string
+	if fs, ok := fmtStringMaybe.(string); ok && strings.Contains(fs, "%") {
+		fmt.Printf(fs, a...)
+		return
+	}
+
+	// default : just print all of the arguments
+	args := []interface{}{fmtStringMaybe}
+	args = Append(args, a...)
+	fmt.Print(fmtStringMaybe, a...)
+
 }
 
 // itoa converts the integer value n into an ascii byte slice.
