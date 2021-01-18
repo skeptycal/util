@@ -64,6 +64,7 @@ func ExampleBR() {
 	// Output:
 	//
 }
+
 func TestConstants(t *testing.T) {
 	tests := []struct {
 		name string
