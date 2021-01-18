@@ -2,6 +2,7 @@ package ansi
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"os"
 	"reflect"
@@ -11,6 +12,33 @@ import (
 var testWriter = NewANSIWriter(44, 33, 1, os.Stdout)
 
 func TestNewANSIWriter(t *testing.T) {
+	type args struct {
+		fg byte
+		bg byte
+		ef byte
+	}
+	tests := []struct {
+		name  string
+		args  args
+		want  ANSI
+		wantW string
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			w := &bytes.Buffer{}
+			if got := NewANSIWriter(tt.args.fg, tt.args.bg, tt.args.ef, w); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NewANSIWriter() = %v, want %v", got, tt.want)
+			}
+			if gotW := w.String(); gotW != tt.wantW {
+				t.Errorf("NewANSIWriter() = %v, want %v", gotW, tt.wantW)
+			}
+		})
+	}
+}
+
+func TestNewANSIWriter2(t *testing.T) {
 	want := &AnsiWriter{
 		*bufio.NewWriter(os.Stdout),
 		DefaultAnsiFmt,
@@ -36,7 +64,18 @@ func TestNewANSIWriter(t *testing.T) {
 		*bufio.NewWriter(os.Stdout),
 		DefaultAnsiFmt,
 	}
-	fakeFile, _ := os.Open("/.file")
+	got = NewANSIWriter(0, 0, 0, want)
+	t.Run("NewANSIWriter test", func(t *testing.T) {
+
+		if got.String() != want.String() {
+			t.Errorf("NewANSIWriter = %v, want %v", got.String(), want.String())
+		}
+	})
+	want = &AnsiWriter{
+		*bufio.NewWriter(os.Stdout),
+		DefaultAnsiFmt,
+	}
+	fakeFile, _ := os.Open("/tmp")
 	got = NewANSIWriter(44, 33, 1, fakeFile)
 	t.Run("NewANSIWriter test", func(t *testing.T) {
 		if got.String() != want.String() {

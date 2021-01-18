@@ -35,14 +35,14 @@ func NewANSIWriter(fg, bg, ef byte, w io.Writer) ANSI {
 	// if w is not a writer, use the default
 	if w == nil {
 		w = defaultioWriter
-	} else {
-		if _, ok := w.(io.Writer); !ok {
-			w = defaultioWriter
-		}
 	}
+	if wr, ok := w.(*AnsiWriter); ok {
+		return wr
+	}
+
 	return &AnsiWriter{
 		*bufio.NewWriter(w),
-		DefaultAnsiFmt,
+		BuildAnsi(fg, bg, ef),
 	}
 }
 
