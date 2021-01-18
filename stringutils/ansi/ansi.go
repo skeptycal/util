@@ -33,11 +33,14 @@ var (
 // If w is nil, the default (os.Stdout) is used.
 func NewANSIWriter(fg, bg, ef byte, w io.Writer) ANSI {
 	// if w is not a writer, use the default
-	wr, ok := w.(io.Writer)
-	if !ok || w == nil {
-		wr = defaultioWriter
+	if w == nil {
+		w = defaultioWriter
+	} else {
+		wr, ok := w.(io.Writer)
+		if !ok {
+			wr = defaultioWriter
+		}
 	}
-
 	return &AnsiWriter{
 		*bufio.NewWriter(wr),
 		DefaultAnsiFmt,

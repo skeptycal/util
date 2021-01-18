@@ -35,14 +35,12 @@ func ExampleEcho() {
 	// [44m[33m[1mhello, world![0m[39m[49m
 	// [44m[33m[1mhello, Mike[0m[39m[49m
 	// [44m[33m[1mhi, Mike and world[0m[39m[49m
-
 }
 
 func ExampleAPrint() {
 	APrint(1, 32)
 	// Output:
 	// [1m[32m
-
 }
 
 func ExampleANSI_Build() {
@@ -111,6 +109,61 @@ func Test_itoa(t *testing.T) {
 			if got := itoa(tt.args.n); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("itoa() = %v, want %v", got, tt.want)
 			}
+		})
+	}
+}
+
+func TestAnsiWriter_Wrap(t *testing.T) {
+	type fields struct {
+		Writer     bufio.Writer
+		ansiString string
+	}
+	type args struct {
+		s string
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+	}{
+		// TODO: Add test cases.
+		{"Wrap: smoke test", fields{*bufio.NewWriter(os.Stdout), DefaultAnsiFmt}, args{""}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			a := &AnsiWriter{
+				Writer:     tt.fields.Writer,
+				ansiString: tt.fields.ansiString,
+			}
+			a.Wrap(tt.args.s)
+		})
+	}
+}
+
+func TestAnsiWriter_Build(t *testing.T) {
+	type fields struct {
+		Writer     bufio.Writer
+		ansiString string
+	}
+	type args struct {
+		b []byte
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+	}{
+		// TODO: Add test cases.
+		{"Wrap: smoke test", fields{*bufio.NewWriter(defaultioWriter), DefaultAnsiFmt}, args{[]byte{33, 44, 1}}},
+		{"Wrap: smoke test", fields{*bufio.NewWriter(nil), DefaultAnsiFmt}, args{[]byte{33, 44, 1}}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			a := &AnsiWriter{
+				Writer:     tt.fields.Writer,
+				ansiString: tt.fields.ansiString,
+			}
+			a.Build(tt.args.b...)
 		})
 	}
 }
