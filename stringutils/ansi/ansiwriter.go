@@ -53,7 +53,8 @@ func (a *AnsiWriter) String() string {
 func (a *AnsiWriter) Wrap(s string) {
 	defer a.Writer.Flush()
 
-	a.WriteString(a.ansi.String())
+    a.WriteString(a.ansi.String())
+
 	a.WriteString(s)
 	a.WriteString(AnsiResetString)
 }
