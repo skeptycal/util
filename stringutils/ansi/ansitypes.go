@@ -27,6 +27,16 @@ var (
 
 type colorDepth byte
 
+func encodeAnsi(fb fbType, ef, c color) string {
+    if fb != foreground && fb != background {
+        fb = foreground
+    }
+    if ef < 0 || ef > 255 {
+        ef = 0
+    }
+
+}
+
 var colorfuncs = map[string]func(fb fbType, c interface{}) string{
 	"fmtBasic":  func(fb fbType, c interface{}) string { return fmt.Sprintf("\x1b[%v%vm", fb, c) },
 	"fmtBright": func(fb fbType, c interface{}) string { return fmt.Sprintf("\x1b[1;%v%vm", fb, c) },
@@ -48,11 +58,19 @@ type AnsiSet interface {
 	String() string
 }
 
+type ansiSet struct {
+	Func func(fb fbType, c interface{}) string
+	fg   interface{}
+	bg   interface{}
+	ef   interface{}
+}
+
 func (a *ansiSet) FG(c color) string {
 	if c == 0 {
 		c = a.fg
 	}
-	a.Func(foreground, c)
+    return fmt.Sprintf(, foreground, c)
+    // "\x1b[%v%vm"
 }
 
 func (a *ansiSet) SetColors(fg, bg, ef color) {
@@ -61,20 +79,19 @@ func (a *ansiSet) SetColors(fg, bg, ef color) {
 	ef = ef
 }
 
-type ansiSet struct {
-	Func func(fb fbType, c interface{}) string
-	fg   color
-	bg   color
-	ef   color
-}
+
 
 func (a *ansiSet) info() string {
 	return fmt.Sprintf("fg: %v, bg: %v, ef %v", a.fg, a.bg, a.ef)
 }
 
-func (a *ansiSet) String() string {
+func (a *ansiSet) color() interface{} {
 	// return fmt.Sprintf(FMTansiSet, a.fg, a.bg, a.ef)
-	return a.Func()
+
+}
+
+func (a *ansiSet) String() string {
+	return a.Func(3, a.color())
 }
 
 // todo - create a pool of stringbuilders that can go when ready?
