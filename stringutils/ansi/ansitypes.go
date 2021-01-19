@@ -43,6 +43,15 @@ var colordepth = map[string]string{
 
 func NewAnsiSet(depth ansiStyle, fg, bg, ef color) *ansiSet {
 
+    switch depth {
+    case ansi8bit:
+        a := ansi8bit{}
+    case: ansi24bit:
+        a := ansi24bit{}
+    default:
+        a := ansiSet{}
+    }
+
 	a := &ansiSet{}
 	a.SetColorDepth(depth)
 	a.SetColors(fg, bg, ef)
@@ -67,8 +76,6 @@ type ansiSet struct {
 }
 
 
-
-func (a *ansiSet) String() string { return a.out }
 func (a *ansiSet) BG() string     { return a.bg }
 func (a *ansiSet) FG() string     { return a.fg }
 
@@ -100,7 +107,13 @@ func (a *ansiSet) info() string { return fmt.Sprintf("fg: %v, bg: %v, ef %v", a.
 
 type ansi8     ansiSet
 
-func (a *ansi8) String() string {
+func (a *ansi8) String() string {return a.out}
+func (a *ansi8) String() string { return a.out }
+
+
+type ansi24     ansiSet
+
+func (a *ansi24) String() string {
     return a.out
 }
 
