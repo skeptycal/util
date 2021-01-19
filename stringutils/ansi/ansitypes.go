@@ -13,6 +13,13 @@ import (
 
 type color = byte
 
+type fbType byte
+
+const (
+	foreground fbType = 3
+	background fbType = 4
+)
+
 var (
 	DefaultioWriter io.Writer = os.Stdout
 	AnsiResetString string    = BuildAnsi(DefaultForeground, DefaultBackground, Normal)
@@ -20,20 +27,12 @@ var (
 
 type colorDepth byte
 
-type colorDepths struct {
-	name      string
-	fmt       string
-	colorfunc func()
-}
-
-var types = []colorDepths{}
-
-var colorfuncs = map[string]func(){
-	"fmtBasic":  func() { fmt.Sprintf("\x1b[%v%vm", fb, a.fg) },
-	"fmtBright": func() { fmt.Sprintf("\x1b[1;%v%vm", fb, a.fg) },
-	"fmtDim":    func() { fmt.Sprintf("\x1b[2;%v%vm", fb, a.fg) },
-	"fmt256":    func() { fmt.Sprintf("\x1b[%v8;5;%vm", fb, a.fg) },
-	"fmt24":     func() { fmt.Sprintf("\x1b[%v8;2;%v;%v;%vm", fb, a.fg) },
+var colorfuncs = map[string]func(fb fbType, c interface{}) string{
+	"fmtBasic":  func(fb fbType, c interface{}) string { return fmt.Sprintf("\x1b[%v%vm", fb, c) },
+	"fmtBright": func(fb fbType, c interface{}) string { return fmt.Sprintf("\x1b[1;%v%vm", fb, c) },
+	"fmtDim":    func(fb fbType, c interface{}) string { return fmt.Sprintf("\x1b[2;%v%vm", fb, c) },
+	"fmt256":    func(fb fbType, c interface{}) string { return fmt.Sprintf("\x1b[%v8;5;%vm", fb, c) },
+	"fmt24":     func(fb fbType, c interface{}) string { return fmt.Sprintf("\x1b[%v8;2;%v;%v;%vm", fb, r, g, b) },
 }
 
 func NewAnsiSet(depth string, fg, bg, ef color) *AnsiSet {
@@ -49,6 +48,13 @@ type AnsiSet interface {
 	String() string
 }
 
+func (a *ansiSet) FG(c color) string {
+	if c == 0 {
+		c = a.fg
+	}
+	a.Func(foreground, c)
+}
+
 func (a *ansiSet) SetColors(fg, bg, ef color) {
 	fg = fg
 	bg = bg
@@ -56,7 +62,7 @@ func (a *ansiSet) SetColors(fg, bg, ef color) {
 }
 
 type ansiSet struct {
-	Func func() string
+	Func func(fb fbType, c interface{}) string
 	fg   color
 	bg   color
 	ef   color
