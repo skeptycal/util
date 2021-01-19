@@ -47,12 +47,10 @@ var colorfuncs = map[string]string{
 
 func NewAnsiSet(depth string, fg, bg, ef color) *ansiSet {
 
-	return &ansiSet{
-		depth: colorfuncs[depth],
-		fg:    fmt.Sprintf(FMTansiFG, fg&ansiMask),
-		bg:    fmt.Sprintf(FMTansiBG, bg&ansiMask),
-		ef:    fmt.Sprintf(FMTansi, ef),
-	}
+	a := &ansiSet{}
+	a.SetColorDepth(depth)
+	a.SetColors(fg, bg, ef)
+
 }
 
 type AnsiSet interface {
@@ -69,12 +67,21 @@ type ansiSet struct {
 	fg    string
 	bg    string
 	ef    string
+	out   string
 }
 
-func (a *ansiSet) String() string             { return a.Func(3, a.color()) }
-func (a *ansiSet) BG() string                 { return fmt.Sprintf(a.depth, background, a.bg) }
-func (a *ansiSet) FG() string                 { return fmt.Sprintf(a.depth, foreground, c) }
-func (a *ansiSet) SetColors(fg, bg, ef color) { a.fg = fg; a.bg = bg; a.ef = ef }
+func (a *ansiSet) String() string { return a.out }
+func (a *ansiSet) BG() string     { return a.bg }
+func (a *ansiSet) FG() string     { return a.fg }
+func (a *ansiSet) SetColors(fg, bg, ef color) {
+	o := fmt.Sprintf("%v;%v;%v", ef, fg&ansiMask, bg&ansiMask)
+
+	a.fg = fmt.Sprintf(FMTansiFG, fg&ansiMask)
+	a.bg = fmt.Sprintf(FMTansiBG, bg&ansiMask)
+	a.ef = fmt.Sprintf(FMTansi, ef)
+	a.out = fmt.Sprintf(FMTansi, o)
+}
+func (a *ansiSet) out() string                { return fmt.Sprintf("%v;%v;%v", ef, fg&ansiMask, bg&ansiMask) }
 func (a *ansiSet) SetColorDepth(depth string) { a.depth = colorfuncs[depth] }
 func (a *ansiSet) info() string               { return fmt.Sprintf("fg: %v, bg: %v, ef %v", a.fg, a.bg, a.ef) }
 
