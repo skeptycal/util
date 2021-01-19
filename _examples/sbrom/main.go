@@ -5,8 +5,6 @@
 package main
 
 import (
-	"fmt"
-
 	. "github.com/skeptycal/util/stringutils/ansi"
 )
 
@@ -25,11 +23,7 @@ var (
 // add a header row, and implement a default
 // ANSI color scheme.
 func topTable() {
-	SetupCLI()
-	CLS()
-	BR()
-	fmt.Print(defaultAnsiSet)
-	// APrint(33, 44, 1)
+	SetupCLI(defaultColors)
 	HR(30)
 	BR()
 	BR()

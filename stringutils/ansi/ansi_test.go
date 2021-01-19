@@ -11,8 +11,9 @@ import (
 var testWriter = NewANSIWriter(os.Stdout)
 
 func ExampleSetupCLI() {
-	SetupCLI()
+	SetupCLI(&defaultAnsiSet)
 	// Output:
+	// c[39;49;0m
 }
 
 func TestNewANSIWriter2(t *testing.T) {
@@ -71,15 +72,29 @@ func ExampleEcho() {
 	Echo("hello, %s", "Mike")
 	Echo("hi, Mike", " and ", "world")
 	// Output:
-	// [33m[44m[1mhello, world![39m[49m[0m
-	// [33m[44m[1mhello, Mike[39m[49m[0m
-	// [33m[44m[1mhi, Mike and world[39m[49m[0m
+	// [39;49;0mhello, world![39m[49m[0m
+	// [39;49;0mhello, Mike[39m[49m[0m
+	// [39;49;0mhi, Mike and world[39m[49m[0m
 }
 
 func ExampleAPrint() {
 	APrint(1, 32)
 	// Output:
 	// [1m[32m
+}
+
+func ExampleAnsiSet_String() {
+	testAnsiSet := NewAnsiSet(35, 44, 4)
+	fmt.Print(testAnsiSet.String())
+	// Output:
+	// [35;44;4m
+}
+
+func ExampleAnsiSet_Info() {
+	testAnsiSet := NewAnsiSet(35, 44, 4)
+	fmt.Print(testAnsiSet.Info())
+	// Output:
+	// [35;44;4m
 }
 
 func ExampleANSI_Build() {

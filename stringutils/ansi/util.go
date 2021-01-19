@@ -26,8 +26,8 @@ func BR()              { fmt.Println("") }
 // is cleared.
 //
 func Echo(fmtStringMaybe interface{}, a ...interface{}) {
-	fmt.Printf("%s", DefaultAnsiFmt)
-	defer fmt.Println(AnsiReset)
+	fmt.Printf("%s", defaultAnsiSet.String())
+	defer fmt.Println(AnsiResetString)
 
 	// only first argument is given; cannot be a format string
 	if len(a) == 0 {

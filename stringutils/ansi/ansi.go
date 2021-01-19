@@ -17,10 +17,8 @@ var (
 	defaultioWriter io.Writer = os.Stdout
 	a               ANSI      = NewANSIWriter(defaultioWriter)
 
-	// Bold, Yellow Text, Blue Background
-	DefaultAnsiFmt string = BuildAnsi(Yellow, BlueBackground, Bold)
 	// Reset Effects; Default Foreground; Default Background
-	AnsiReset string = BuildAnsi(DefaultForeground, DefaultBackground, Normal)
+	AnsiResetString string = BuildAnsi(DefaultForeground, DefaultBackground, Normal)
 
 	defaultAnsiSet AnsiSet = AnsiSet{
 		fg: DefaultForeground,
@@ -30,6 +28,7 @@ var (
 )
 
 func SetupCLI(a *AnsiSet) {
+	BR()
 	CLS()
 	fmt.Print(a.String())
 }
@@ -100,7 +99,7 @@ func (a *AnsiWriter) Wrap(s string) {
 
 	a.WriteString(a.ansi.String())
 	a.WriteString(s)
-	a.WriteString(AnsiReset)
+	a.WriteString(AnsiResetString)
 }
 
 // Build encodes a variadic list of bytes into ANSI codes
