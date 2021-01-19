@@ -1,5 +1,15 @@
 package ansi
 
+// const (
+// 	fmtBasic  string = "\x1b[%vm"
+// 	fmtBright string = "\x1b[1;%vm"
+// 	fmtDim    string = "\x1b[2;%vm"
+// 	fmt256FG  string = "\x1b[38;5;%vm"
+// 	fmt256BG  string = "\x1b[48;5;%vm"
+// 	fmt24FG   string = "\x1b[38;2;%v;%v;%vm"
+// 	fmt24BG   string = "\x1b[48;2;%v;%v;%vm"
+// )
+
 const (
 	// Character used for HR function
 	HrChar string = "="

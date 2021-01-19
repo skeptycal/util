@@ -11,22 +11,13 @@ import (
 	"os"
 )
 
-// const (
-// 	fmtBasic  string = "\x1b[%vm"
-// 	fmtBright string = "\x1b[1;%vm"
-// 	fmtDim    string = "\x1b[2;%vm"
-// 	fmt256FG  string = "\x1b[38;5;%vm"
-// 	fmt256BG  string = "\x1b[48;5;%vm"
-// 	fmt24FG   string = "\x1b[38;2;%v;%v;%vm"
-// 	fmt24BG   string = "\x1b[48;2;%v;%v;%vm"
-// )
+type color = byte
 
 var (
 	DefaultioWriter io.Writer = os.Stdout
 	AnsiResetString string    = BuildAnsi(DefaultForeground, DefaultBackground, Normal)
 )
 
-type color = byte
 type colorDepth byte
 
 type colorDepths struct {
@@ -51,11 +42,24 @@ func NewAnsiSet(depth string, fg, bg, ef color) *AnsiSet {
 	return &AnsiSet{depth, fg, bg, ef}
 }
 
-type AnsiSet struct {
-	depth string
-	fg    color
-	bg    color
-	ef    color
+type AnsiSet interface {
+	Build(b ...byte) string
+	SetType(t int)
+	SetColors(fg, bg, ef color)
+	String() string
+}
+
+func (s *ansiSet) SetColors(fg, bg, ef color) {
+	fg = fg
+	bg = bg
+	ef = ef
+}
+
+type ansiSet struct {
+	Func func()
+	fg   color
+	bg   color
+	ef   color
 }
 
 func (a *AnsiSet) info() string {
