@@ -39,8 +39,11 @@ const (
 
 // Format Strings for Ansi printf commands.
 const (
+	ansiMask byte = 0xF
 	// basic Ansi colors
-	FMTansi string = "\033[%vm"
+	FMTansi   string = "\033[%vm"
+	FMTansiFG string = "\033[3%vm"
+	FMTansiBG string = "\033[4%vm"
 	// basic Ansi "bright" colors
 	FMTbright string = "\033[1;%vm"
 	// basic Ansi "dim" colors
