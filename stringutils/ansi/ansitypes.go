@@ -37,12 +37,10 @@ func encodeAnsi(fb fbType, ef, c color) string {
 
 }
 
-var colorfuncs = map[string]string{
-	"fmtBasic":  "\x1b[%v%v%m",
-	"fmtBright": "\x1b[1;%v%%vm",
-	"fmtDim":    "\x1b[2;%v%%vm",
-	"fmt256":    "\x1b[%v8;5;%%vm",
-	"fmt24":     "\x1b[%v8;2;%%vm",
+var colordepth = map[string]string{
+	"fmtBasic": "\x1b[%v%v%m",
+	"fmt256":   "\x1b[%v8;5;%%vm",
+	"fmt24":    "\x1b[%v8;2;%%vm",
 }
 
 func NewAnsiSet(depth string, fg, bg, ef color) *ansiSet {
@@ -74,14 +72,14 @@ func (a *ansiSet) String() string { return a.out }
 func (a *ansiSet) BG() string     { return a.bg }
 func (a *ansiSet) FG() string     { return a.fg }
 func (a *ansiSet) SetColors(fg, bg, ef color) {
-	o := fmt.Sprintf("%v;%v;%v", ef, fg&ansiMask, bg&ansiMask)
+	o := fmt.Sprintf("%v;3%v;4%v", ef, fg&ansiMask, bg&ansiMask)
 
 	a.fg = fmt.Sprintf(FMTansiFG, fg&ansiMask)
 	a.bg = fmt.Sprintf(FMTansiBG, bg&ansiMask)
 	a.ef = fmt.Sprintf(FMTansi, ef)
 	a.out = fmt.Sprintf(FMTansi, o)
 }
-func (a *ansiSet) out() string                { return fmt.Sprintf("%v;%v;%v", ef, fg&ansiMask, bg&ansiMask) }
+func (a *ansiSet) out() string                { return fmt.Sprintf("%v;%v;%v", a.ef, a.fg, a.bg) }
 func (a *ansiSet) SetColorDepth(depth string) { a.depth = colorfuncs[depth] }
 func (a *ansiSet) info() string               { return fmt.Sprintf("fg: %v, bg: %v, ef %v", a.fg, a.bg, a.ef) }
 

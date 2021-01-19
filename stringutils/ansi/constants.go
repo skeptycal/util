@@ -37,6 +37,21 @@ const (
 	BgWhiteString  string = "\033[47m"
 )
 
+type ansiStyle byte
+
+const (
+	normal ansiStyle = iota
+	bold
+	ansi8bit
+	italics
+	underline
+	ansi24bit
+	blink
+	inverse
+	conceal
+	strikeout
+)
+
 // Format Strings for Ansi printf commands.
 const (
 	ansiMask byte = 0xF
