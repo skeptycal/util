@@ -63,3 +63,14 @@ func itoa(n int) []byte {
 	}
 	return []byte(strconv.Itoa(n))
 }
+
+// BuildAnsi returns a basic (3/4 bit) ANSI format code
+// from a variadic argument list of bytes
+func BuildAnsi(b ...byte) string {
+	sb := strings.Builder{}
+	defer sb.Reset()
+	for _, n := range b {
+		sb.WriteString(fmt.Sprintf(FMTansi, n))
+	}
+	return sb.String()
+}
