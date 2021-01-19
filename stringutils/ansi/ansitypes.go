@@ -33,15 +33,7 @@ const (
 	strikeout
 )
 
-func encodeAnsi(fb fbType, ef, c color) string {
-	if fb < foreground || fb > background {
-		fb = foreground
-	}
-	if ef < 0 || ef > 74 {
-		ef = 0
-	}
 
-}
 
 var colordepth = map[string]string{
 	"fmtBasic": "\x1b[%v%v%m",
@@ -49,7 +41,7 @@ var colordepth = map[string]string{
 	"fmt24":    "\x1b[%v8;2;%%vm",
 }
 
-func NewAnsiSet(depth string, fg, bg, ef color) *ansiSet {
+func NewAnsiSet(depth ansiStyle, fg, bg, ef color) *ansiSet {
 
 	a := &ansiSet{}
 	a.SetColorDepth(depth)
@@ -74,21 +66,26 @@ type ansiSet struct {
 	out   string
 }
 
+
+
 func (a *ansiSet) String() string { return a.out }
 func (a *ansiSet) BG() string     { return a.bg }
 func (a *ansiSet) FG() string     { return a.fg }
-func (a *ansiSet) SetColors(fg, bg, ef color) {
-	o := fmt.Sprintf("%v;3%v;4%v", ef, fg&ansiMask, bg&ansiMask)
 
-	a.fg = fmt.Sprintf(FMTansiFG, fg&ansiMask)
-	a.bg = fmt.Sprintf(FMTansiBG, bg&ansiMask)
+
+func (a *ansiSet) SetColors(fg, bg, ef color) {
+	o := fmt.Sprintf("%v;3%v;4%v", ef, fg&BasicMask, bg&BasicMask)
+
+	a.fg = fmt.Sprintf(FMTansiFG, fg&BasicMask)
+	a.bg = fmt.Sprintf(FMTansiBG, bg&BasicMask)
 	a.ef = fmt.Sprintf(FMTansi, ef)
 	a.out = fmt.Sprintf(FMTansi, o)
 }
-func (a *ansiSet) out() string { return fmt.Sprintf("%v;%v;%v", a.ef, a.fg, a.bg) }
+func (a *ansiSet) output() string { return fmt.Sprintf("%v;%v;%v", a.ef, a.fg, a.bg) }
 func (a *ansiSet) SetStyle(style ansiStyle) {
 	if style == 2 {
-		// 8 bit colors
+        // 8 bit colors
+        a = NewAnsiSet(ansi8bits)
 		a.depth = FMT8bit
 	}
 	if style == 5 {
@@ -99,6 +96,15 @@ func (a *ansiSet) SetStyle(style ansiStyle) {
 	a.depth = fmt.Sprintf(FMTansi, style)
 }
 func (a *ansiSet) info() string { return fmt.Sprintf("fg: %v, bg: %v, ef %v", a.fg, a.bg, a.ef) }
+
+
+type ansi8     ansiSet
+
+func (a *ansi8) String() string {
+    return a.out
+}
+
+
 
 // todo - create a pool of stringbuilders that can go when ready?
 // type sbSync struct {

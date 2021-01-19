@@ -74,3 +74,15 @@ func BuildAnsi(b ...byte) string {
 	}
 	return sb.String()
 }
+
+func encodeAnsi(fb fbType, ef, c color) string {
+	if fb < foreground || fb > background {
+		fb = foreground
+	}
+	if ef < 0 || ef > 74 {
+		ef = 0
+    }
+
+    // todo - fixme
+    return ""
+}
