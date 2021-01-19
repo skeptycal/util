@@ -16,14 +16,24 @@ type color = byte
 type ansiTypes = map[string]string
 
 var types ansiTypes = ansiTypes{
-	"basic":  "\033[%vm",
-	"bright": "\033[1;%vm",
-	"dim":    "\033[2;%vm",
-	"256FG":  "\033[38;5;%vm",
-	"256BG":  "\033[48;5;%vm",
-	"24FG":   "\033[38;2;%v;%v;%vm",
-	"24BG":   "\033[48;2;%v;%v;%vm",
+	"fmtBasic":  "\x1b[%vm",
+	"fmtBright": "\x1b[1;%vm",
+	"fmtDim":    "\x1b[2;%vm",
+	"fmt256FG":  "\x1b[38;5;%vm",
+	"fmt256BG":  "\x1b[48;5;%vm",
+	"fmt24FG":   "\x1b[38;2;%v;%v;%vm",
+	"fmt24BG":   "\x1b[48;2;%v;%v;%vm",
 }
+
+const (
+	fmtBasic  string = "\x1b[%vm"
+	fmtBright string = "\x1b[1;%vm"
+	fmtDim    string = "\x1b[2;%vm"
+	fmt256FG  string = "\x1b[38;5;%vm"
+	fmt256BG  string = "\x1b[48;5;%vm"
+	fmt24FG   string = "\x1b[38;2;%v;%v;%vm"
+	fmt24BG   string = "\x1b[48;2;%v;%v;%vm"
+)
 
 var (
 	DefaultioWriter io.Writer = os.Stdout
