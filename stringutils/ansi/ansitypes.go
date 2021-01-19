@@ -28,21 +28,21 @@ var (
 type colorDepth byte
 
 func encodeAnsi(fb fbType, ef, c color) string {
-    if fb != foreground && fb != background {
-        fb = foreground
-    }
-    if ef < 0 || ef > 255 {
-        ef = 0
-    }
+	if fb < foreground || fb > background {
+		fb = foreground
+	}
+	if ef < 0 || ef > 74 {
+		ef = 0
+	}
 
 }
 
-var colorfuncs = map[string]func(fb fbType, c interface{}) string{
-	"fmtBasic":  func(fb fbType, c interface{}) string { return fmt.Sprintf("\x1b[%v%vm", fb, c) },
-	"fmtBright": func(fb fbType, c interface{}) string { return fmt.Sprintf("\x1b[1;%v%vm", fb, c) },
-	"fmtDim":    func(fb fbType, c interface{}) string { return fmt.Sprintf("\x1b[2;%v%vm", fb, c) },
-	"fmt256":    func(fb fbType, c interface{}) string { return fmt.Sprintf("\x1b[%v8;5;%vm", fb, c) },
-	"fmt24":     func(fb fbType, c interface{}) string { return fmt.Sprintf("\x1b[%v8;2;%v;%v;%vm", fb, r, g, b) },
+var colorfuncs = map[string]string{
+	"fmtBasic":  "\x1b[%v%v%m",
+	"fmtBright": "\x1b[1;%v%%vm",
+	"fmtDim":    "\x1b[2;%v%%vm",
+	"fmt256":    "\x1b[%v8;5;%%vm",
+	"fmt24":     "\x1b[%v8;2;%%vm",
 }
 
 func NewAnsiSet(depth string, fg, bg, ef color) *AnsiSet {
@@ -67,10 +67,10 @@ type ansiSet struct {
 
 func (a *ansiSet) FG(c color) string {
 	if c == 0 {
-		c = a.fg
+		c = a.fg.(byte)
 	}
-    return fmt.Sprintf(, foreground, c)
-    // "\x1b[%v%vm"
+	return fmt.Sprintf(a.Func(foreground, c))
+	// "\x1b[%v%vm"
 }
 
 func (a *ansiSet) SetColors(fg, bg, ef color) {
@@ -78,8 +78,6 @@ func (a *ansiSet) SetColors(fg, bg, ef color) {
 	bg = bg
 	ef = ef
 }
-
-
 
 func (a *ansiSet) info() string {
 	return fmt.Sprintf("fg: %v, bg: %v, ef %v", a.fg, a.bg, a.ef)

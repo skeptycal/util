@@ -83,14 +83,14 @@ func ExampleAPrint() {
 }
 
 func ExampleAnsiSet_String() {
-	testAnsiSet := NewAnsiSet(35, 44, 4)
+	testAnsiSet := NewAnsiSet("",35, 44, 4)
 	fmt.Print(testAnsiSet.String())
 	// Output:
 	// [35;44;4m
 }
 
 func ExampleAnsiSet_info() {
-	testAnsiSet := NewAnsiSet(35, 44, 4)
+	testAnsiSet := NewAnsiSet("",35, 44, 4)
 	fmt.Print(testAnsiSet.info())
 	// Output:
 	// fg: 35, bg: 44, ef 4
@@ -238,12 +238,12 @@ func TestNewAnsiSet(t *testing.T) {
 		want *AnsiSet
 	}{
 		// TODO: Add test cases.
-		{"32,42,2", args{32, 42, 2}, NewAnsiSet(32, 42, 2)},
+		{"32,42,2", args{32, 42, 2}, NewAnsiSet("",32, 42, 2)},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := NewAnsiSet(tt.args.fg, tt.args.bg, tt.args.ef); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewAnsiSet() = %v, want %v", got, tt.want)
+			if got := NewAnsiSet("",tt.args.fg, tt.args.bg, tt.args.ef); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NewAnsiSet("",) = %v, want %v", got, tt.want)
 			}
 		})
 	}
