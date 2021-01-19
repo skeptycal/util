@@ -19,7 +19,7 @@ const (
 var (
 	ansi = NewAnsiSet(35, 44, 4)
     a    = NewANSIWriter(os.Stdout)
-    a.ansi
+    a.SetColors(ansi)
 )
 
 // topTable creates a terminal header to:

@@ -14,13 +14,13 @@ import (
 )
 
 var (
-	defaultioWriter io.Writer = os.Stdout
-	a               ANSI      = NewANSIWriter(defaultioWriter)
+	DefaultioWriter io.Writer = os.Stdout
+	a               ANSI      = NewANSIWriter(DefaultioWriter)
 
 	// Reset Effects; Default Foreground; Default Background
 	AnsiResetString string = BuildAnsi(DefaultForeground, DefaultBackground, Normal)
 
-	defaultAnsiSet AnsiSet = AnsiSet{
+	DefaultAnsiSet AnsiSet = AnsiSet{
 		fg: DefaultForeground,
 		bg: DefaultBackground,
 		ef: Normal,
@@ -58,13 +58,13 @@ func (a *AnsiSet) String() string {
 func NewANSIWriter(w io.Writer) ANSI {
 	// if w is not a writer, use the default
 	if w == nil {
-		w = defaultioWriter
+		w = DefaultioWriter
 	}
 	if wr, ok := w.(*AnsiWriter); ok {
 		return wr
 	}
 
-	return &AnsiWriter{*bufio.NewWriter(w), &defaultAnsiSet}
+	return &AnsiWriter{*bufio.NewWriter(w), &DefaultAnsiSet}
 }
 
 type ANSI interface {
