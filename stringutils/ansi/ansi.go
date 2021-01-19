@@ -39,7 +39,7 @@ type AnsiSet struct {
 	ef color
 }
 
-func (a *AnsiSet) Info() string {
+func (a *AnsiSet) info() string {
 	return fmt.Sprintf("fg: %v, bg: %v, ef %v", a.fg, a.bg, a.ef)
 }
 
@@ -64,7 +64,7 @@ func NewANSIWriter(w io.Writer) ANSI {
 		return wr
 	}
 
-	return &AnsiWriter{*bufio.NewWriter(w), defaultAnsiSet}
+	return &AnsiWriter{*bufio.NewWriter(w), &defaultAnsiSet}
 }
 
 type ANSI interface {
@@ -78,7 +78,11 @@ type ANSI interface {
 
 type AnsiWriter struct {
 	bufio.Writer
-	ansi AnsiSet
+	ansi *AnsiSet
+}
+
+func (a *AnsiWriter) SetColors(s *AnsiSet) {
+	a.ansi = s
 }
 
 func (a *AnsiWriter) String() string {

@@ -5,6 +5,8 @@
 package main
 
 import (
+	"os"
+
 	. "github.com/skeptycal/util/stringutils/ansi"
 )
 
@@ -15,7 +17,9 @@ const (
 )
 
 var (
-	defaultColors = NewAnsiSet(35, 44, 4)
+	ansi = NewAnsiSet(35, 44, 4)
+    a    = NewANSIWriter(os.Stdout)
+    a.ansi
 )
 
 // topTable creates a terminal header to:
@@ -24,7 +28,7 @@ var (
 // ANSI color scheme.
 func topTable() {
 	BR()
-	SetupCLI(defaultColors)
+	SetupCLI(ansi)
 	HR(30)
 	BR()
 	BR()
