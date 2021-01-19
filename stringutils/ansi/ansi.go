@@ -24,9 +24,7 @@ import (
 
 var (
 	DefaultioWriter io.Writer = os.Stdout
-
-	// Reset Effects; Default Foreground; Default Background
-	AnsiResetString string = BuildAnsi(DefaultForeground, DefaultBackground, Normal)
+	AnsiResetString string    = BuildAnsi(DefaultForeground, DefaultBackground, Normal)
 )
 
 type color = byte
