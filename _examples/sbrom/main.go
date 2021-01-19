@@ -14,10 +14,11 @@ const (
 	sampleint int32 = 0b1010101010101010101010
 )
 
-// Example code for printing Ansi color text.
-// Reference:
-func main() {
-
+// topTable creates a terminal header to:
+// clear the screen, add a few blank lines, and
+// add a header row, and implement a default
+// ANSI color scheme.
+func topTable() {
 	CLS()
 	BR()
 
@@ -26,7 +27,15 @@ func main() {
 	HR(30)
 	BR()
 	BR()
-	// Echo(sample)
+}
+
+// Example code for printing Ansi color text.
+// Reference:
+func main() {
+	topTable()
+
+	Echo("Sample Benchmarks for string reversal:\n ")
+	Echo(sample)
 	// Echo(sample2)
 	// Echo(sampleint)
 
