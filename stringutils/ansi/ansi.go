@@ -30,25 +30,25 @@ var (
 )
 
 type color = byte
-type colorDepth  struct{
-    name string
-    fmt string
-    colorfunc func()
+type colorDepth byte
+
+type colorDepths struct {
+	name      string
+	fmt       string
+	colorfunc func()
 }
 
-var types = [string]colorDepth{
-	"fmtBasic":  "\x1b[%vm",
-	"fmtBright": "\x1b[1;%vm",
-	"fmtDim":    "\x1b[2;%vm",
-	"fmt256FG":  "\x1b[38;5;%vm",
-	"fmt256BG":  "\x1b[48;5;%vm",
-	"fmt24FG":   "\x1b[38;2;%v;%v;%vm",
-	"fmt24BG":   "\x1b[48;2;%v;%v;%vm",
+var types = []colorDepths{
+	{"fmtBasic", "\x1b[%vm", func() {}},
+	{"fmtBright", "\x1b[1;%vm", func() {}},
+	{"fmtDim", "\x1b[2;%vm", func() {}},
+	{"fmt256FG", "\x1b[38;5;%vm", func() {}},
+	{"fmt256BG", "\x1b[48;5;%vm", func() {}},
+	{"fmt24FG", "\x1b[38;2;%v;%v;%vm", func() {}},
+	{"fmt24BG", "\x1b[48;2;%v;%v;%vm", func() {}},
 }
 
-var colorfuncs = map[string]func{
-
-}
+var colorfuncs = map[string]func(){}
 
 func NewAnsiSet(depth string, fg, bg, ef color) *AnsiSet {
 	return &AnsiSet{depth, fg, bg, ef}
