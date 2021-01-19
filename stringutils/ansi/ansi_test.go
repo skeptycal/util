@@ -10,6 +10,11 @@ import (
 
 var testWriter = NewANSIWriter(os.Stdout)
 
+func ExampleSetupCLI() {
+	SetupCLI()
+	// Output:
+}
+
 func TestNewANSIWriter2(t *testing.T) {
 	want := &AnsiWriter{
 		*bufio.NewWriter(os.Stdout),
@@ -66,9 +71,9 @@ func ExampleEcho() {
 	Echo("hello, %s", "Mike")
 	Echo("hi, Mike", " and ", "world")
 	// Output:
-	// [44m[33m[1mhello, world![0m[39m[49m
-	// [44m[33m[1mhello, Mike[0m[39m[49m
-	// [44m[33m[1mhi, Mike and world[0m[39m[49m
+	// [33m[44m[1mhello, world![39m[49m[0m
+	// [33m[44m[1mhello, Mike[39m[49m[0m
+	// [33m[44m[1mhi, Mike and world[39m[49m[0m
 }
 
 func ExampleAPrint() {
@@ -200,6 +205,29 @@ func TestAnsiWriter_Build(t *testing.T) {
 				ansi:   tt.fields.ansi,
 			}
 			a.Build(tt.args.b...)
+		})
+	}
+}
+
+func TestNewAnsiSet(t *testing.T) {
+	type args struct {
+		fg color
+		bg color
+		ef color
+	}
+	tests := []struct {
+		name string
+		args args
+		want *AnsiSet
+	}{
+		// TODO: Add test cases.
+		{"32,42,2", args{32, 42, 2}, NewAnsiSet(32, 42, 2)},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := NewAnsiSet(tt.args.fg, tt.args.bg, tt.args.ef); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NewAnsiSet() = %v, want %v", got, tt.want)
+			}
 		})
 	}
 }

@@ -29,7 +29,16 @@ var (
 	}
 )
 
+func SetupCLI(a *AnsiSet) {
+	CLS()
+	fmt.Print(a.String())
+}
+
 type color = byte
+
+func NewAnsiSet(fg, bg, ef color) *AnsiSet {
+	return &AnsiSet{fg, bg, ef}
+}
 
 type AnsiSet struct {
 	fg color

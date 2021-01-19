@@ -5,6 +5,8 @@
 package main
 
 import (
+	"fmt"
+
 	. "github.com/skeptycal/util/stringutils/ansi"
 )
 
@@ -14,16 +16,20 @@ const (
 	sampleint int32 = 0b1010101010101010101010
 )
 
+var (
+	defaultColors = NewAnsiSet(32, 0, 1)
+)
+
 // topTable creates a terminal header to:
 // clear the screen, add a few blank lines, and
 // add a header row, and implement a default
 // ANSI color scheme.
 func topTable() {
+	SetupCLI()
 	CLS()
 	BR()
-
-	APrint(33, 44, 1)
-
+	fmt.Print(defaultAnsiSet)
+	// APrint(33, 44, 1)
 	HR(30)
 	BR()
 	BR()
