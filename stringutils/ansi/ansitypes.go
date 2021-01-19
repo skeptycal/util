@@ -7,8 +7,6 @@ package ansi
 
 import (
 	"fmt"
-	"io"
-	"os"
 )
 
 type color = byte
@@ -20,12 +18,20 @@ const (
 	background fbType = 4
 )
 
-var (
-	DefaultioWriter io.Writer = os.Stdout
-	AnsiResetString string    = BuildAnsi(DefaultForeground, DefaultBackground, Normal)
-)
+type ansiStyle byte
 
-type colorDepth byte
+const (
+	normal ansiStyle = iota
+	bold
+	ansi8bit
+	italics
+	underline
+	ansi24bit
+	blink
+	inverse
+	conceal
+	strikeout
+)
 
 func encodeAnsi(fb fbType, ef, c color) string {
 	if fb < foreground || fb > background {
@@ -79,9 +85,20 @@ func (a *ansiSet) SetColors(fg, bg, ef color) {
 	a.ef = fmt.Sprintf(FMTansi, ef)
 	a.out = fmt.Sprintf(FMTansi, o)
 }
-func (a *ansiSet) out() string                { return fmt.Sprintf("%v;%v;%v", a.ef, a.fg, a.bg) }
-func (a *ansiSet) SetColorDepth(depth string) { a.depth = colorfuncs[depth] }
-func (a *ansiSet) info() string               { return fmt.Sprintf("fg: %v, bg: %v, ef %v", a.fg, a.bg, a.ef) }
+func (a *ansiSet) out() string { return fmt.Sprintf("%v;%v;%v", a.ef, a.fg, a.bg) }
+func (a *ansiSet) SetStyle(style ansiStyle) {
+	if style == 2 {
+		// 8 bit colors
+		a.depth = FMT8bit
+	}
+	if style == 5 {
+		// 24 bit colors
+		a.depth = FMT24bit
+	}
+
+	a.depth = fmt.Sprintf(FMTansi, style)
+}
+func (a *ansiSet) info() string { return fmt.Sprintf("fg: %v, bg: %v, ef %v", a.fg, a.bg, a.ef) }
 
 // todo - create a pool of stringbuilders that can go when ready?
 // type sbSync struct {

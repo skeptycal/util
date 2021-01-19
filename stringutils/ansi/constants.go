@@ -1,15 +1,5 @@
 package ansi
 
-// const (
-// 	fmtBasic  string = "\x1b[%vm"
-// 	fmtBright string = "\x1b[1;%vm"
-// 	fmtDim    string = "\x1b[2;%vm"
-// 	fmt256FG  string = "\x1b[38;5;%vm"
-// 	fmt256BG  string = "\x1b[48;5;%vm"
-// 	fmt24FG   string = "\x1b[38;2;%v;%v;%vm"
-// 	fmt24BG   string = "\x1b[48;2;%v;%v;%vm"
-// )
-
 const (
 	// Character used for HR function
 	HrChar string = "="
@@ -37,24 +27,9 @@ const (
 	BgWhiteString  string = "\033[47m"
 )
 
-type ansiStyle byte
-
-const (
-	normal ansiStyle = iota
-	bold
-	ansi8bit
-	italics
-	underline
-	ansi24bit
-	blink
-	inverse
-	conceal
-	strikeout
-)
-
 // Format Strings for Ansi printf commands.
 const (
-	ansiMask byte = 0xF
+	BasicMask byte = 0xF
 	// basic Ansi colors
 	FMTansi   string = "\033[%vm"
 	FMTansiFG string = "\033[3%vm"
