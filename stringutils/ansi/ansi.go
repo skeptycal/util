@@ -12,6 +12,19 @@ import (
 	"strings"
 )
 
+type color = byte
+type ansiTypes = map[string]string
+
+var types ansiTypes = ansiTypes{
+	"basic":  "\033[%vm",
+	"bright": "\033[1;%vm",
+	"dim":    "\033[2;%vm",
+	"256FG":  "\033[38;5;%vm",
+	"256BG":  "\033[48;5;%vm",
+	"24FG":   "\033[38;2;%v;%v;%vm",
+	"24BG":   "\033[48;2;%v;%v;%vm",
+}
+
 var (
 	DefaultioWriter io.Writer = os.Stdout
 	a               ANSI      = NewANSIWriter(DefaultioWriter)
@@ -19,8 +32,6 @@ var (
 	// Reset Effects; Default Foreground; Default Background
 	AnsiResetString string = BuildAnsi(DefaultForeground, DefaultBackground, Normal)
 )
-
-type color = byte
 
 func NewAnsiSet(fg, bg, ef color) *AnsiSet {
 	return &AnsiSet{fg, bg, ef}

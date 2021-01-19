@@ -9,42 +9,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"os"
 )
-
-var (
-	DefaultioWriter io.Writer = os.Stdout
-	a               ANSI      = NewANSIWriter(DefaultioWriter)
-
-	// Reset Effects; Default Foreground; Default Background
-	AnsiResetString string = BuildAnsi(DefaultForeground, DefaultBackground, Normal)
-)
-
-type color = byte
-
-func NewAnsiSet(fg, bg, ef color) *AnsiSet {
-	return &AnsiSet{fg, bg, ef}
-}
-
-type AnsiSet struct {
-	fg color
-	bg color
-	ef color
-}
-
-func (a *AnsiSet) info() string {
-	return fmt.Sprintf("fg: %v, bg: %v, ef %v", a.fg, a.bg, a.ef)
-}
-
-func (a *AnsiSet) String() string {
-	return fmt.Sprintf(FMTansiSet, a.fg, a.bg, a.ef)
-}
-
-// todo - create a pool of stringbuilders that can go when ready?
-// type sbSync struct {
-// 	strings.Builder
-// 	mu sync.Mutex
-// }
 
 // NewANSIWriter returns a new ANSI Writer for use in terminal output.
 // If w is nil, the default (os.Stdout) is used.
