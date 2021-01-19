@@ -7,6 +7,13 @@ import (
 	"strings"
 )
 
+// SetupCLI clears the screen and sets the terminal
+// defaults to the given AnsiSet settings
+func SetupCLI(a *AnsiSet) {
+	CLS()
+	fmt.Print(a.String())
+}
+
 // APrint prints a basic ansi string based on the
 // variadic argument list of bytes
 func APrint(a ...byte) { fmt.Print(BuildAnsi(a...)) }

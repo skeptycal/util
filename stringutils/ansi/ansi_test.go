@@ -94,7 +94,7 @@ func ExampleAnsiSet_Info() {
 	testAnsiSet := NewAnsiSet(35, 44, 4)
 	fmt.Print(testAnsiSet.Info())
 	// Output:
-	// [35;44;4m
+	// fg: 35, bg: 44, ef 4
 }
 
 func ExampleANSI_Build() {

@@ -15,7 +15,7 @@ const (
 )
 
 var (
-	defaultColors = NewAnsiSet(32, 0, 1)
+	defaultColors = NewAnsiSet(35, 44, 4)
 )
 
 // topTable creates a terminal header to:
@@ -23,6 +23,7 @@ var (
 // add a header row, and implement a default
 // ANSI color scheme.
 func topTable() {
+	BR()
 	SetupCLI(defaultColors)
 	HR(30)
 	BR()

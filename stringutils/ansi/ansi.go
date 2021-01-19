@@ -27,12 +27,6 @@ var (
 	}
 )
 
-func SetupCLI(a *AnsiSet) {
-	BR()
-	CLS()
-	fmt.Print(a.String())
-}
-
 type color = byte
 
 func NewAnsiSet(fg, bg, ef color) *AnsiSet {
