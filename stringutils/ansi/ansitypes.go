@@ -26,48 +26,49 @@ type colorDepths struct {
 	colorfunc func()
 }
 
-var types = []colorDepths{
-	{"fmtBasic", "\x1b[%vm", func() {}},
-	{"fmtBright", "\x1b[1;%vm", func() {}},
-	{"fmtDim", "\x1b[2;%vm", func() {}},
-	{"fmt256FG", "\x1b[38;5;%vm", func() {}},
-	{"fmt256BG", "\x1b[48;5;%vm", func() {}},
-	{"fmt24FG", "\x1b[38;2;%v;%v;%vm", func() {}},
-	{"fmt24BG", "\x1b[48;2;%v;%v;%vm", func() {}},
+var types = []colorDepths{}
+
+var colorfuncs = map[string]func(){
+	"fmtBasic":  func() { fmt.Sprintf("\x1b[%v%vm", fb, a.fg) },
+	"fmtBright": func() { fmt.Sprintf("\x1b[1;%v%vm", fb, a.fg) },
+	"fmtDim":    func() { fmt.Sprintf("\x1b[2;%v%vm", fb, a.fg) },
+	"fmt256":    func() { fmt.Sprintf("\x1b[%v8;5;%vm", fb, a.fg) },
+	"fmt24":     func() { fmt.Sprintf("\x1b[%v8;2;%v;%v;%vm", fb, a.fg) },
 }
 
-var colorfuncs = map[string]func(){}
-
 func NewAnsiSet(depth string, fg, bg, ef color) *AnsiSet {
-	return &AnsiSet{depth, fg, bg, ef}
+	return &ansiSet{depth, fg, bg, ef}
 }
 
 type AnsiSet interface {
+	BG(c color) string
+	FG(c color) string
 	Build(b ...byte) string
 	SetType(t int)
 	SetColors(fg, bg, ef color)
 	String() string
 }
 
-func (s *ansiSet) SetColors(fg, bg, ef color) {
+func (a *ansiSet) SetColors(fg, bg, ef color) {
 	fg = fg
 	bg = bg
 	ef = ef
 }
 
 type ansiSet struct {
-	Func func()
+	Func func() string
 	fg   color
 	bg   color
 	ef   color
 }
 
-func (a *AnsiSet) info() string {
+func (a *ansiSet) info() string {
 	return fmt.Sprintf("fg: %v, bg: %v, ef %v", a.fg, a.bg, a.ef)
 }
 
-func (a *AnsiSet) String() string {
-	return fmt.Sprintf(FMTansiSet, a.fg, a.bg, a.ef)
+func (a *ansiSet) String() string {
+	// return fmt.Sprintf(FMTansiSet, a.fg, a.bg, a.ef)
+	return a.Func()
 }
 
 // todo - create a pool of stringbuilders that can go when ready?
