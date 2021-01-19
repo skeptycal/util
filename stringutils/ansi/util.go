@@ -14,6 +14,8 @@ func SetupCLI(a *AnsiSet) {
 	fmt.Print(a.String())
 }
 
+func DefaultAnsiSet() *AnsiSet { return NewAnsiSet(DefaultForeground, DefaultBackground, Normal) }
+
 // APrint prints a basic ansi string based on the
 // variadic argument list of bytes
 func APrint(a ...byte) { fmt.Print(BuildAnsi(a...)) }

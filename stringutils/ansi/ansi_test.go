@@ -11,7 +11,7 @@ import (
 var testWriter = NewANSIWriter(os.Stdout)
 
 func ExampleSetupCLI() {
-	SetupCLI(&DefaultAnsiSet)
+	SetupCLI(DefaultAnsiSet())
 	// Output:
 	// c[39;49;0m
 }
@@ -19,7 +19,7 @@ func ExampleSetupCLI() {
 func TestNewANSIWriter2(t *testing.T) {
 	want := &AnsiWriter{
 		*bufio.NewWriter(os.Stdout),
-		&DefaultAnsiSet,
+		DefaultAnsiSet(),
 	}
 	got := NewANSIWriter(os.Stdout)
 	t.Run("NewANSIWriter test", func(t *testing.T) {
@@ -29,7 +29,7 @@ func TestNewANSIWriter2(t *testing.T) {
 	})
 	want = &AnsiWriter{
 		*bufio.NewWriter(os.Stdout),
-		&DefaultAnsiSet,
+		DefaultAnsiSet(),
 	}
 	got = NewANSIWriter(nil)
 	t.Run("NewANSIWriter test", func(t *testing.T) {
@@ -40,7 +40,7 @@ func TestNewANSIWriter2(t *testing.T) {
 	})
 	want = &AnsiWriter{
 		*bufio.NewWriter(os.Stdout),
-		&DefaultAnsiSet,
+		DefaultAnsiSet(),
 	}
 	got = NewANSIWriter(want)
 	t.Run("NewANSIWriter test", func(t *testing.T) {
@@ -51,7 +51,7 @@ func TestNewANSIWriter2(t *testing.T) {
 	})
 	want = &AnsiWriter{
 		*bufio.NewWriter(os.Stdout),
-		&DefaultAnsiSet,
+		DefaultAnsiSet(),
 	}
 	fakeFile, _ := os.Open("/tmp")
 	got = NewANSIWriter(fakeFile)
@@ -170,7 +170,7 @@ func Test_itoa(t *testing.T) {
 func TestAnsiWriter_Wrap(t *testing.T) {
 	type fields struct {
 		Writer bufio.Writer
-		ansi   AnsiSet
+		ansi   *AnsiSet
 	}
 	type args struct {
 		s string
@@ -181,13 +181,13 @@ func TestAnsiWriter_Wrap(t *testing.T) {
 		args   args
 	}{
 		// TODO: Add test cases.
-		{"Wrap: smoke test", fields{*bufio.NewWriter(os.Stdout), DefaultAnsiSet}, args{""}},
+		{"Wrap: smoke test", fields{*bufio.NewWriter(os.Stdout), DefaultAnsiSet()}, args{""}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			a := &AnsiWriter{
 				Writer: tt.fields.Writer,
-				ansi:   &tt.fields.ansi,
+				ansi:   tt.fields.ansi,
 			}
 			a.Wrap(tt.args.s)
 		})
@@ -196,10 +196,12 @@ func TestAnsiWriter_Wrap(t *testing.T) {
 
 func TestAnsiWriter_Build(t *testing.T) {
 	devNull, _ := os.Open("/dev/null")
+
 	type fields struct {
 		Writer bufio.Writer
-		ansi   AnsiSet
+		ansi   *AnsiSet
 	}
+
 	type args struct {
 		b []byte
 	}
@@ -209,14 +211,15 @@ func TestAnsiWriter_Build(t *testing.T) {
 		args   args
 	}{
 		// TODO: Add test cases.
-		{"Wrap: smoke test", fields{*bufio.NewWriter(defaultioWriter), DefaultAnsiSet}, args{[]byte{33, 44, 1}}},
-		{"Wrap: smoke test", fields{*bufio.NewWriter(devNull), DefaultAnsiSet}, args{[]byte{33, 44, 1}}},
+		{"Wrap: smoke test", fields{*bufio.NewWriter(DefaultioWriter), DefaultAnsiSet()}, args{[]byte{33, 44, 1}}},
+		{"Wrap: smoke test", fields{*bufio.NewWriter(devNull), DefaultAnsiSet()}, args{[]byte{33, 44, 1}}},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			a := &AnsiWriter{
 				Writer: tt.fields.Writer,
-				ansi:   &tt.fields.ansi,
+				ansi:   tt.fields.ansi,
 			}
 			a.Build(tt.args.b...)
 		})
@@ -250,7 +253,7 @@ func TestAnsiWriter_SetColors(t *testing.T) {
 	t.Run("SetColors", func(t *testing.T) {
 		a := &AnsiWriter{
 			Writer: *bufio.NewWriter(os.Stdout),
-			ansi:   &DefaultAnsiSet,
+			ansi:   DefaultAnsiSet(),
 		}
 		a.SetColors(&AnsiSet{35, 45, 7})
 	})
