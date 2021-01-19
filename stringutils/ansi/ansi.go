@@ -12,10 +12,31 @@ import (
 	"strings"
 )
 
-type color = byte
-type ansiTypes = map[string]string
+// const (
+// 	fmtBasic  string = "\x1b[%vm"
+// 	fmtBright string = "\x1b[1;%vm"
+// 	fmtDim    string = "\x1b[2;%vm"
+// 	fmt256FG  string = "\x1b[38;5;%vm"
+// 	fmt256BG  string = "\x1b[48;5;%vm"
+// 	fmt24FG   string = "\x1b[38;2;%v;%v;%vm"
+// 	fmt24BG   string = "\x1b[48;2;%v;%v;%vm"
+// )
 
-var types ansiTypes = ansiTypes{
+var (
+	DefaultioWriter io.Writer = os.Stdout
+
+	// Reset Effects; Default Foreground; Default Background
+	AnsiResetString string = BuildAnsi(DefaultForeground, DefaultBackground, Normal)
+)
+
+type color = byte
+type colorDepth  struct{
+    name string
+    fmt string
+    colorfunc func()
+}
+
+var types = [string]colorDepth{
 	"fmtBasic":  "\x1b[%vm",
 	"fmtBright": "\x1b[1;%vm",
 	"fmtDim":    "\x1b[2;%vm",
@@ -25,32 +46,19 @@ var types ansiTypes = ansiTypes{
 	"fmt24BG":   "\x1b[48;2;%v;%v;%vm",
 }
 
-const (
-	fmtBasic  string = "\x1b[%vm"
-	fmtBright string = "\x1b[1;%vm"
-	fmtDim    string = "\x1b[2;%vm"
-	fmt256FG  string = "\x1b[38;5;%vm"
-	fmt256BG  string = "\x1b[48;5;%vm"
-	fmt24FG   string = "\x1b[38;2;%v;%v;%vm"
-	fmt24BG   string = "\x1b[48;2;%v;%v;%vm"
-)
+var colorfuncs = map[string]func{
 
-var (
-	DefaultioWriter io.Writer = os.Stdout
-	a               ANSI      = NewANSIWriter(DefaultioWriter)
+}
 
-	// Reset Effects; Default Foreground; Default Background
-	AnsiResetString string = BuildAnsi(DefaultForeground, DefaultBackground, Normal)
-)
-
-func NewAnsiSet(fg, bg, ef color) *AnsiSet {
-	return &AnsiSet{fg, bg, ef}
+func NewAnsiSet(depth string, fg, bg, ef color) *AnsiSet {
+	return &AnsiSet{depth, fg, bg, ef}
 }
 
 type AnsiSet struct {
-	fg color
-	bg color
-	ef color
+	depth string
+	fg    color
+	bg    color
+	ef    color
 }
 
 func (a *AnsiSet) info() string {
