@@ -52,11 +52,13 @@ default:
 */
 
 func NewAnsiSet(depth ansiStyle, fg, bg, ef color) *ansiSet {
-    a := &ansiSet{}
+    a := AnsiSet()
     switch depth {
-    case ansi8bit:
+    case fmtBasic:
+        a = ansiSet{}
+    case fmt8:
         a = ansi8bit
-    case ansi24bit:
+            case fmt24:
         a = ansi24bit
     default:
         a = ansiSet{}
@@ -77,6 +79,14 @@ type AnsiSet interface {
 	Build(b ...byte) string
 }
 
+
+type ansi8   ansiSet
+
+func (a *ansi8) String() string {return a.out}
+
+type ansi24   ansiSet
+func (a *ansi24) String() string { return a.out }
+
 type ansiSet struct {
 	depth string
 	fg    string
@@ -88,8 +98,8 @@ type ansiSet struct {
 
 func (a *ansiSet) BG() string     { return a.bg }
 func (a *ansiSet) FG() string     { return a.fg }
-
-
+func (a *ansiSet) info() string { return fmt.Sprintf("fg: %v, bg: %v, ef %v", a.fg, a.bg, a.ef) }
+func (a *ansiSet) output() string { return fmt.Sprintf("%v;%v;%v", a.ef, a.fg, a.bg) }
 func (a *ansiSet) SetColors(fg, bg, ef color) {
 	o := fmt.Sprintf("%v;3%v;4%v", ef, fg&BasicMask, bg&BasicMask)
 
@@ -98,7 +108,6 @@ func (a *ansiSet) SetColors(fg, bg, ef color) {
 	a.ef = fmt.Sprintf(FMTansi, ef)
 	a.out = fmt.Sprintf(FMTansi, o)
 }
-func (a *ansiSet) output() string { return fmt.Sprintf("%v;%v;%v", a.ef, a.fg, a.bg) }
 func (a *ansiSet) SetStyle(style ansiStyle) {
 	if style == 2 {
         // 8 bit colors
@@ -112,22 +121,6 @@ func (a *ansiSet) SetStyle(style ansiStyle) {
 
 	a.depth = fmt.Sprintf(FMTansi, style)
 }
-func (a *ansiSet) info() string { return fmt.Sprintf("fg: %v, bg: %v, ef %v", a.fg, a.bg, a.ef) }
-
-
-type ansi8     ansiSet
-
-func (a *ansi8) String() string {return a.out}
-func (a *ansi8) String() string { return a.out }
-
-
-type ansi24     ansiSet
-
-func (a *ansi24) String() string {
-    return a.out
-}
-
-
 
 // todo - create a pool of stringbuilders that can go when ready?
 // type sbSync struct {
