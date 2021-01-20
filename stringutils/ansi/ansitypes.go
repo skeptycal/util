@@ -33,41 +33,35 @@ const (
 	strikeout
 )
 
-
-
 var styleFormat = map[ansiStyle]string{
-	normal: "\x1b[%v%v%m",
+	normal: "\x1b[%v%%vm",
 	ansi8bit:   "\x1b[%v8;5;%%vm",
 	ansi24bit:    "\x1b[%v8;2;%%vm",
 }
 
-func NewAnsiSet(depth ansiStyle) *ansiSetType {
-    a := ansiSetType{}
+func NewAnsiSet(depth ansiStyle) AnsiSet {
     switch depth {
     case ansi8bit:
-        a = ansiSetType(ansi8{})
+        return &ansi8{ansiSetType{depth:depth}}
     case ansi24bit:
-        a = ansiSetType(ansi24{})
+        return &ansi24{}
     default:
-        a = ansiSetType(ansiBasic{})
+        return &ansiBasic{}
     }
-
-	a.SetStyle(depth)
-return &a
 }
 
 type AnsiSet interface {
 	String() string
-	BG(c color) string
-	FG(c color) string
+	BG() string
+	FG() string
 	SetColors(fg, bg, ef color)
-	SetType(t int)
-    Build(b ...byte) string
+    SetStyle(style ansiStyle)
+    // Build(b ...byte) string
 }
 
-type ansiBasic ansiSetType
-type ansi8   ansiSetType
-type ansi24   ansiSetType
+type ansiBasic struct {ansiSetType}
+type ansi8 struct   {ansiSetType}
+type ansi24 struct   {ansiSetType}
 
 func (a *ansiBasic) String() string {return a.out}
 func (a *ansi8) String() string {return a.out}
@@ -94,7 +88,7 @@ func (a *ansiSetType) SetColors(fg, bg, ef color) {
 	a.out = fmt.Sprintf(FMTansi, o)
 }
 func (a *ansiSetType) SetStyle(style ansiStyle) {
-    a := NewAnsiSet(style)
+    a = NewAnsiSet(style).(ansiSetType)
 
 	a.depth = fmt.Sprintf(FMTansi, style)
 }
