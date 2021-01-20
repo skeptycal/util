@@ -35,23 +35,13 @@ const (
 
 
 
-var colordepth = map[string]string{
-	"fmtBasic": "\x1b[%v%v%m",
-	"fmt256":   "\x1b[%v8;5;%%vm",
-	"fmt24":    "\x1b[%v8;2;%%vm",
+var styleFormat = map[ansiStyle]string{
+	normal: "\x1b[%v%v%m",
+	ansi8bit:   "\x1b[%v8;5;%%vm",
+	ansi24bit:    "\x1b[%v8;2;%%vm",
 }
 
-/* switch time.Now().Weekday() {
-case time.Saturday:
-    fmt.Println("Today is Saturday.")
-case time.Sunday:
-    fmt.Println("Today is Sunday.")
-default:
-    fmt.Println("Today is a weekday.")
-}
-*/
-
-func NewAnsiSet(depth ansiStyle, fg, bg, ef color) *ansiSetType {
+func NewAnsiSet(depth ansiStyle) *ansiSetType {
     a := ansiSetType{}
     switch depth {
     case ansi8bit:
@@ -63,7 +53,6 @@ func NewAnsiSet(depth ansiStyle, fg, bg, ef color) *ansiSetType {
     }
 
 	a.SetStyle(depth)
-	a.SetColors(fg, bg, ef)
 return &a
 }
 
@@ -73,7 +62,7 @@ type AnsiSet interface {
 	FG(c color) string
 	SetColors(fg, bg, ef color)
 	SetType(t int)
-	Build(b ...byte) string
+    Build(b ...byte) string
 }
 
 type ansiBasic ansiSetType
@@ -85,14 +74,12 @@ func (a *ansi8) String() string {return a.out}
 func (a *ansi24) String() string { return a.out }
 
 type ansiSetType struct {
-	depth string
+	depth ansiStyle
 	fg    string
 	bg    string
 	ef    string
 	out   string
 }
-
-
 
 func (a *ansiSetType) BG() string     { return a.bg }
 func (a *ansiSetType) FG() string     { return a.fg }
@@ -107,17 +94,7 @@ func (a *ansiSetType) SetColors(fg, bg, ef color) {
 	a.out = fmt.Sprintf(FMTansi, o)
 }
 func (a *ansiSetType) SetStyle(style ansiStyle) {
-    as := NewAnsiSet(style,  a.fg , a.bg , a.ef )
-
-	if style == ansi8bit {
-        // 8 bit colors
-        a = NewAnsiSet(ansi8bits)
-		a.depth = FMT8bit
-	}
-	if style == 5 {
-		// 24 bit colors
-		a.depth = FMT24bit
-	}
+    a := NewAnsiSet(style)
 
 	a.depth = fmt.Sprintf(FMTansi, style)
 }
