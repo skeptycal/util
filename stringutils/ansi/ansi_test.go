@@ -83,14 +83,14 @@ func ExampleAPrint() {
 }
 
 func ExampleAnsiSet_String() {
-	testAnsiSet := NewAnsiSet(normal)
+	testAnsiSet := NewAnsiSet(StyleNormal)
 	fmt.Print(testAnsiSet.String())
 	// Output:
 	// [35;44;4m
 }
 
 func ExampleAnsiSet_info() {
-    testAnsiSet := NewAnsiSet(normal)
+    testAnsiSet := NewAnsiSet(StyleNormal)
     testAnsiSet.SetColors(35, 44, 4)
 	fmt.Print(testAnsiSet.String())
 	// Output:

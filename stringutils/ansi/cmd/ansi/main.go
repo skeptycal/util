@@ -7,7 +7,16 @@ import (
 )
 
 func main() {
+    a := ansi.NewAnsiSet(ansi.StyleBold)
+    a.SetColors(35,44,ansi.Bold)
+    fmt.Println(a.Info())
+    fmt.Println("a.String() before ",a.String(), "...after")
+
+
     w := ansi.NewANSIWriter(nil)
+
+
+
     w.WriteString("WriteString tests\n")
     w.Write([]byte("Write Text\n"))
 

@@ -18,32 +18,32 @@ const (
 	background fbType = 4
 )
 
-type ansiStyle byte
+type AnsiStyle byte
 
 const (
-	normal ansiStyle = iota
-	bold
-	ansi8bit
-	italics
-	underline
-	ansi24bit
-	blink
-	inverse
-	conceal
-	strikeout
+	StyleNormal AnsiStyle = iota
+	StyleBold
+	StyleAnsi8bit
+	StyleItalics
+	StyleUnderline
+	StyleAnsi24bit
+	StyleBlink
+	StyleInverse
+	StyleConceal
+	StyleStrikeout
 )
 
-var styleFormat = map[ansiStyle]string{
-	normal: "\x1b[%v%%vm",
-	ansi8bit:   "\x1b[%v8;5;%%vm",
-	ansi24bit:    "\x1b[%v8;2;%%vm",
+var styleFormat = map[AnsiStyle]string{
+	StyleNormal: "\x1b[%v%%vm",
+	StyleAnsi8bit:   "\x1b[%v8;5;%%vm",
+	StyleAnsi24bit:    "\x1b[%v8;2;%%vm",
 }
 
-func NewAnsiSet(depth ansiStyle) AnsiSet {
+func NewAnsiSet(depth AnsiStyle) AnsiSet {
     switch depth {
-    case ansi8bit:
-        return &ansi8{ansiSetType{depth:depth}}
-    case ansi24bit:
+    case StyleAnsi8bit:
+        return &ansi8{format:styleFormat[depth]}
+    case StyleAnsi24bit:
         return &ansi24{}
     default:
         return &ansiBasic{}
@@ -67,7 +67,8 @@ func (a *ansi8) String() string {return a.out}
 func (a *ansi24) String() string { return a.out }
 
 type ansiSetType struct {
-	depth ansiStyle
+    depth AnsiStyle
+    format string
 	fg    string
 	bg    string
 	ef    string

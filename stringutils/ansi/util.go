@@ -15,7 +15,7 @@ const (
 
 var (
     DefaultioWriter = os.Stdout
-    DefaultAnsiSet = NewAnsiSet(normal)
+    DefaultAnsiSet = NewAnsiSet(StyleNormal)
 )
 
 func init() {

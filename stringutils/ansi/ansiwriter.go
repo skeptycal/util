@@ -24,7 +24,7 @@ func NewANSIWriter(w io.Writer) ANSI {
 
 	return &AnsiWriter{
         *bufio.NewWriter(w),
-        NewAnsiSet(normal),
+        NewAnsiSet(StyleNormal),
     }
 }
 
