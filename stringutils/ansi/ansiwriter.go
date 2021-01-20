@@ -48,7 +48,7 @@ func (a *AnsiWriter) SetColors(s AnsiSet) {
 
 func (a *AnsiWriter) String() string {
 	// todo - add color from BuildAnsi(fg, bg, ef)
-	return fmt.Sprintf("AnsiWriter: bytes written:%v, buffer available: %v/%v)", a.Buffered(), a.Available(), a.Size())
+	return fmt.Sprintf("%sAnsiWriter: bytes written:%v, buffer available: %v/%v)", a.ansi.String(), a.Buffered(), a.Available(), a.Size())
 }
 
 // Wrap wraps the string in the default color and effects

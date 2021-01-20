@@ -19,7 +19,15 @@ func main() {
 
    w.Wrap("Wrap test\n")
 
-   w.Build(ansi.Italics, ansi.Red,ansi.YellowBackground)
+   w.Build(ansi.Italics, ansi.Red, ansi.YellowBackground)
 
    fmt.Println("Build test (should be: italic red text on yellow background")
+
+   fmt.Print("still ansi color \n")
+   fmt.Print(ansi.Reset)
+   fmt.Print("color off\n")
+
+
+
+
 }

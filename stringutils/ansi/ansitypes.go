@@ -55,7 +55,7 @@ type AnsiSet interface {
 	BG() string
 	FG() string
     SetColors(fg, bg, ef color)
-    info() string
+    Info() string
 }
 
 type ansiBasic struct {ansiSetType}
@@ -76,7 +76,7 @@ type ansiSetType struct {
 
 func (a ansiSetType) BG() string     { return a.bg }
 func (a ansiSetType) FG() string     { return a.fg }
-func (a ansiSetType) info() string { return fmt.Sprintf("fg: %v, bg: %v, ef %v", a.fg, a.bg, a.ef) }
+func (a ansiSetType) Info() string { return fmt.Sprintf("fg: %v, bg: %v, ef %v", a.fg, a.bg, a.ef) }
 func (a ansiSetType) output() string { return fmt.Sprintf("%v;%v;%v", a.ef, a.fg, a.bg) }
 func (a ansiSetType) SetColors(fg, bg, ef color) {
 	o := fmt.Sprintf("%v;3%v;4%v", ef, fg&BasicMask, bg&BasicMask)
