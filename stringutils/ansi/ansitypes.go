@@ -101,7 +101,8 @@ func (a ansiSetType) SetColors(fg, bg, ef color) {
     */
 
 
-	a.fg = fmt.Sprintf(a.format, foreground, fg&BasicMask)
+    a.fg = fmt.Sprintf(a.format, foreground, fg&BasicMask)
+    fmt.Printf("a.fg: %q\n",a.fg)
 	a.bg = fmt.Sprintf(a.format, background ,bg&BasicMask)
 	a.ef = fmt.Sprintf(FMTansi, ef)
 	o := fmt.Sprintf("%v;3%v;4%v", ef, fg&BasicMask, bg&BasicMask)
