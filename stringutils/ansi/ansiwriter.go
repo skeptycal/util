@@ -22,7 +22,7 @@ func NewANSIWriter(w io.Writer) ANSI {
 		return wr
 	}
 
-	return &AnsiWriter{*bufio.NewWriter(w), DefaultAnsiSet()}
+	return &AnsiWriter{*bufio.NewWriter(w),DefaultAnsiSet.String()}
 }
 
 type ANSI interface {

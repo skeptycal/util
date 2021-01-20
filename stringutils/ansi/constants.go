@@ -1,10 +1,5 @@
 package ansi
 
-const (
-	// Character used for HR function
-	HrChar string = "="
-)
-
 // Ansi basic color codes
 // Reference: https://en.wikipedia.org/wiki/ANSI_escape_code
 const (
@@ -26,7 +21,6 @@ const (
 
 // Format Strings for Ansi printf commands.
 const (
-	BasicMask byte = 0xF
 	// basic Ansi colors
 	FMTansi   string = "\033[%vm"
 	FMTansiFG string = "\033[3%vm"

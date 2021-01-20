@@ -13,11 +13,11 @@ const (
 	Reset          string = "\033[0m"     // Turn off all attributes
 )
 
-
+var (
+)
 
 func init() {
-     DefaultioWriter  := os.Stdout
-
+        DefaultioWriter := os.Stdout
      DefaultAnsi := NewAnsiSet(normal)
      DefaultAnsi.SetColors(Blue, YellowBackground, Bold)
 }

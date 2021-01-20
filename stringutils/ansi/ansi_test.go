@@ -11,7 +11,7 @@ import (
 var testWriter = NewANSIWriter(os.Stdout)
 
 func ExampleSetupCLI() {
-	SetupCLI(DefaultAnsiSet())
+	SetupCLI(DefaultAnsiSet)
 	// Output:
 	// c[39;49;0m
 }
@@ -19,7 +19,7 @@ func ExampleSetupCLI() {
 func TestNewANSIWriter2(t *testing.T) {
 	want := &AnsiWriter{
 		*bufio.NewWriter(os.Stdout),
-		DefaultAnsiSet(),
+		DefaultAnsiSet,
 	}
 	got := NewANSIWriter(os.Stdout)
 	t.Run("NewANSIWriter test", func(t *testing.T) {
@@ -29,7 +29,7 @@ func TestNewANSIWriter2(t *testing.T) {
 	})
 	want = &AnsiWriter{
 		*bufio.NewWriter(os.Stdout),
-		DefaultAnsiSet(),
+		DefaultAnsiSet,
 	}
 	got = NewANSIWriter(nil)
 	t.Run("NewANSIWriter test", func(t *testing.T) {
@@ -40,7 +40,7 @@ func TestNewANSIWriter2(t *testing.T) {
 	})
 	want = &AnsiWriter{
 		*bufio.NewWriter(os.Stdout),
-		DefaultAnsiSet(),
+		DefaultAnsiSet,
 	}
 	got = NewANSIWriter(want)
 	t.Run("NewANSIWriter test", func(t *testing.T) {
@@ -51,7 +51,7 @@ func TestNewANSIWriter2(t *testing.T) {
 	})
 	want = &AnsiWriter{
 		*bufio.NewWriter(os.Stdout),
-		DefaultAnsiSet(),
+		DefaultAnsiSet,
 	}
 	fakeFile, _ := os.Open("/tmp")
 	got = NewANSIWriter(fakeFile)
@@ -83,7 +83,7 @@ func ExampleAPrint() {
 }
 
 func ExampleAnsiSet_String() {
-	testAnsiSet := NewAnsiSet("",35, 44, 4)
+	testAnsiSet := NewAnsiSet(normal)
 	fmt.Print(testAnsiSet.String())
 	// Output:
 	// [35;44;4m
