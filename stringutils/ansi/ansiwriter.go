@@ -36,10 +36,10 @@ type ANSI interface {
 
 type AnsiWriter struct {
 	bufio.Writer
-	ansi *ansiSetType
+	ansi ansiSetType
 }
 
-func (a *AnsiWriter) SetColors(s *ansiSetType) {
+func (a *AnsiWriter) SetColors(s ansiSetType) {
 	a.ansi = s
 }
 
@@ -53,7 +53,7 @@ func (a *AnsiWriter) String() string {
 func (a *AnsiWriter) Wrap(s string) {
 	defer a.Writer.Flush()
 
-    a.WriteString(a.ansi.String())
+    a.WriteString(a.ansi.out)
 
 	a.WriteString(s)
 	a.WriteString(AnsiResetString)

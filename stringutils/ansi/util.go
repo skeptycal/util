@@ -14,7 +14,7 @@ func SetupCLI(a *AnsiSet) {
 	fmt.Print(a.String())
 }
 
-func DefaultAnsiSet() *AnsiSet { return NewAnsiSet(Normal,DefaultForeground, DefaultBackground, Normal) }
+func DefaultAnsiSet() AnsiSet { return NewAnsiSet(normal) }
 
 // APrint prints a basic ansi string based on the
 // variadic argument list of bytes
@@ -35,7 +35,7 @@ func BR()              { fmt.Println("") }
 // is cleared.
 //
 func Echo(fmtStringMaybe interface{}, a ...interface{}) {
-	fmt.Printf("%s", DefaultAnsiSet.String())
+	fmt.Printf("%s", DefaultAnsiSet)
 	defer fmt.Println(AnsiResetString)
 
 	// only first argument is given; cannot be a format string
