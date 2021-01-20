@@ -51,23 +51,20 @@ default:
 }
 */
 
-func NewAnsiSet(depth ansiStyle, fg, bg, ef color) *ansiSet {
-    a := AnsiSet()
+func NewAnsiSet(depth ansiStyle, fg, bg, ef color) *ansiSetType {
+    a := ansiSetType{}
     switch depth {
-    case fmtBasic:
-        a = ansiSet{}
-    case fmt8:
-        a = ansi8bit
-            case fmt24:
-        a = ansi24bit
+    case ansi8bit:
+        a := ansi8{}
+    case ansi24bit:
+        a := ansi24{}
     default:
-        a = ansiSet{}
+        a := ansiBasic{}
     }
 
-	a := &ansiSet{}
-	a.SetColorDepth(depth)
+	a.SetStyle(depth)
 	a.SetColors(fg, bg, ef)
-
+return &a
 }
 
 type AnsiSet interface {
@@ -79,15 +76,15 @@ type AnsiSet interface {
 	Build(b ...byte) string
 }
 
+type ansiBasic ansiSetType
+type ansi8   ansiSetType
+type ansi24   ansiSetType
 
-type ansi8   ansiSet
-
+func (a *ansiBasic) String() string {return a.out}
 func (a *ansi8) String() string {return a.out}
-
-type ansi24   ansiSet
 func (a *ansi24) String() string { return a.out }
 
-type ansiSet struct {
+type ansiSetType struct {
 	depth string
 	fg    string
 	bg    string
@@ -96,11 +93,12 @@ type ansiSet struct {
 }
 
 
-func (a *ansiSet) BG() string     { return a.bg }
-func (a *ansiSet) FG() string     { return a.fg }
-func (a *ansiSet) info() string { return fmt.Sprintf("fg: %v, bg: %v, ef %v", a.fg, a.bg, a.ef) }
-func (a *ansiSet) output() string { return fmt.Sprintf("%v;%v;%v", a.ef, a.fg, a.bg) }
-func (a *ansiSet) SetColors(fg, bg, ef color) {
+
+func (a *ansiSetType) BG() string     { return a.bg }
+func (a *ansiSetType) FG() string     { return a.fg }
+func (a *ansiSetType) info() string { return fmt.Sprintf("fg: %v, bg: %v, ef %v", a.fg, a.bg, a.ef) }
+func (a *ansiSetType) output() string { return fmt.Sprintf("%v;%v;%v", a.ef, a.fg, a.bg) }
+func (a *ansiSetType) SetColors(fg, bg, ef color) {
 	o := fmt.Sprintf("%v;3%v;4%v", ef, fg&BasicMask, bg&BasicMask)
 
 	a.fg = fmt.Sprintf(FMTansiFG, fg&BasicMask)
@@ -108,7 +106,7 @@ func (a *ansiSet) SetColors(fg, bg, ef color) {
 	a.ef = fmt.Sprintf(FMTansi, ef)
 	a.out = fmt.Sprintf(FMTansi, o)
 }
-func (a *ansiSet) SetStyle(style ansiStyle) {
+func (a *ansiSetType) SetStyle(style ansiStyle) {
 	if style == 2 {
         // 8 bit colors
         a = NewAnsiSet(ansi8bits)
