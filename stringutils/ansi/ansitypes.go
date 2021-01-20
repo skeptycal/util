@@ -11,7 +11,7 @@ import (
 
 type color = byte
 
-type fbType byte
+type fbType = byte
 
 const (
 	foreground fbType = 3
@@ -35,8 +35,8 @@ const (
 
 var styleFormat = map[AnsiStyle]string{
 	StyleNormal: "\x1b[%v;%%vm",
-	StyleAnsi8bit:   "\x1b[%v8;5;%%vm",
-	StyleAnsi24bit:    "\x1b[%v8;2;%%vm",
+	StyleAnsi8bit:   "\x1b[%%v;5;%%vm",
+	StyleAnsi24bit:    "\x1b[%%v;2;%%vm",
 }
 
 func NewAnsiSet(depth AnsiStyle) AnsiSet {
@@ -84,15 +84,29 @@ func (a ansiSetType) FG() string     { return a.fg }
 func (a ansiSetType) Info() string { return fmt.Sprintf("fg: %v, bg: %v, ef %v", a.fg, a.bg, a.ef) }
 func (a ansiSetType) output() string { return fmt.Sprintf("%v;%v;%v", a.ef, a.fg, a.bg) }
 func (a ansiSetType) SetColors(fg, bg, ef color) {
+    /* styleFormat:
+
+    StyleNormal: "\x1b[%v%vm",
+	StyleAnsi8bit:   "\x1b[%v8;5;%vm",
+    StyleAnsi24bit:    "\x1b[%v8;2;%vm",
+    */
 
     a.format = fmt.Sprintf(styleFormat[a.depth],a.depth)
 
+    /* a.format  varieties
+
+    StyleNormal: "\x1b[0;%%vm",
+	StyleAnsi8bit:   "\x1b[%%v;5;%%vm",
+    StyleAnsi24bit:    "\x1b[%%v;2;%%vm",
+    */
+
+
+	a.fg = fmt.Sprintf(a.format, foreground, fg&BasicMask)
+	a.bg = fmt.Sprintf(a.format, background ,bg&BasicMask)
+	a.ef = fmt.Sprintf(FMTansi, ef)
 	o := fmt.Sprintf("%v;3%v;4%v", ef, fg&BasicMask, bg&BasicMask)
 
-	a.fg = fmt.Sprintf(a.format, fg&BasicMask)
-	a.bg = fmt.Sprintf(a.format, bg&BasicMask)
-	a.ef = fmt.Sprintf(FMTansi, ef)
-	a.out = fmt.Sprintf(FMTansi, o)
+    a.out = fmt.Sprintf(a.format, o)
 }
 
 
