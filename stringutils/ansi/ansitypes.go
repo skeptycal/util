@@ -41,15 +41,25 @@ var colordepth = map[string]string{
 	"fmt24":    "\x1b[%v8;2;%%vm",
 }
 
-func NewAnsiSet(depth ansiStyle, fg, bg, ef color) *ansiSet {
+/* switch time.Now().Weekday() {
+case time.Saturday:
+    fmt.Println("Today is Saturday.")
+case time.Sunday:
+    fmt.Println("Today is Sunday.")
+default:
+    fmt.Println("Today is a weekday.")
+}
+*/
 
+func NewAnsiSet(depth ansiStyle, fg, bg, ef color) *ansiSet {
+    a := &ansiSet{}
     switch depth {
     case ansi8bit:
-        a := ansi8bit{}
-    case: ansi24bit:
-        a := ansi24bit{}
+        a = ansi8bit
+    case ansi24bit:
+        a = ansi24bit
     default:
-        a := ansiSet{}
+        a = ansiSet{}
     }
 
 	a := &ansiSet{}
