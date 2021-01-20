@@ -9,12 +9,12 @@ import (
 
 // SetupCLI clears the screen and sets the terminal
 // defaults to the given AnsiSet settings
-func SetupCLI(a *AnsiSet) {
+func SetupCLI(a AnsiSet) {
 	CLS()
 	fmt.Print(a.String())
 }
 
-func DefaultAnsiSet() AnsiSet { return NewAnsiSet(normal) }
+var DefaultAnsiSet AnsiSet  = NewAnsiSet(normal)
 
 // APrint prints a basic ansi string based on the
 // variadic argument list of bytes
@@ -35,7 +35,7 @@ func BR()              { fmt.Println("") }
 // is cleared.
 //
 func Echo(fmtStringMaybe interface{}, a ...interface{}) {
-	fmt.Printf("%s", DefaultAnsiSet)
+	fmt.Printf("%v", DefaultAnsiSet.
 	defer fmt.Println(AnsiResetString)
 
 	// only first argument is given; cannot be a format string
