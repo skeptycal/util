@@ -8,9 +8,6 @@ const (
 // Ansi basic color codes
 // Reference: https://en.wikipedia.org/wiki/ANSI_escape_code
 const (
-	DefaultAll     string = "\033[39;49m"
-	DefaultText    string = "\033[22;39m" // Normal text color and intensity
-	Reset          string = "\033[0m"     // Turn off all attributes
 	RedString      string = "\033[31m"
 	GreenString    string = "\033[32m"
 	YellowString   string = "\033[33m"

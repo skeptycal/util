@@ -7,6 +7,21 @@ import (
 	"strings"
 )
 
+const (
+    	DefaultAll     string = "\033[39;49;0m"
+	DefaultText    string = "\033[22;39m" // Normal text color and intensity
+	Reset          string = "\033[0m"     // Turn off all attributes
+)
+
+
+
+func init() {
+     DefaultioWriter  := os.Stdout
+
+     DefaultAnsi := NewAnsiSet(normal)
+     DefaultAnsi.SetColors(Blue, YellowBackground, Bold)
+}
+
 // SetupCLI clears the screen and sets the terminal
 // defaults to the given AnsiSet settings
 func SetupCLI(a AnsiSet) {
@@ -35,8 +50,8 @@ func BR()              { fmt.Println("") }
 // is cleared.
 //
 func Echo(fmtStringMaybe interface{}, a ...interface{}) {
-	fmt.Printf("%v", DefaultAnsiSet.
-	defer fmt.Println(AnsiResetString)
+	fmt.Printf("%v", DefaultAnsiSet)
+	defer fmt.Println(DefaultAll)
 
 	// only first argument is given; cannot be a format string
 	if len(a) == 0 {
