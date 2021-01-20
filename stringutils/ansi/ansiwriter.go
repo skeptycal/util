@@ -36,10 +36,10 @@ type ANSI interface {
 
 type AnsiWriter struct {
 	bufio.Writer
-	ansi *ansiSet
+	ansi *ansiSetType
 }
 
-func (a *AnsiWriter) SetColors(s *ansiSet) {
+func (a *AnsiWriter) SetColors(s *ansiSetType) {
 	a.ansi = s
 }
 

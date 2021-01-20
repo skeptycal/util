@@ -55,11 +55,11 @@ func NewAnsiSet(depth ansiStyle, fg, bg, ef color) *ansiSetType {
     a := ansiSetType{}
     switch depth {
     case ansi8bit:
-        a := ansi8{}
+        a = ansiSetType(ansi8{})
     case ansi24bit:
-        a := ansi24{}
+        a = ansiSetType(ansi24{})
     default:
-        a := ansiBasic{}
+        a = ansiSetType(ansiBasic{})
     }
 
 	a.SetStyle(depth)
