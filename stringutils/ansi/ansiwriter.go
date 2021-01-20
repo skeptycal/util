@@ -22,7 +22,10 @@ func NewANSIWriter(w io.Writer) ANSI {
 		return wr
 	}
 
-	return &AnsiWriter{*bufio.NewWriter(w),DefaultAnsiSet.String()}
+	return &AnsiWriter{
+        *bufio.NewWriter(w),
+        NewAnsiSet(normal),
+    }
 }
 
 type ANSI interface {
@@ -51,12 +54,13 @@ func (a *AnsiWriter) String() string {
 // Wrap wraps the string in the default color and effects
 // set in the AnsiWriter.
 func (a *AnsiWriter) Wrap(s string) {
+    defer	a.WriteString(DefaultAll)
+
 	defer a.Writer.Flush()
 
     a.WriteString(a.ansi.String())
 
 	a.WriteString(s)
-	a.WriteString(AnsiResetString)
 }
 
 // Build encodes a variadic list of bytes into ANSI codes

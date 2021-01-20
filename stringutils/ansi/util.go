@@ -8,18 +8,18 @@ import (
 )
 
 const (
-    	DefaultAll     string = "\033[39;49;0m"
+    DefaultAll     string = "\033[39;49;0m"
 	DefaultText    string = "\033[22;39m" // Normal text color and intensity
 	Reset          string = "\033[0m"     // Turn off all attributes
 )
 
 var (
+    DefaultioWriter = os.Stdout
+    DefaultAnsiSet = NewAnsiSet(normal)
 )
 
 func init() {
-        DefaultioWriter := os.Stdout
-     DefaultAnsi := NewAnsiSet(normal)
-     DefaultAnsi.SetColors(Blue, YellowBackground, Bold)
+     DefaultAnsiSet.SetColors(Blue, YellowBackground, Bold)
 }
 
 // SetupCLI clears the screen and sets the terminal
@@ -29,7 +29,6 @@ func SetupCLI(a AnsiSet) {
 	fmt.Print(a.String())
 }
 
-var DefaultAnsiSet AnsiSet  = NewAnsiSet(normal)
 
 // APrint prints a basic ansi string based on the
 // variadic argument list of bytes
@@ -91,10 +90,10 @@ func BuildAnsi(b ...byte) string {
 }
 
 func encodeAnsi(fb fbType, ef, c color) string {
-	if fb < foreground || fb > background {
+	if fb != foreground && fb != background {
 		fb = foreground
 	}
-	if ef < 0 || ef > 74 {
+	if  ef > 74 {
 		ef = 0
     }
 
