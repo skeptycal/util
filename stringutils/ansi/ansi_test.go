@@ -243,7 +243,7 @@ func TestNewAnsiSet(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := NewAnsiSet(Normal,tt.args.fg, tt.args.bg, tt.args.ef); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewAnsiSet("",) = %v, want %v", got, tt.want)
+				t.Errorf("NewAnsiSet("") = %v, want %v", got, tt.want)
 			}
 		})
 	}

@@ -107,7 +107,9 @@ func (a *ansiSetType) SetColors(fg, bg, ef color) {
 	a.out = fmt.Sprintf(FMTansi, o)
 }
 func (a *ansiSetType) SetStyle(style ansiStyle) {
-	if style == 2 {
+    as := NewAnsiSet(style,  a.fg , a.bg , a.ef )
+
+	if style == ansi8bit {
         // 8 bit colors
         a = NewAnsiSet(ansi8bits)
 		a.depth = FMT8bit
