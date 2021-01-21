@@ -129,5 +129,6 @@ func filecopy(src, dst string) (err error) {
                     return err
             }
         }
-        return nil
+        buf = nil
+    return nil
 }
