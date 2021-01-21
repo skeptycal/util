@@ -33,18 +33,24 @@ const (
 	StyleStrikeout
 )
 
-func NewAnsiSet(depth AnsiStyle) AnsiSet {
-    a := ansiSetType{
+func NewAnsiSet(depth AnsiStyle, fg, bg, ef color) AnsiSet {
+    a := &ansiSetType{
         depth: depth,
         format: styleFormat[depth],
     }
     switch depth {
     case StyleAnsi8bit:
-        return &ansi8{a}
+        b := &ansi8{*a}
+        b.SetColors(fg, bg, ef)
+        return b
     case StyleAnsi24bit:
-        return &ansi24{a}
+        b := &ansi24{*a}
+        b.SetColors(fg, bg, ef)
+        return b
     default:
-        return &ansiBasic{a}
+        b := &ansiBasic{*a}
+        b.SetColors(fg, bg, ef)
+        return b
     }
 }
 
@@ -105,6 +111,7 @@ type ansiBasic struct {ansiSetType}
 func (a ansiBasic) BG() string     { return fmt.Sprintf(a.format,a.bg) }
 func (a ansiBasic) FG() string     { return fmt.Sprintf(a.format,a.fg) }
 func (a ansiBasic) String() string {return a.out}
+
 // SetColors configures the ansi object according to the specified
 // ANSI set
 //
@@ -112,8 +119,8 @@ func (a ansiBasic) String() string {return a.out}
 //      depth  AnsiStyle - set in the constructor
 //      format string - copied from the styleFormat map
 //      fg, bg, ef     byte - stored from args
-//      out    string  // calculated from 'format' and
-//                          the stored bytes
+//      out    string   // made from fg() BG(), and a
+//                                  generic ansi effects string
 func (a ansiBasic) SetColors(fg, bg, ef color) {
     a.format = styleFormat[a.depth]
 
@@ -121,12 +128,11 @@ func (a ansiBasic) SetColors(fg, bg, ef color) {
 	a.bg = bg
     a.ef = ef
 
-	o := fmt.Sprintf("%v;3%v;4%v", ef, fg, bg)
+    o := fmt.Sprintf("%v;%v;%v", a.FG(), a.BG(), BuildAnsi(a.ef))
 
     a.out = fmt.Sprintf(a.format, o)
 
     fmt.Printf("fg, a.fg: %q, %q\n",fg, a.fg)
-
 }
 
 
