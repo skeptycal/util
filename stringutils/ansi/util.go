@@ -15,7 +15,6 @@ const (
 
 var (
     DefaultAnsiSet  = NewAnsiSet(StyleNormal, White, Black,Normal)
-
 )
 
 
