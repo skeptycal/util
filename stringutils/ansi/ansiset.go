@@ -7,6 +7,29 @@ import (
 	"fmt"
 )
 
+// AnsiSet implements the Ansi standard in strings. There are methods
+// to wrap strings, encode streams, and unmarshal data structures.
+//
+type AnsiSet interface {
+	String() string
+	BG() string
+	FG() string
+    SetColors(fg, bg, ef color)
+    Info() string
+    Output() string
+}
+
+// NewAnsiSet returns a new AnsiSet with the specified features.
+//
+// The type of Ansi output is determined by the 'depth' argument.
+// It can be
+//  StyleNormal (the default)
+// standard original 3/4 bit Ansi style with ranges
+// of 8 named colors. e.g.
+//  Blue, YellowBackground, Bold Green
+// or 8 bit Ansi colors (232 colors plus )
+//  StyleAnsi8bit:   "\x1b[%v8;5;%vm", // [38;5;${ID}m
+//  StyleAnsi24bit:    "\x1b[%v8;2;%vm",
 func NewAnsiSet(depth AnsiStyle, fg, bg, ef color) AnsiSet {
     a := &ansiSetType{
         depth: depth,
@@ -26,18 +49,6 @@ func NewAnsiSet(depth AnsiStyle, fg, bg, ef color) AnsiSet {
         b.SetColors(fg, bg, ef)
         return b
     }
-}
-
-
-// AnsiSet implements the Ansi standard in strings. There are methods
-// to wrap strings, encode streams, and unmarshal data structures.
-type AnsiSet interface {
-	String() string
-	BG() string
-	FG() string
-    SetColors(fg, bg, ef color)
-    Info() string
-    Output() string
 }
 
 type ansiSetType struct {
