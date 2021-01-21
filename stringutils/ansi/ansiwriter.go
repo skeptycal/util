@@ -27,7 +27,31 @@ import (
 // lock.
 //
 // Reference: /go/src/sync/rwmutex.go (go standard library)
-type ioMutex sync.RWMutex
+type ioMutex = sync.RWMutex
+
+type OnOff struct {
+    enabled bool
+    *ioMutex
+}
+
+func (o OnOff) Disable() {
+    o.Lock()
+    defer o.configLock.Unlock()
+    o.enabled = false
+}
+
+func (o OnOff) Enable() {
+    o.configLock.Lock()
+    defer o.configLock.Unlock()
+    o.enabled = true
+}
+
+func (o OnOff) Toggle() {
+    o.configLock.RLocker().Lock()
+    defer o.configLock.Unlock()
+    o.enabled = !o.enabled
+}
+
 
 var disableFormatting bool
 var formattingLock sync.RWMutex
