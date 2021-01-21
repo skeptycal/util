@@ -92,7 +92,7 @@ func ExampleAnsiSet_String() {
 func ExampleAnsiSet_Info() {
     testAnsiSet := NewAnsiSet(StyleNormal)
     testAnsiSet.SetColors(35, 44, 4)
-	fmt.Print(testAnsiSet.String())
+	fmt.Print(testAnsiSet.Info())
 	// Output:
 	// fg: 35, bg: 44, ef 4
 }

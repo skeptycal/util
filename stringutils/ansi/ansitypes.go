@@ -33,11 +33,7 @@ const (
 	StyleStrikeout
 )
 
-var styleFormat = map[AnsiStyle]string{
-	StyleNormal: "\x1b[%v;%%vm",
-	StyleAnsi8bit:   "\x1b[%%v;5;%%vm",
-	StyleAnsi24bit:    "\x1b[%%v;2;%%vm",
-}
+
 
 func NewAnsiSet(depth AnsiStyle) AnsiSet {
     a := ansiSetType{
@@ -82,25 +78,33 @@ type ansiSetType struct {
 
 func (a ansiSetType) BG() string     { return a.bg }
 func (a ansiSetType) FG() string     { return a.fg }
-func (a ansiSetType) Info() string { return fmt.Sprintf("fg: %v, bg: %v, ef %v", a.fg, a.bg, a.ef) }
+func (a ansiSetType) Info() string { return fmt.Sprint(a.out) }
 func (a ansiSetType) Output() string { return fmt.Sprintf("%v;%v;%v", a.ef, a.fg, a.bg) }
+
+var styleFormat = map[AnsiStyle]string{
+	StyleNormal: "\x1b[%v;%%vm",
+	StyleAnsi8bit:   "\x1b[%%v8;5;%%vm",
+	StyleAnsi24bit:    "\x1b[%%v8;2;%%vm",
+}
+
+// SetColors creates printable strings for each of the ansi effects
+/* styleFormat:
+
+StyleNormal:
+    "\x1b[%v%vm"
+StyleAnsi8bit:
+    "\x1b[%v8;5;%vm"
+StyleAnsi24bit:
+    "\x1b[%v8;2;%vm"
+*/
 func (a ansiSetType) SetColors(fg, bg, ef color) {
-    /* styleFormat:
-
-    StyleNormal: "\x1b[%v%vm",
-	StyleAnsi8bit:   "\x1b[%v8;5;%vm",
-    StyleAnsi24bit:    "\x1b[%v8;2;%vm",
+    // a.format  varieties
+    /*
+        StyleNormal: "\x1b[0;%%vm",
+        StyleAnsi8bit:   "\x1b[%%v;5;%%vm",
+        StyleAnsi24bit:    "\x1b[%%v;2;%%vm",
     */
-
     a.format = fmt.Sprintf(styleFormat[a.depth],"")
-
-    /* a.format  varieties
-
-    StyleNormal: "\x1b[0;%%vm",
-	StyleAnsi8bit:   "\x1b[%%v;5;%%vm",
-    StyleAnsi24bit:    "\x1b[%%v;2;%%vm",
-    */
-
 
     a.fg = fmt.Sprintf(a.format, foreground, fg&BasicMask)
     fmt.Printf("a.fg: %q\n",a.fg)
