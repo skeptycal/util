@@ -62,6 +62,7 @@ func main() {
     fmt.Println("configFile: ", configFile)
 
     filename := myfile( configFile)
+    bakfile :=filename + ".bak"
 
     contents := getFile(filename)
 
@@ -92,6 +93,9 @@ func main() {
 
     fmt.Printf("contents: \n%s\n",newContents)
 
-    err := ioutil.WriteFile(filename,newContents,0644)
+    err := ioutil.WriteFile(bacfile,newContents,0644)
+    if err != nil {
+        log.Fatal(err)
+    }
 
 }
