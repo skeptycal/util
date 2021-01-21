@@ -102,30 +102,22 @@ StyleAnsi24bit:
 
 
 type ansiBasic struct {ansiSetType}
-
+func (a ansiBasic) BG() string     { return fmt.Sprintf(a.format,a.bg) }
+func (a ansiBasic) FG() string     { return fmt.Sprintf(a.format,a.fg) }
 func (a ansiBasic) String() string {return a.out}
+// SetColors configures the ansi object according to the specified
+// ANSI set
+//
+// struct items are set in the following way:
+//     depth  AnsiStyle - set in the constructor
+    // format string - copied from the map
+    // fg, bg, ef     byte - stored from args
+    // out    string  // calculated from 'format' and the stored bytes
 func (a ansiBasic) SetColors(fg, bg, ef color) {
-    // a.format  varieties
-    /*
-        StyleNormal: "\x1b[%v%vm",
-        StyleAnsi8bit:   "\x1b[%v8;5;%vm", // [38;5;${ID}m
-        StyleAnsi24bit:    "\x1b[%%v8;2;%vm",
-
-            depth AnsiStyle
-    format string
-	fg    byte
-	bg    byte
-	ef    byte
-	out   string
-
-
-        */
     a.format = styleFormat[a.depth]
 
-
-
-    a.fg = fg&BasicMask
-	a.bg = bg&BasicMask
+    a.fg = fg
+	a.bg = bg
     a.ef = ef
 
 	o := fmt.Sprintf("%v;3%v;4%v", ef, fg, bg)
