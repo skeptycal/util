@@ -15,12 +15,9 @@ const (
 
 var (
     DefaultioWriter = os.Stdout
-    DefaultAnsiSet = NewAnsiSet(StyleNormal)
 )
 
-func init() {
-     DefaultAnsiSet.SetColors(Blue, YellowBackground, Bold)
-}
+
 
 // SetupCLI clears the screen and sets the terminal
 // defaults to the given AnsiSet settings

@@ -13,7 +13,7 @@ import (
 
 // NewANSIWriter returns a new ANSI Writer for use in terminal output.
 // If w is nil, the default (os.Stdout) is used.
-func NewANSIWriter(w io.Writer) ANSI {
+func NewAnsiWriter(w io.Writer) ANSI {
 	// if w is not a writer, use the default
 	if w == nil {
 		w = DefaultioWriter
