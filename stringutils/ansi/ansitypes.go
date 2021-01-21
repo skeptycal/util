@@ -109,10 +109,11 @@ func (a ansiBasic) String() string {return a.out}
 // ANSI set
 //
 // struct items are set in the following way:
-//     depth  AnsiStyle - set in the constructor
-    // format string - copied from the map
-    // fg, bg, ef     byte - stored from args
-    // out    string  // calculated from 'format' and the stored bytes
+//      depth  AnsiStyle - set in the constructor
+//      format string - copied from the styleFormat map
+//      fg, bg, ef     byte - stored from args
+//      out    string  // calculated from 'format' and
+//                          the stored bytes
 func (a ansiBasic) SetColors(fg, bg, ef color) {
     a.format = styleFormat[a.depth]
 
