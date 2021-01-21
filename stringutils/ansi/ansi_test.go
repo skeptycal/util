@@ -89,7 +89,7 @@ func ExampleAnsiSet_String() {
 	// [35;44;4m
 }
 
-func ExampleAnsiSet_info() {
+func ExampleAnsiSet_Info() {
     testAnsiSet := NewAnsiSet(StyleNormal)
     testAnsiSet.SetColors(35, 44, 4)
 	fmt.Print(testAnsiSet.String())

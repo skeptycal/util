@@ -60,6 +60,7 @@ type AnsiSet interface {
 	FG() string
     SetColors(fg, bg, ef color)
     Info() string
+    Output() string
 }
 
 type ansiBasic struct {ansiSetType}
@@ -82,7 +83,7 @@ type ansiSetType struct {
 func (a ansiSetType) BG() string     { return a.bg }
 func (a ansiSetType) FG() string     { return a.fg }
 func (a ansiSetType) Info() string { return fmt.Sprintf("fg: %v, bg: %v, ef %v", a.fg, a.bg, a.ef) }
-func (a ansiSetType) output() string { return fmt.Sprintf("%v;%v;%v", a.ef, a.fg, a.bg) }
+func (a ansiSetType) Output() string { return fmt.Sprintf("%v;%v;%v", a.ef, a.fg, a.bg) }
 func (a ansiSetType) SetColors(fg, bg, ef color) {
     /* styleFormat:
 
@@ -91,7 +92,7 @@ func (a ansiSetType) SetColors(fg, bg, ef color) {
     StyleAnsi24bit:    "\x1b[%v8;2;%vm",
     */
 
-    a.format = fmt.Sprintf(styleFormat[a.depth],a.depth)
+    a.format = fmt.Sprintf(styleFormat[a.depth],"")
 
     /* a.format  varieties
 
