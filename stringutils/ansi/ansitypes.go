@@ -57,11 +57,9 @@ type AnsiSet interface {
     Output() string
 }
 
-type ansiBasic struct {ansiSetType}
 type ansi8 struct   {ansiSetType}
 type ansi24 struct   {ansiSetType}
 
-func (a *ansiBasic) String() string {return a.out}
 func (a *ansi8) String() string {return a.out}
 func (a *ansi24) String() string { return a.out }
 
@@ -78,6 +76,12 @@ func (a ansiSetType) BG() string     { return fmt.Sprintf(a.format,background,a.
 func (a ansiSetType) FG() string     { return fmt.Sprintf(a.format,foreground,a.fg) }
 func (a ansiSetType) Info() string { return fmt.Sprint(a.fg) }
 func (a ansiSetType) Output() string { return fmt.Sprintf("%v;%v;%v", a.ef, a.fg, a.bg) }
+func (a ansiSetType) SetColors(fg, bg, ef color) {
+    a.fg = fg
+    a.bg = bg
+    a.ef = ef
+    // not implemented
+}
 
 var styleFormat = map[AnsiStyle]string{
 	StyleNormal: "\x1b%vm",
@@ -95,14 +99,30 @@ StyleAnsi8bit:
 StyleAnsi24bit:
     "\x1b[%v8;2;%vm"
 */
-func (a ansiSetType) SetColors(fg, bg, ef color) {
+
+
+type ansiBasic struct {ansiSetType}
+
+func (a ansiBasic) String() string {return a.out}
+func (a ansiBasic) SetColors(fg, bg, ef color) {
     // a.format  varieties
     /*
         StyleNormal: "\x1b[%v%vm",
         StyleAnsi8bit:   "\x1b[%v8;5;%vm", // [38;5;${ID}m
         StyleAnsi24bit:    "\x1b[%%v8;2;%vm",
-    */
+
+            depth AnsiStyle
+    format string
+	fg    byte
+	bg    byte
+	ef    byte
+	out   string
+
+
+        */
     a.format = styleFormat[a.depth]
+
+
 
     a.fg = fg&BasicMask
 	a.bg = bg&BasicMask
