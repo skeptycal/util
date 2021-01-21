@@ -74,15 +74,24 @@ func main() {
         os.Exit(1)
     }
 
-    fmt.Printf("Option is at: %v\n", i)
+    fmt.Printf("Option text starts at: %v\n", i)
 
-    optIndex := i + len(find)
+    optIndex := i + len(find) - 1
+
+    fmt.Printf("Option value starts at: %v\n", optIndex)
 
     optString := contents[i:i+len(find)]
     fmt.Printf("optString: %v\n", optString)
 
+    optValue := contents[optIndex] - 48
+    fmt.Printf("optValue: %v\n", optValue)
 
+    optNew := mode
 
-    // fmt.Printf("contents: \n%s\n",contents)
+    newContents := []byte(fmt.Sprintf("%v%v%v",contents[:optIndex],optNew,contents[optIndex+1:]))
+
+    fmt.Printf("contents: \n%s\n",newContents)
+
+    err := ioutil.WriteFile(filename,newContents,0644)
 
 }
