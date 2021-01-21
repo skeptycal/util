@@ -63,11 +63,6 @@ type AnsiSet interface {
     Output() string
 }
 
-type ansi24 struct   {ansiSetType}
-
-func (a *ansi8) String() string {return a.out}
-func (a *ansi24) String() string { return a.out }
-
 type ansiSetType struct {
     depth AnsiStyle
     format string
@@ -79,7 +74,7 @@ type ansiSetType struct {
 
 func (a ansiSetType) BG() string     { return fmt.Sprintf(a.format,background,a.bg) }
 func (a ansiSetType) FG() string     { return fmt.Sprintf(a.format,foreground,a.fg) }
-func (a ansiSetType) Info() string {  return fmt.Sprintf("%q;%q;%q", a.ef, a.fg, a.bg) }
+func (a ansiSetType) Info() string {  return fmt.Sprintf("fg: %q;bg: %q; ef: %q",  a.fg, a.bg,a.ef) }
 func (a ansiSetType) Output() string { return fmt.Sprintf("%v;%v;%v", a.ef, a.fg, a.bg) }
 func (a ansiSetType) SetColors(fg, bg, ef color) {
     a.fg = fg
@@ -135,9 +130,14 @@ func (a ansiBasic) SetColors(fg, bg, ef color) {
 }
 
 type ansi8 struct   {ansiSetType}
-func (a ansi8) BG() string     { return a.ansiSetType.BG()}
-func (a ansi8) FG() string     { return fmt.Sprintf(a.format,a.fg) }
+// func (a ansi8) BG() string     { return a.ansiSetType.BG()}
+// func (a ansi8) FG() string     { return fmt.Sprintf(a.format,a.fg) }
 func (a ansi8) String() string {return a.out}
+
+
+type ansi24 struct   {ansiSetType}
+
+func (a *ansi24) String() string { return a.out }
 
 // todo - create a pool of stringbuilders that can go when ready?
 // type sbSync struct {
