@@ -10,7 +10,6 @@ import (
 )
 
 const (
-
     configFile = `.dotfiles/zshrc_inc/dev_mode.zsh`
 )
 
