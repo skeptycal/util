@@ -93,7 +93,8 @@ func main() {
 
     fmt.Printf("contents: \n%s\n",newContents)
 
-    err := ioutil.WriteFile(bacfile,newContents,0644)
+
+    err := ioutil.WriteFile(bakfile,newContents,0644)
     if err != nil {
         log.Fatal(err)
     }
