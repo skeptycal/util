@@ -31,45 +31,7 @@ type ioMutex = sync.RWMutex
 
 
 
-type OnOff struct {
-    config Config
-    enabled bool
-    locker *ioMutex
-}
 
-func (o OnOff) Disable() {
-    o.locker.Lock()
-    defer o.locker.Unlock()
-    o.enabled = false
-}
-
-func (o OnOff) Enable() {
-    o.locker.Lock()
-    defer o.locker.Unlock()
-    o.enabled = true
-}
-
-func (o OnOff) Toggle() {
-    o.locker.RLocker().Lock()
-    defer o.locker.Unlock()
-    o.enabled = !o.enabled
-}
-
-
-var disableFormatting bool
-var formattingLock sync.RWMutex
-
-func DisableFormatting() {
-	formattingLock.Lock()
-	defer formattingLock.Unlock()
-	disableFormatting = true
-}
-
-func EnableFormatting() {
-	formattingLock.Lock()
-	defer formattingLock.Unlock()
-	disableFormatting = false
-}
 
 // NewAnsiWriter returns a new ANSI Writer for use in terminal output.
 // If w is nil, the default (os.Stdout) is used.
@@ -89,7 +51,7 @@ func NewAnsiWriter(w io.Writer) ANSI {
 
 	return &AnsiWriter{
         *bufio.NewWriter(w),
-        DefaultAnsiSet,
+        Config{},
     }
 }
 
@@ -104,18 +66,16 @@ type ANSI interface {
 
 type AnsiWriter struct {
     bufio.Writer
-    enable bool
-    ansi AnsiSet
-    configLock ioMutex
+    config Config
 }
 
 func (a *AnsiWriter) SetColors(s AnsiSet) {
-	a.ansi = s
+	a.config.ansi = s
 }
 
 func (a *AnsiWriter) String() string {
 	// todo - add color from BuildAnsi(fg, bg, ef)
-	return fmt.Sprintf("%sAnsiWriter: bytes written:%v, buffer available: %v/%v)", a.ansi.String(), a.Buffered(), a.Available(), a.Size())
+	return fmt.Sprintf("%sAnsiWriter: bytes written:%v, buffer available: %v/%v)", a.config.ansi.String(), a.Buffered(), a.Available(), a.Size())
 }
 
 // Wrap wraps the string in the default color and effects
@@ -125,7 +85,7 @@ func (a *AnsiWriter) Wrap(s string) {
 
 	defer a.Writer.Flush()
 
-    a.WriteString(a.ansi.String())
+    a.WriteString(a.config.ansi.String())
 
 	a.WriteString(s)
 }

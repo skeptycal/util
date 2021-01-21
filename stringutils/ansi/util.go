@@ -7,18 +7,6 @@ import (
 	"strings"
 )
 
-const (
-    DefaultAll     string = "\033[39;49;0m"
-	DefaultText    string = "\033[22;39m" // Normal text color and intensity
-	Reset          string = "\033[0m"     // Turn off all attributes
-)
-
-var (
-    DefaultAnsiSet  = NewAnsiSet(StyleNormal, White, Black,Normal)
-)
-
-
-
 // SetupCLI clears the screen and sets the terminal
 // defaults to the given AnsiSet settings.
 // The returned AnsiSet may or may not be modified

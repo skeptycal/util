@@ -11,6 +11,14 @@ import (
 	"strings"
 )
 
+
+const (
+    DefaultAll     string = "\033[39;49;0m"
+	DefaultText    string = "\033[22;39m" // Normal text color and intensity
+	Reset          string = "\033[0m"     // Turn off all attributes
+)
+
+
 const (
 	// Character used for HR function
     HrChar string = "="
@@ -20,28 +28,61 @@ const (
     MSNibbleMask byte = 0xF0
 )
 
-var config Config = Config{
-    "name": "anansi",
+type Config struct {
+    enable bool
+    ansi AnsiSet
+    enabled bool
+    configLock ioMutex
+}
+
+
+type OnOff struct {
+    config Config
+    locker *ioMutex
+}
+
+func (o *OnOff) Disable() {
+    o.locker.Lock()
+    defer o.locker.Unlock()
+    o.enabled = false
+}
+
+func (o *OnOff) Enable() {
+    o.locker.Lock()
+    defer o.locker.Unlock()
+    o.enabled = true
+}
+
+func (o *OnOff) Toggle() {
+    o.locker.RLocker().Lock()
+    defer o.locker.Unlock()
+    o.enabled = !o.enabled
+}
+
+
+
+var defaultconfig ConfigMap = ConfigMap{
+    "name": "ansi",
     "enabled": true,
     "defaultWriter": os.Stdout,
 }
+var (
+    DefaultAnsiSet  = NewAnsiSet(StyleNormal, White, Black,Normal)
+)
 
 type Any = interface{}
 
-type Config map[string]Any
-
-func (c Config) Get(key string) Any {
+type ConfigMap map[string]Any
+func (c ConfigMap) Get(key string) Any {
     if v, ok := c[key]; ok {
         return v
     }
     return nil
 }
-
-func (c Config) Set(key string, v Any) {
+func (c ConfigMap) Set(key string, v Any) {
     c[key] = v
 }
-
-func (c Config) String() string {
+func (c ConfigMap) String() string {
     if len(c) < 1 {
         return "Empty Config."
     }

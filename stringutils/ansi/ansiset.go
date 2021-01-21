@@ -18,7 +18,7 @@ const (
 	background fbType = 4
 )
 
-type AnsiStyle byte
+type AnsiStyle color
 
 const (
 	StyleNormal AnsiStyle = iota

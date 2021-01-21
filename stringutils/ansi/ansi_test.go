@@ -18,8 +18,8 @@ func ExampleSetupCLI() {
 
 func TestNewANSIWriter2(t *testing.T) {
 	want := &AnsiWriter{
-		*bufio.NewWriter(os.Stdout), true,
-		DefaultAnsiSet,
+		*bufio.NewWriter(os.Stdout),
+		Config{},
 	}
 	got := NewAnsiWriter(os.Stdout)
 	t.Run("NewAnsiWriter test", func(t *testing.T) {
