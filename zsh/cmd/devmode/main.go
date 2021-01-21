@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -99,4 +100,34 @@ func main() {
         log.Fatal(err)
     }
 
+}
+
+func filecopy(src, dst string) (err error) {
+    BUFFERSIZE := 1024
+
+    source, err := os.Open(src)
+    if err != nil {
+        return err
+    }
+    destination, err := os.Create(dst)
+    if err != nil {
+        return err
+    }
+
+
+    buf := make([]byte, BUFFERSIZE)
+    for {
+            n, err := source.Read(buf)
+            if err != nil && err != io.EOF {
+                    return err
+            }
+            if n == 0 {
+                    break
+            }
+
+            if _, err := destination.Write(buf[:n]); err != nil {
+                    return err
+            }
+        }
+        return nil
 }
