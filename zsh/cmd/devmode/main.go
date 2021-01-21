@@ -46,23 +46,26 @@ func getFile(filename string)string {
 }
 
 func main() {
-    modeFlag := flag.Int("mode",0,"mode for dev output (0-4)")
+    modeFlag := flag.Int("mode",5,"mode for dev output (0-2)")
 
     flag.Parse()
 
-    if modeFlag < 0 or modeFlag > 2 {
+    mode := *modeFlag
+
+    if mode < 0 || mode > 2 {
         flag.Usage()
+        os.Exit(1)
     }
 
+    fmt.Println("devmode - change shell dev boot mode")
     fmt.Println("configFile: ", configFile)
 
     filename := myfile( configFile)
-    fmt.Println("filename: ", filename)
 
     contents := getFile(filename)
 
 
 
-    fmt.Printf("contents: \n%s\n",contents)
+    // fmt.Printf("contents: \n%s\n",contents)
 
 }
