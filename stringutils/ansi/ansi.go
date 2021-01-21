@@ -28,39 +28,6 @@ const (
     MSNibbleMask byte = 0xF0
 )
 
-type Config struct {
-    enable bool
-    ansi AnsiSet
-    enabled bool
-    configLock ioMutex
-}
-
-
-type OnOff struct {
-    config Config
-    locker *ioMutex
-}
-
-func (o *OnOff) Disable() {
-    o.locker.Lock()
-    defer o.locker.Unlock()
-    o.enabled = false
-}
-
-func (o *OnOff) Enable() {
-    o.locker.Lock()
-    defer o.locker.Unlock()
-    o.enabled = true
-}
-
-func (o *OnOff) Toggle() {
-    o.locker.RLocker().Lock()
-    defer o.locker.Unlock()
-    o.enabled = !o.enabled
-}
-
-
-
 var defaultconfig ConfigMap = ConfigMap{
     "name": "ansi",
     "enabled": true,
@@ -71,19 +38,52 @@ var (
 )
 
 type Any = interface{}
-
 type ConfigMap map[string]Any
-func (c ConfigMap) Get(key string) Any {
-    if v, ok := c[key]; ok {
+
+// Config represents a configuration structure that can be used to configure
+// a variety of objects.
+//
+// There is an enabled flag with interface methods Enable and Disable.
+//
+// There is a map for named settings of any type.
+//
+type Config struct {
+    enable bool
+    ansi AnsiSet
+    enabled bool
+    settings ConfigMap
+    locker *ioMutex
+}
+
+func (o *Config) Disable() {
+    o.Lock(); defer o.Unlock()
+    o.enabled = false
+}
+func (o *Config) Enable() {
+    o.Lock(); defer o.Unlock()
+    o.enabled = true
+}
+func (o *Config) Lock() {
+    o.locker.Lock()
+}
+func (o *Config) Unlock() {
+    o.locker.Unlock()
+}
+func (o *Config) Get(key string) Any {
+    o.Lock(); defer o.Unlock()
+    if v, ok := o.settings[key]; ok {
         return v
     }
     return nil
 }
-func (c ConfigMap) Set(key string, v Any) {
-    c[key] = v
+func (o *Config) Set(key string, v Any) {
+    o.Lock(); defer o.Unlock()
+    o.settings[key] = v
 }
-func (c ConfigMap) String() string {
-    if len(c) < 1 {
+func (o *Config) String() string {
+    o.Lock(); defer o.Unlock()
+
+    if len(o.settings) < 1 {
         return "Empty Config."
     }
 
@@ -91,7 +91,7 @@ func (c ConfigMap) String() string {
     defer sb.Reset()
 
     // TODO - limit number of lines returned? or use Less format?
-    for k, v := range c {
+    for k, v := range o.settings {
         sb.WriteString(fmt.Sprintf(" %s: %v\n",k,v))
     }
     sb.WriteString("\n")
