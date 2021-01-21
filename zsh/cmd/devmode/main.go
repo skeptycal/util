@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"strings"
 )
 
 const (
@@ -46,7 +47,7 @@ func getFile(filename string)string {
 }
 
 func main() {
-    modeFlag := flag.Int("mode",5,"mode for dev output (0-2)")
+    modeFlag := flag.Int("mode",0,"mode for dev output (0-2)")
 
     flag.Parse()
 
@@ -63,6 +64,22 @@ func main() {
     filename := myfile( configFile)
 
     contents := getFile(filename)
+
+    find := "declare -ix SET_DEBUG=0"
+
+    i :=     strings.Index(contents, find)
+
+    if i < 0 {
+        fmt.Printf("option not found in config file: %v\n",find)
+        os.Exit(1)
+    }
+
+    fmt.Printf("Option is at: %v\n", i)
+
+    optIndex := i + len(find)
+
+    optString := contents[i:i+len(find)]
+    fmt.Printf("optString: %v\n", optString)
 
 
 
