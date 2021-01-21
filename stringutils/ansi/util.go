@@ -14,16 +14,21 @@ const (
 )
 
 var (
-    DefaultAnsiSet = NewAnsiSet(StyleNormal)
+    DefaultAnsiSet  = NewAnsiSet(StyleNormal, White, Black,Normal)
+
 )
 
 
 
 // SetupCLI clears the screen and sets the terminal
-// defaults to the given AnsiSet settings
-func SetupCLI(a AnsiSet) {
-	CLS()
-	fmt.Print(a.String())
+// defaults to the given AnsiSet settings.
+// The returned AnsiSet may or may not be modified
+// depending on the options passed.
+func SetupCLI(a AnsiSet) AnsiSet{
+    CLS()
+    fmt.Print(a)
+    fmt.Print(a.Output())
+    return a
 }
 
 

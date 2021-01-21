@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-    a := ansi.NewAnsiSet(ansi.StyleBold)
+    a := ansi.DefaultAnsiSet
     a.SetColors(35,44,ansi.Bold)
     ansi.SetupCLI(a)
     fmt.Println((a.String()))

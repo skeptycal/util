@@ -30,7 +30,7 @@ func NewAnsiWriter(w io.Writer) ANSI {
 
 	return &AnsiWriter{
         *bufio.NewWriter(w),
-        NewAnsiSet(StyleNormal),
+        DefaultAnsiSet,
     }
 }
 
