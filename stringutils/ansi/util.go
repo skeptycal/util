@@ -14,7 +14,7 @@ const (
 )
 
 var (
-    DefaultioWriter = os.Stdout
+    DefaultAnsiSet = NewAnsiSet(StyleNormal)
 )
 
 

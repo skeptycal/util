@@ -9,18 +9,24 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"os"
 )
 
-// NewANSIWriter returns a new ANSI Writer for use in terminal output.
+// NewAnsiWriter returns a new ANSI Writer for use in terminal output.
 // If w is nil, the default (os.Stdout) is used.
+//
+// // var     DefaultioWriter = os.Stdout
 func NewAnsiWriter(w io.Writer) ANSI {
-	// if w is not a writer, use the default
+	// if w is nil, use the default
 	if w == nil {
-		w = DefaultioWriter
-	}
+		w = os.Stdout
+    }
+
+    // if w is an AnsiWriter writer, reuse it
 	if wr, ok := w.(*AnsiWriter); ok {
 		return wr
 	}
+
 
 	return &AnsiWriter{
         *bufio.NewWriter(w),
