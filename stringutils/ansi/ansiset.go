@@ -1,36 +1,10 @@
 // Copyright (c) 2020 Michael Treanor
 // MIT License
 
-// Package ansi provides fast ansi escape sequence processing based on strings.Builder.
-// The standard is defined by the ECMA-48 standard "Control Functions for Coded Character Sets - Fifth Edition"
 package ansi
 
 import (
 	"fmt"
-)
-
-type color = byte
-
-type fbType = byte
-
-const (
-	foreground fbType = 3
-	background fbType = 4
-)
-
-type AnsiStyle color
-
-const (
-	StyleNormal AnsiStyle = iota
-	StyleBold
-	StyleAnsi8bit
-	StyleItalics
-	StyleUnderline
-	StyleAnsi24bit
-	StyleBlink
-	StyleInverse
-	StyleConceal
-	StyleStrikeout
 )
 
 func NewAnsiSet(depth AnsiStyle, fg, bg, ef color) AnsiSet {
@@ -54,6 +28,9 @@ func NewAnsiSet(depth AnsiStyle, fg, bg, ef color) AnsiSet {
     }
 }
 
+
+// AnsiSet implements the Ansi standard in strings. There are methods
+// to wrap strings, encode streams, and unmarshal data structures.
 type AnsiSet interface {
 	String() string
 	BG() string
@@ -144,3 +121,29 @@ func (a *ansi24) String() string { return a.out }
 // 	strings.Builder
 // 	mu sync.Mutex
 // }
+
+
+
+type color = byte
+
+type fbType = byte
+
+const (
+	foreground fbType = 3
+	background fbType = 4
+)
+
+type AnsiStyle color
+
+const (
+	StyleNormal AnsiStyle = iota
+	StyleBold
+	StyleAnsi8bit
+	StyleItalics
+	StyleUnderline
+	StyleAnsi24bit
+	StyleBlink
+	StyleInverse
+	StyleConceal
+	StyleStrikeout
+)

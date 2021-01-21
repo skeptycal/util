@@ -10,33 +10,11 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"sync"
 )
-
-// ioMutex is a reader/writer mutual exclusion lock.
-// The lock can be held by an arbitrary number of readers OR a single writer.
-// The zero value for a RWMutex is an unlocked mutex.
-//
-// A RWMutex must not be copied after first use.
-//
-// If a goroutine holds a RWMutex for reading and another goroutine might
-// call Lock, no goroutine should expect to be able to acquire a read lock
-// until the initial read lock is released. In particular, this prohibits
-// recursive read locking. This is to ensure that the lock eventually becomes
-// available; a blocked Lock call excludes new readers from acquiring the
-// lock.
-//
-// Reference: /go/src/sync/rwmutex.go (go standard library)
-type ioMutex = sync.RWMutex
-
-
-
-
 
 // NewAnsiWriter returns a new ANSI Writer for use in terminal output.
 // If w is nil, the default (os.Stdout) is used.
 //
-// // var     DefaultioWriter = os.Stdout
 func NewAnsiWriter(w io.Writer) ANSI {
 	// if w is nil, use the default
 	if w == nil {
@@ -49,6 +27,7 @@ func NewAnsiWriter(w io.Writer) ANSI {
 	}
 
 
+    // otherwise, create a new AnsiWriter from w
 	return &AnsiWriter{
         *bufio.NewWriter(w),
         Config{},
