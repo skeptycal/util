@@ -146,7 +146,11 @@ func (a *ansi24) String() string { return a.out }
 
 
 
-type color = byte
+type ansi  byte
+
+func (a *ansi) String() string {
+
+}
 
 type fbType = byte
 
@@ -155,7 +159,7 @@ const (
 	background fbType = 4
 )
 
-type AnsiStyle color
+type AnsiStyle ansi
 
 const (
 	StyleNormal AnsiStyle = iota
