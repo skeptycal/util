@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -22,7 +23,7 @@ func myfile(filename string) string {
     return path.Join(home, filename)
 }
 
-func getfile(filename string) string {
+func getFileUsingExec(filename string) string {
     cmd := exec.Command("cat", filename )
     b, err := cmd.Output()
     if err != nil {
@@ -45,12 +46,20 @@ func getFile(filename string)string {
 }
 
 func main() {
+    modeFlag := flag.Int("mode",0,"mode for dev output (0-4)")
+
+    flag.Parse()
+
+    if modeFlag < 0 or modeFlag > 2 {
+        flag.Usage()
+    }
+
     fmt.Println("configFile: ", configFile)
 
     filename := myfile( configFile)
     fmt.Println("filename: ", filename)
 
-    contents := getfile(filename)
+    contents := getFile(filename)
 
 
 
