@@ -21,15 +21,26 @@ type AnsiSet interface {
 
 // NewAnsiSet returns a new AnsiSet with the specified features.
 //
+// The fg, bg, and ef values are the defaults that are used any
+// time no other features are specified.
+//
 // The type of Ansi output is determined by the 'depth' argument.
 // It can be
 //  StyleNormal (the default)
 // standard original 3/4 bit Ansi style with ranges
 // of 8 named colors. e.g.
 //  Blue, YellowBackground, Bold Green
-// or 8 bit Ansi colors (232 colors plus )
-//  StyleAnsi8bit:   "\x1b[%v8;5;%vm", // [38;5;${ID}m
-//  StyleAnsi24bit:    "\x1b[%v8;2;%vm",
+// or 8 bit Ansi colors
+//  StyleAnsi8bit
+// This set includes 216 colors (numbered 0 - 231)
+// plus 24 grayscale shades (numbered 232 - 255)
+// They are labeled fgxxx for foreground colors and bgxxx for background
+//  fg127, bg250, bg57
+// Finally, 24 bit truecolor values can be used in most terminals
+//  StyleAnsi24bit
+// These are encoded as RGB(xxx,xxx,xxx) values. Users could also
+// implement a map of colors that can be updated, adjusted to match
+// a photo or camera view, or simply change as the sun sets.
 func NewAnsiSet(depth AnsiStyle, fg, bg, ef color) AnsiSet {
     a := &ansiSetType{
         depth: depth,
