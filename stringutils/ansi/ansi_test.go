@@ -18,7 +18,7 @@ func ExampleSetupCLI() {
 
 func TestNewANSIWriter2(t *testing.T) {
 	want := &AnsiWriter{
-		*bufio.NewWriter(os.Stdout),
+		*bufio.NewWriter(os.Stdout), true,
 		DefaultAnsiSet,
 	}
 	got := NewAnsiWriter(os.Stdout)
@@ -27,10 +27,7 @@ func TestNewANSIWriter2(t *testing.T) {
 			t.Errorf("NewAnsiWriter = %v, want %v", got.String(), want.String())
 		}
 	})
-	want = &AnsiWriter{
-		*bufio.NewWriter(os.Stdout),
-		DefaultAnsiSet,
-	}
+
 	got = NewAnsiWriter(nil)
 	t.Run("NewAnsiWriter test", func(t *testing.T) {
 
@@ -38,10 +35,7 @@ func TestNewANSIWriter2(t *testing.T) {
 			t.Errorf("NewAnsiWriter = %v, want %v", got.String(), want.String())
 		}
 	})
-	want = &AnsiWriter{
-		*bufio.NewWriter(os.Stdout),
-		DefaultAnsiSet,
-	}
+
 	got = NewAnsiWriter(want)
 	t.Run("NewAnsiWriter test", func(t *testing.T) {
 
@@ -49,10 +43,7 @@ func TestNewANSIWriter2(t *testing.T) {
 			t.Errorf("NewAnsiWriter = %v, want %v", got.String(), want.String())
 		}
 	})
-	want = &AnsiWriter{
-		*bufio.NewWriter(os.Stdout),
-		DefaultAnsiSet,
-	}
+
 	fakeFile, _ := os.Open("/tmp")
 	got = NewAnsiWriter(fakeFile)
 	t.Run("NewAnsiWriter test", func(t *testing.T) {
