@@ -1,10 +1,10 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"flag"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -50,6 +50,7 @@ func getFile(filename string)string {
 
 func main() {
     modeFlag := flag.Int("mode",0,"mode for dev output (0-3)")
+    helpFlag := flag.Bool("help",false,helpText)
 
     flag.Parse()
 
@@ -110,6 +111,11 @@ func main() {
         log.Fatal(err)
     }
 
+    err = filecopy(bakfile,"test.bak")
+    if err != nil {
+        log.Fatal(err)
+    }
+
 }
 
 func filecopy(src, dst string) (err error) {
@@ -118,7 +124,7 @@ func filecopy(src, dst string) (err error) {
         return err
     }
 
-    BUFFERSIZE := ((fi.Size() / bytes.MinRead) + 1) * bytes.MinRead
+    BUFFERSIZE := int(((fi.Size() / bytes.MinRead) + 1) * bytes.MinRead)
 
     source, err := os.Open(src)
     if err != nil {
@@ -130,22 +136,45 @@ func filecopy(src, dst string) (err error) {
         return err
     }
 
+    // buf := make([]byte, BUFFERSIZE)
 
-    buf := make([]byte, BUFFERSIZE)
 
-    for {
-        n, err := source.Read(buf)
-        if err != nil && err != io.EOF {
-                return err
-        }
-        if n == 0 {
-                break
-        }
+    rw := bufio.NewReadWriter(bufio.NewReaderSize(source, BUFFERSIZE), bufio.NewWriterSize(destination, BUFFERSIZE))
 
-        if _, err := destination.Write(buf[:n]); err != nil {
-                return err
-        }
+    n, err :=rw.WriteTo(rw)
+    if err != nil {
+        return err
     }
-        buf = nil
+
+    fmt.Printf("%v bytes written",n)
+
+
+    // for {
+    //     n, err := source.Read(buf)
+    //     if err != nil && err != io.EOF {
+    //             return err
+    //     }
+    //     if n == 0 {
+    //             break
+    //     }
+
+    //     if _, err := destination.Write(buf[:n]); err != nil {
+    //             return err
+    //     }
+    // }
+        // buf = nil
     return nil
 }
+
+
+const (
+    helpText string = `devmode - change the shell dev boot mode
+
+    mode = 0 is production mode
+
+    mode is set to non-zero for dev mode
+        1 - Show debug info and log to $LOGFILE
+        2 - #1 plus trace and run specific tests
+        3 - #2 plus display and log everything
+    `
+)
