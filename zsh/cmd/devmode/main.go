@@ -81,19 +81,19 @@ func main() {
 
 }
 
-// Reference: https://stackoverflow.com/a/52684989
-func findAllOccurrences(data []byte, searches []string) map[string][]int {
-    results := make(map[string][]int)
-    for _, search := range searches {
-        searchData := data
-        term := []byte(search)
-        for x, d := bytes.Index(searchData, term), 0; x > -1; x, d = bytes.Index(searchData, term), d+x+1 {
-            results[search] = append(results[search], x+d)
-            searchData = searchData[x+1 : ]
-        }
-    }
-    return results
-}
+// // Reference: https://stackoverflow.com/a/52684989
+// func findAllOccurrences(data []byte, searches []string) map[string][]int {
+//     results := make(map[string][]int)
+//     for _, search := range searches {
+//         searchData := data
+//         term := []byte(search)
+//         for x, d := bytes.Index(searchData, term), 0; x > -1; x, d = bytes.Index(searchData, term), d+x+1 {
+//             results[search] = append(results[search], x+d)
+//             searchData = searchData[x+1 : ]
+//         }
+//     }
+//     return results
+// }
 
 func findOccurrence(buf []byte, sub []byte) (start, end int) {
     start = bytes.Index(buf, sub)
@@ -102,6 +102,7 @@ func findOccurrence(buf []byte, sub []byte) (start, end int) {
     }
 
     end = start + len(sub) - 1
+    // fmt.Println("findocc start-end: ", string(buf[start:end]))
     return
 }
 
@@ -134,6 +135,8 @@ func changeDevMode(filename string, mode int) error {
 
     buf.WriteRune(rune(mode))
     buf.Write(contents[end+1:])
+
+    fmt.Println(buf.String())
 
 
     err = ioutil.WriteFile("test.bak",buf.Bytes(),0644)
