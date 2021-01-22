@@ -49,32 +49,27 @@ func getFile(filename string)string {
 }
 
 func main() {
-    modeFlag := flag.Int("mode",0,"mode for dev output (0-3)")
+
+    filename := myfile( configFile)
+    bakfile :=filename + ".bak"
+
+    modeFlag := flag.Int("mode",-1,"mode for dev output (0-3)")
     helpFlag := flag.Bool("help",false,helpText)
 
     flag.Parse()
 
     mode := *modeFlag
+    help := *helpFlag
+
+    if help {
+        fmt.Printf(helpText,filename)
+        os.Exit(0)
+    }
 
     if mode < 0 || mode > 2 {
         flag.Usage()
         os.Exit(1)
     }
-
-    fmt.Println(`devmode - change the shell dev boot mode
-
-    mode = 0 is production mode
-
-    mode is set to non-zero for dev mode
-        1 - Show debug info and log to $LOGFILE
-        2 - #1 plus trace and run specific tests
-        3 - #2 plus display and log everything
-    `)
-
-    fmt.Println("configFile: ", configFile)
-
-    filename := myfile( configFile)
-    bakfile :=filename + ".bak"
 
     contents := getFile(filename)
 
@@ -168,13 +163,41 @@ func filecopy(src, dst string) (err error) {
 
 
 const (
-    helpText string = `devmode - change the shell dev boot mode
+    helpText string = `DEVMODE(1)                       User Commands                      DEVMODE(1)
 
-    mode = 0 is production mode
 
-    mode is set to non-zero for dev mode
-        1 - Show debug info and log to $LOGFILE
-        2 - #1 plus trace and run specific tests
-        3 - #2 plus display and log everything
-    `
+
+NAME
+       devmode - set login script debug options
+
+SYNOPSIS
+       devmode [OPTION]...
+
+DESCRIPTION
+       Apply changes to login script options. The main option that enables the
+       dev mode is the 'mode' option. This option is stored in the devmode
+       config script:
+
+           %s
+
+       mode = 0 is production mode
+
+       mode is set to non-zero for dev mode
+          1 - Show debug info and log to $LOGFILE
+          2 - #1 plus trace and run specific tests
+          3 - #2 plus display and log everything
+
+       Mandatory  arguments  to  long  options are mandatory for short options
+       too.
+
+       -m <mode>
+              set debug mode in login script
+
+       -h, -help
+              show this help message
+
+       -l, -list
+              list all available options
+
+`
 )
