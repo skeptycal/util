@@ -113,14 +113,28 @@ func changeDevMode(filename string, mode int) error {
         return err
     }
 
-    fmt.Println(contents)
+    // fmt.Println(contents)
 
 
     find := []byte("declare -ix SET_DEBUG=0")
-    fmt.Print(find)
+    // fmt.Print(find)
 
-    fmt.Println(bytes.Split(contents, []byte(100)))
+    splitchar := []byte("d")
+    secondSplit := []byte("=")
 
+    list := bytes.Split(contents, splitchar)
+
+    for i, b := range list {
+        sublist := bytes.Split(b, secondSplit)
+        if len(sublist) > 1 {
+            fmt.Printf("%d:  %s\n\n",i,string(b))
+        for j, bb := range sublist {
+            fmt.Printf("%d:  %s\n\n",j,string(bb))
+        }
+    }
+
+        // fmt.Printf("%d :  %v\n%s\n\n",i,b,string(b))
+    }
 
     start, end := findOccurrence(contents, find)
 
