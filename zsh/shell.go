@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	log "github.com/sirupsen/logrus"
+	"github.com/skeptycal/util/stringutils/ansi"
 	. "github.com/skeptycal/util/stringutils/ansi"
 )
 
@@ -35,9 +36,10 @@ type version struct {
 }
 
 var (
-	DefaultContext = context.Background()
-	errorColor     = AnsiWriter.Build(Black, Bold, RedBackground)
-	reset          = AnsiWriter(Normal).String()
+    DefaultContext = context.Background()
+    errorColor = ansi.NewAnsiSet(0, ansi.Black, ansi.RedBackground, ansi.Bold)
+    errorWriter = ansi.NewAnsiWriter(os.Stdout)
+    errorWriter.
 )
 
 const defaultGetStdinArgs = `Example: tr lowercase to UpperCase`

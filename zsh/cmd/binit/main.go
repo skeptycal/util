@@ -8,6 +8,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 	"github.com/skeptycal/util/gofile"
+	"github.com/skeptycal/util/zsh"
 )
 
 const (
@@ -106,7 +107,7 @@ func main() {
 			continue
 		}
 
-		if extension != "" && !Contains(extList, extension) {
+		if extension != "" && !stringutils.Contains(extList, extension) {
 			baseName += "." + extension
 		}
 		log.Info("baseName: ", baseName)

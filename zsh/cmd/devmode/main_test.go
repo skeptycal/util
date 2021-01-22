@@ -22,7 +22,7 @@ BenchmarkGetFile-8            	       102792	        11759 ns/op	          632 B
 
 func BenchmarkGetFileUsingExec(b *testing.B) {
     for i := 0; i < b.N; i++ {
-        getFileUsingExec("/dev/null")
+        GetFileUsingExec("/dev/null")
     }
 }
 
@@ -47,9 +47,9 @@ func Test_getFileUsingExec(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := strings.Split(string(getFileUsingExec(tt.args.filename)), " ")[0]
+			got := strings.Split(string(GetFileUsingExec(tt.args.filename)), " ")[0]
 			if got != tt.want {
-				t.Errorf("getFileUsingExec() = %v, want %v", got, tt.want)
+				t.Errorf("GetFileUsingExec() = %v, want %v", got, tt.want)
 			}
 		})
 	}

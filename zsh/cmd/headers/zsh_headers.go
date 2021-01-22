@@ -137,9 +137,12 @@ func zshMakeMain(file string) string {
 //  license information
 //  github repository url
 func zshMakeHeader() string {
-	fmt.Sprintf(zshHeader)
+    return ""
+    // todo - this
+    // return fmt.Sprintf(zshHeader,name,description,copyright,license,url)
+
 }
 
-func SampleScript(zshSampleScriptFilename) {
-
+func SampleScript(zshSampleScriptFilename) string{
+    return ""
 }
