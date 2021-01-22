@@ -113,7 +113,14 @@ func changeDevMode(filename string, mode int) error {
         return err
     }
 
+    fmt.Println(contents)
+
+
     find := []byte("declare -ix SET_DEBUG=0")
+    fmt.Print(find)
+
+    fmt.Println(bytes.Split(contents, []byte(100)))
+
 
     start, end := findOccurrence(contents, find)
 
