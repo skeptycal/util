@@ -133,13 +133,13 @@ func changeDevMode(filename string, mode int) error {
         log.Fatal(err)
     }
 
-    buf.WriteRune(rune(mode))
+    buf.WriteRune(rune(mode+48))
     buf.Write(contents[end+1:])
 
-    fmt.Println(buf.String())
+    // fmt.Println(buf.String())
 
 
-    err = ioutil.WriteFile("test.bak",buf.Bytes(),0644)
+    err = ioutil.WriteFile(filename,buf.Bytes(),0644)
     if err != nil {
         return fmt.Errorf("error writing file %v: %v", bakfile, err)
     }
