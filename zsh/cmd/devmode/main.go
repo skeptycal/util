@@ -136,7 +136,8 @@ func changeDevMode(filename string, mode int) error {
         // fmt.Printf("%d :  %v\n%s\n\n",i,b,string(b))
     }
 
-    start, end := findOccurrence(contents, find)
+    start, end := findOccurrence(contents, splitchar)
+    fmt.Printf("%d : %d\n",start,end)
 
     if start < 0 {
         return fmt.Errorf("option not found in config file: %v",string(find))
