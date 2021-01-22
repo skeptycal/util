@@ -10,7 +10,6 @@ import (
 	"os"
 	"os/exec"
 	"path"
-	"strings"
 )
 
 const (
@@ -78,33 +77,46 @@ func main() {
 
 }
 
+// Reference: https://stackoverflow.com/a/52684989
+func findAllOccurrences(data []byte, searches []string) map[string][]int {
+    results := make(map[string][]int)
+    for _, search := range searches {
+        searchData := data
+        term := []byte(search)
+        for x, d := bytes.Index(searchData, term), 0; x > -1; x, d = bytes.Index(searchData, term), d+x+1 {
+            results[search] = append(results[search], x+d)
+            searchData = searchData[x+1 : len(searchData)]
+        }
+    }
+    return results
+}
 
-func changeDevMode(buf []byte, mode int) error {
+func findOccurrence(buf []byte, sub []byte) (start, end int) {
+    start := bytes.Index(buf, sub)
+    if start < 0 {
+        return -1,-1
+    }
 
-    find := "declare -ix SET_DEBUG=0"
+    end = start + len(sub) - 1
+    return
+}
 
-    i :=     strings.Index(contents, find)
+func changeDevMode(contents []byte, mode int) error {
 
-    if i < 0 {
-        fmt.Printf("option not found in config file: %v\n",find)
+    find := []byte("declare -ix SET_DEBUG=0")
+
+    start, end := findOccurrence(contents, find)
+
+    // i :=     strings.Index(contents, find)
+
+    if start < 0 {
+        fmt.Printf("option not found in config file: %v\n",string(find))
         os.Exit(1)
     }
 
-    // fmt.Printf("Option text starts at: %v\n", i)
+    contents[end+1] = []byte(mode)
 
-    optIndex := i + len(find) - 1
-
-    // fmt.Printf("Option value starts at: %v\n", optIndex)
-
-    optString := contents[i:i+len(find)]
-    fmt.Printf("optString: %v\n", optString)
-
-    optValue := contents[optIndex] - 48
-    fmt.Printf("optValue: %v\n", optValue)
-
-    optNew := mode
-
-    newContents := []byte(fmt.Sprintf("%v%v%v",contents[:optIndex],optNew,contents[optIndex+1:]))
+    newContents := []byte(fmt.Sprintf("%v%v%v",contents[:optIndex],mode,contents[optIndex+1:]))
 
     // fmt.Printf("contents: \n%s\n",newContents)
 
