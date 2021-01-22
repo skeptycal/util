@@ -26,26 +26,26 @@ func myfile(filename string) string {
     return path.Join(home, filename)
 }
 
-func getFileUsingExec(filename string) string {
+func getFileUsingExec(filename string) []byte {
     cmd := exec.Command("cat", filename )
     b, err := cmd.Output()
     if err != nil {
         log.Fatal(err)
-        return ""
+        return nil
     }
-    return string(b)
+    return b
 }
 
-func getFile(filename string)string {
+func getFile(filename string)[]byte {
     f, err := os.Open(filename)
     if err != nil {
-        return ""
+        return nil
     }
     b, err := ioutil.ReadAll(f)
     if err != nil {
         log.Fatal(err)
     }
-    return string(b)
+    return b
 }
 
 func main() {
@@ -66,12 +66,20 @@ func main() {
         os.Exit(0)
     }
 
-    if mode < 0 || mode > 2 {
-        flag.Usage()
-        os.Exit(1)
+    contents := getFile(filename)
+
+    // parse mode 0 .. 3
+    if mode > -1 && mode < 4 {
+        err := changeDevMode(mode)
+        if err != nil {
+            log.Fatal(err)
+        }
     }
 
-    contents := getFile(filename)
+}
+
+
+func changeDevMode(buf []byte, mode int) error {
 
     find := "declare -ix SET_DEBUG=0"
 

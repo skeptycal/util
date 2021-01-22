@@ -46,7 +46,7 @@ func Test_getFileUsingExec(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := strings.Split(getFileUsingExec(tt.args.filename), " ")[0]
+			got := strings.Split(string(getFileUsingExec(tt.args.filename)), " ")[0]
 			if got != tt.want {
 				t.Errorf("getFileUsingExec() = %v, want %v", got, tt.want)
 			}
@@ -70,7 +70,7 @@ func Test_getFile(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := strings.Split(getFile(tt.args.filename), " ")[0]
+			got := strings.Split(string(getFile(tt.args.filename)), " ")[0]
 			if got != tt.want {
 				t.Errorf("getFile() = %v, want %v", got, tt.want)
 			}
