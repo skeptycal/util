@@ -9,7 +9,8 @@ import (
 
 /* Benchmark results
 
-using exec is 232 times slower ...
+when getting file contents,
+using exec.command() is 232 times slower than native os.Open()
 and uses 14.5 times more allocations
 
 goos: darwin

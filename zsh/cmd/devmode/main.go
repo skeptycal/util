@@ -25,7 +25,11 @@ func myfile(filename string) string {
     return path.Join(home, filename)
 }
 
-func getFileUsingExec(filename string) []byte {
+// GetFileUsingExec is an alternative to getFile using exec.Command()
+// along with cmd.Output() to gather file contents.
+//
+// In benchmarks, it is ~230 times slower than os.Open() with ioutil.ReadAll()
+func GetFileUsingExec(filename string) []byte {
     cmd := exec.Command("cat", filename )
     b, err := cmd.Output()
     if err != nil {
@@ -113,7 +117,7 @@ func changeDevMode(filename string, mode int) error {
     start, end := findOccurrence(contents, find)
 
     if start < 0 {
-        return fmt.Errorf("option not found in config file: %v\n",string(find))
+        return fmt.Errorf("option not found in config file: %v",string(find))
     }
 
     buf := bytes.NewBuffer(contents[:end])
