@@ -1,3 +1,4 @@
+// Package headers creates headers for files in a repository.
 package headers
 
 import (
@@ -143,6 +144,6 @@ func zshMakeHeader() string {
 
 }
 
-func SampleScript(zshSampleScriptFilename) string{
-    return ""
-}
+// func SampleScript(zshSampleScriptFilename) string{
+//     return ""
+// }
