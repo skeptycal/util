@@ -54,7 +54,6 @@ func Test_getFileUsingExec(t *testing.T) {
 	}
 }
 
-
 func Test_getFile(t *testing.T) {
 	type args struct {
 		filename string
@@ -69,15 +68,18 @@ func Test_getFile(t *testing.T) {
 		{"main.go first word", args{"main.go"}, "package"},
 	}
 	for _, tt := range tests {
+        contents, err := getFile(tt.args.filename)
+        if err != nil {
+            t.Errorf("error opening config file: %v", err)
+        }
 		t.Run(tt.name, func(t *testing.T) {
-			got := strings.Split(string(getFile(tt.args.filename)), " ")[0]
+			got := strings.Split(string(contents), " ")[0]
 			if got != tt.want {
 				t.Errorf("getFile() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
-
 
 func Test_myfile(t *testing.T) {
 

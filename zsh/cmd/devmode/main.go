@@ -35,16 +35,18 @@ func getFileUsingExec(filename string) []byte {
     return b
 }
 
-func getFile(filename string)[]byte {
+func getFile(filename string) ([]byte,error) {
     f, err := os.Open(filename)
     if err != nil {
-        return nil
+        return nil, err
     }
+    defer f.Close()
+
     b, err := ioutil.ReadAll(f)
     if err != nil {
-        log.Fatal(err)
+        return nil, err
     }
-    return b
+    return b, nil
 }
 
 func main() {
@@ -83,14 +85,14 @@ func findAllOccurrences(data []byte, searches []string) map[string][]int {
         term := []byte(search)
         for x, d := bytes.Index(searchData, term), 0; x > -1; x, d = bytes.Index(searchData, term), d+x+1 {
             results[search] = append(results[search], x+d)
-            searchData = searchData[x+1 : len(searchData)]
+            searchData = searchData[x+1 : ]
         }
     }
     return results
 }
 
 func findOccurrence(buf []byte, sub []byte) (start, end int) {
-    start := bytes.Index(buf, sub)
+    start = bytes.Index(buf, sub)
     if start < 0 {
         return -1,-1
     }
@@ -101,18 +103,9 @@ func findOccurrence(buf []byte, sub []byte) (start, end int) {
 
 func changeDevMode(filename string, mode int) error {
 
-    contents := getFile(filename)
-    sb := bytes.Buffer{}
-    defer sb.Reset()
-
-
-
-    bakfile :=filename + ".bak"
-
-    // make a backup copy first
-    err := filecopy(filename, bakfile)
+    contents, err:= getFile(filename)
     if err != nil {
-        log.Fatal(err)
+        return err
     }
 
     find := []byte("declare -ix SET_DEBUG=0")
@@ -123,19 +116,27 @@ func changeDevMode(filename string, mode int) error {
         return fmt.Errorf("option not found in config file: %v\n",string(find))
     }
 
-    sb.Write(contents[:end])
-    sb.WriteRune(rune(mode))
-    sb.Write(contents[end+1:])
+    buf := bytes.NewBuffer(contents[:end])
+    defer buf.Reset()
 
 
-    // write to bak file first
-    err := ioutil.WriteFile(bakfile,sb.Bytes(),0644)
+    bakfile :=filename + ".bak"
+
+    // make a backup copy first
+    err = filecopy(filename, bakfile)
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    buf.WriteRune(rune(mode))
+    buf.Write(contents[end+1:])
+
+
+    err = ioutil.WriteFile("test.bak",buf.Bytes(),0644)
     if err != nil {
         return fmt.Errorf("error writing file %v: %v", bakfile, err)
     }
-
-
-
+    return nil
 }
 
 func filecopy(src, dst string) (err error) {
