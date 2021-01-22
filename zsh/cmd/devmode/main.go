@@ -50,7 +50,6 @@ func getFile(filename string)[]byte {
 func main() {
 
     filename := myfile( configFile)
-    bakfile :=filename + ".bak"
 
     modeFlag := flag.Int("mode",-1,"mode for dev output (0-3)")
     helpFlag := flag.Bool("help",false,helpText)
@@ -65,11 +64,10 @@ func main() {
         os.Exit(0)
     }
 
-    contents := getFile(filename)
 
     // parse mode 0 .. 3
     if mode > -1 && mode < 4 {
-        err := changeDevMode(mode)
+        err := changeDevMode(filename, mode)
         if err != nil {
             log.Fatal(err)
         }
@@ -101,35 +99,42 @@ func findOccurrence(buf []byte, sub []byte) (start, end int) {
     return
 }
 
-func changeDevMode(contents []byte, mode int) error {
+func changeDevMode(filename string, mode int) error {
+
+    contents := getFile(filename)
+    sb := bytes.Buffer{}
+    defer sb.Reset()
+
+
+
+    bakfile :=filename + ".bak"
+
+    // make a backup copy first
+    err := filecopy(filename, bakfile)
+    if err != nil {
+        log.Fatal(err)
+    }
 
     find := []byte("declare -ix SET_DEBUG=0")
 
     start, end := findOccurrence(contents, find)
 
-    // i :=     strings.Index(contents, find)
-
     if start < 0 {
-        fmt.Printf("option not found in config file: %v\n",string(find))
-        os.Exit(1)
+        return fmt.Errorf("option not found in config file: %v\n",string(find))
     }
 
-    contents[end+1] = []byte(mode)
-
-    newContents := []byte(fmt.Sprintf("%v%v%v",contents[:optIndex],mode,contents[optIndex+1:]))
-
-    // fmt.Printf("contents: \n%s\n",newContents)
+    sb.Write(contents[:end])
+    sb.WriteRune(rune(mode))
+    sb.Write(contents[end+1:])
 
 
-    err := ioutil.WriteFile(bakfile,newContents,0644)
+    // write to bak file first
+    err := ioutil.WriteFile(bakfile,sb.Bytes(),0644)
     if err != nil {
-        log.Fatal(err)
+        return fmt.Errorf("error writing file %v: %v", bakfile, err)
     }
 
-    err = filecopy(bakfile,"test.bak")
-    if err != nil {
-        log.Fatal(err)
-    }
+
 
 }
 
