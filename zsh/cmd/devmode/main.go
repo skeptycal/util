@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
 	"io"
@@ -48,7 +49,7 @@ func getFile(filename string)string {
 }
 
 func main() {
-    modeFlag := flag.Int("mode",0,"mode for dev output (0-2)")
+    modeFlag := flag.Int("mode",0,"mode for dev output (0-3)")
 
     flag.Parse()
 
@@ -59,7 +60,16 @@ func main() {
         os.Exit(1)
     }
 
-    fmt.Println("devmode - change shell dev boot mode")
+    fmt.Println(`devmode - change the shell dev boot mode
+
+    mode = 0 is production mode
+
+    mode is set to non-zero for dev mode
+        1 - Show debug info and log to $LOGFILE
+        2 - #1 plus trace and run specific tests
+        3 - #2 plus display and log everything
+    `)
+
     fmt.Println("configFile: ", configFile)
 
     filename := myfile( configFile)
@@ -76,11 +86,11 @@ func main() {
         os.Exit(1)
     }
 
-    fmt.Printf("Option text starts at: %v\n", i)
+    // fmt.Printf("Option text starts at: %v\n", i)
 
     optIndex := i + len(find) - 1
 
-    fmt.Printf("Option value starts at: %v\n", optIndex)
+    // fmt.Printf("Option value starts at: %v\n", optIndex)
 
     optString := contents[i:i+len(find)]
     fmt.Printf("optString: %v\n", optString)
@@ -92,7 +102,7 @@ func main() {
 
     newContents := []byte(fmt.Sprintf("%v%v%v",contents[:optIndex],optNew,contents[optIndex+1:]))
 
-    fmt.Printf("contents: \n%s\n",newContents)
+    // fmt.Printf("contents: \n%s\n",newContents)
 
 
     err := ioutil.WriteFile(bakfile,newContents,0644)
@@ -103,12 +113,18 @@ func main() {
 }
 
 func filecopy(src, dst string) (err error) {
-    BUFFERSIZE := 1024
+    fi, err := os.Stat(src)
+    if err != nil {
+        return err
+    }
+
+    BUFFERSIZE := ((fi.Size() / bytes.MinRead) + 1) * bytes.MinRead
 
     source, err := os.Open(src)
     if err != nil {
         return err
     }
+
     destination, err := os.Create(dst)
     if err != nil {
         return err
@@ -116,19 +132,20 @@ func filecopy(src, dst string) (err error) {
 
 
     buf := make([]byte, BUFFERSIZE)
-    for {
-            n, err := source.Read(buf)
-            if err != nil && err != io.EOF {
-                    return err
-            }
-            if n == 0 {
-                    break
-            }
 
-            if _, err := destination.Write(buf[:n]); err != nil {
-                    return err
-            }
+    for {
+        n, err := source.Read(buf)
+        if err != nil && err != io.EOF {
+                return err
         }
+        if n == 0 {
+                break
+        }
+
+        if _, err := destination.Write(buf[:n]); err != nil {
+                return err
+        }
+    }
         buf = nil
     return nil
 }
