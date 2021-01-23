@@ -2,11 +2,11 @@ package ascii
 
 import "fmt"
 
-// ToAscii returns the string with non-ascii characters escaped.
+// ToASCII returns the string with non-ascii characters escaped.
 // This converts any non-ASCII characters to their respective
 // Unicode escape sequence (in ASCII characters).
 //  e.g. ToAscii("Θ") returns "\u0398"
-func ToAscii(s string) string {
+func ToASCII(s string) string {
 	return fmt.Sprintf("%+s", s)
 }
 
@@ -21,4 +21,19 @@ func Quoted(s string) string {
 //  e.g. Hexed() returns -0x1.23abcp+20
 func Hexed(v interface{}) string {
 	return fmt.Sprintf("%x", v)
+}
+
+// Binned returns a number in binary notation (with decimal power of two exponent),
+//  e.g. Binned() returns -0x1.23abcp+20
+func Binned(v interface{}) string {
+    switch v := v.(type) {
+    case bool:
+        return fmt.Sprintf("%t", v)
+    case  int,int8, int16, int32, int64, uint8, uint16, uint32, uint:
+        return fmt.Sprintf("%b", v)
+    case float32, float64:
+        return fmt.Sprintf("%b", v)
+    default:
+        return fmt.Sprintf("%b", v)
+    }
 }
