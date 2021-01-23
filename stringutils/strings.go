@@ -24,7 +24,22 @@ func IsAlpha(c byte) bool {
 	return false
 }
 
+func IsAlphaSwitch(c byte) bool {
+    switch  {
+    case c>'a' && c<'z':
+        return true
+
+    case c>'A' && c<'Z':
+        return true
+    case c>'0' && c<'9':
+        return true
+    default:
+        return false
+    }
+}
+
 func IsAlphaNum(c byte) bool {
+
 	if (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') {
 		return true
 	}

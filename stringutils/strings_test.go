@@ -10,11 +10,26 @@ package strings
 
 import "testing"
 
+/* Benchmark results
+BenchmarkIsWhiteSpace-8    	923692542	         1.29 ns/op	       0 B/op	       0 allocs/op
+BenchmarkIsAlphaSwitch-8   	639313898	         1.88 ns/op	       0 B/op	       0 allocs/op
+BenchmarkIsAlphaNum-8      	780350467	         1.54 ns/op	       0 B/op	       0 allocs/op
+BenchmarkIsAlpha-8         	972538683	         1.28 ns/op	       0 B/op	       0 allocs/op
+BenchmarkIsDigit-8         	935870430	         1.37 ns/op	       0 B/op	       0 allocs/op
+*/
 func BenchmarkIsWhiteSpace(b *testing.B) {
     for i := 0; i < b.N; i++ {
-        IsWhiteSpace('A')
-        IsWhiteSpace('0')
-        IsWhiteSpace('\n')
+        IsWhiteSpace(65) // A
+        IsWhiteSpace(48) // 0
+        IsWhiteSpace(12) // \n
+    }
+}
+
+func BenchmarkIsAlphaSwitch(b *testing.B) {
+    for i := 0; i < b.N; i++ {
+        IsAlphaSwitch(65) // A
+        IsAlphaSwitch(48) // 0
+        IsAlphaSwitch(12) // \n
     }
 }
 
@@ -108,6 +123,40 @@ func TestIsAlpha(t *testing.T) {
 	}
 }
 
+
+func TestIsDigit(t *testing.T) {
+	type args struct {
+		c byte
+	}
+	tests := []struct {
+		args args
+		want bool
+	}{
+        // TODO: Add test cases.
+        { args{'\n'}, false},
+        { args{'\t'}, false},
+        { args{'\r'}, false},
+        { args{'\v'}, false},
+        { args{'\f'}, false},
+        { args{' '}, false},
+        { args{'A'}, false},
+        { args{'c'}, false},
+        { args{'0'}, true},
+        { args{'7'}, true},
+        { args{'='}, false},
+        { args{'?'}, false},
+        { args{'/'}, false},
+        { args{'%'}, false},
+	}
+	for _, tt := range tests {
+		t.Run(string(tt.args.c), func(t *testing.T) {
+			if got := IsDigit(tt.args.c); got != tt.want {
+				t.Errorf("IsDigit() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestIsAlphaNum(t *testing.T) {
 	type args struct {
 		c byte
@@ -141,7 +190,7 @@ func TestIsAlphaNum(t *testing.T) {
 	}
 }
 
-func TestIsDigit(t *testing.T) {
+func TestIsAlphaNum(t *testing.T) {
 	type args struct {
 		c byte
 	}
@@ -156,8 +205,8 @@ func TestIsDigit(t *testing.T) {
         { args{'\v'}, false},
         { args{'\f'}, false},
         { args{' '}, false},
-        { args{'A'}, false},
-        { args{'c'}, false},
+        { args{'A'}, true},
+        { args{'c'}, true},
         { args{'0'}, true},
         { args{'7'}, true},
         { args{'='}, false},
@@ -167,8 +216,8 @@ func TestIsDigit(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(string(tt.args.c), func(t *testing.T) {
-			if got := IsDigit(tt.args.c); got != tt.want {
-				t.Errorf("IsDigit() = %v, want %v", got, tt.want)
+			if got := IsAlphaNum(tt.args.c); got != tt.want {
+				t.Errorf("IsAlphaNum() = %v, want %v", got, tt.want)
 			}
 		})
 	}
