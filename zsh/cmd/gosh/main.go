@@ -9,6 +9,11 @@ import (
 	"strings"
 )
 
+func prompt() string {
+    return `
+ ➜ `
+}
+
 func main() {
 
     fmt.Println("gosh - the go shell")
@@ -21,16 +26,25 @@ func main() {
             log.Fatal(err)
         }
 
+        read = strings.TrimSpace(read)
+
         args := strings.Split(read, " ")
 
-        exec.Command(args)
+        cmd := exec.Command(args[0],args[1:]...)
 
-        n, err := fmt.Println(read)
+        buf, err := cmd.CombinedOutput()
         if err != nil {
             log.Fatal(err)
         }
 
-        fmt.Printf(" (%d bytes written)\n>",n)
+        out := string(buf)
+
+        n, err := fmt.Println(out)
+        if err != nil {
+            log.Fatal(err)
+        }
+
+        fmt.Printf(" (%d bytes written)\n%x",n,prompt())
 
     }
 }
