@@ -11,11 +11,11 @@ package strings
 import "testing"
 
 /* Benchmark results
-BenchmarkIsWhiteSpace-8    	923692542	         1.29 ns/op	       0 B/op	       0 allocs/op
-BenchmarkIsAlphaSwitch-8   	639313898	         1.88 ns/op	       0 B/op	       0 allocs/op
-BenchmarkIsAlphaNum-8      	780350467	         1.54 ns/op	       0 B/op	       0 allocs/op
-BenchmarkIsAlpha-8         	972538683	         1.28 ns/op	       0 B/op	       0 allocs/op
-BenchmarkIsDigit-8         	935870430	         1.37 ns/op	       0 B/op	       0 allocs/op
+BenchmarkIsWhiteSpace-8    	957675391	         1.31 ns/op	       0 B/op	       0 allocs/op
+BenchmarkIsAlphaSwitch-8   	644505457	         1.84 ns/op	       0 B/op	       0 allocs/op
+BenchmarkIsAlphaNum-8      	773480662	         1.54 ns/op	       0 B/op	       0 allocs/op
+BenchmarkIsAlpha-8         	977785057	         1.23 ns/op	       0 B/op	       0 allocs/op
+BenchmarkIsDigit-8         	944950424	         1.25 ns/op	       0 B/op	       0 allocs/op
 */
 func BenchmarkIsWhiteSpace(b *testing.B) {
     for i := 0; i < b.N; i++ {
@@ -190,7 +190,7 @@ func TestIsAlphaNum(t *testing.T) {
 	}
 }
 
-func TestIsAlphaNum(t *testing.T) {
+func TestIsIsAlphaSwitch(t *testing.T) {
 	type args struct {
 		c byte
 	}
@@ -216,8 +216,8 @@ func TestIsAlphaNum(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(string(tt.args.c), func(t *testing.T) {
-			if got := IsAlphaNum(tt.args.c); got != tt.want {
-				t.Errorf("IsAlphaNum() = %v, want %v", got, tt.want)
+			if got := IsAlphaSwitch(tt.args.c); got != tt.want {
+				t.Errorf("IsAlphaSwitch() = %v, want %v", got, tt.want)
 			}
 		})
 	}

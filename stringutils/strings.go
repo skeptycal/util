@@ -26,12 +26,11 @@ func IsAlpha(c byte) bool {
 
 func IsAlphaSwitch(c byte) bool {
     switch  {
-    case c>'a' && c<'z':
+    case c>='a' && c<='z':
         return true
-
-    case c>'A' && c<'Z':
+    case c>='A' && c<='Z':
         return true
-    case c>'0' && c<'9':
+    case c>='0' && c<='9':
         return true
     default:
         return false
