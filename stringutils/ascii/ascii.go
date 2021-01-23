@@ -78,8 +78,12 @@ func ToOctal(v interface{}) string {
     }
 }
 
-// ToBinary returns a number in binary notation (with decimal power of two exponent),
-//  e.g. Binned() returns -0x1.23abcp+20
+// ToBinary returns a value (int, float, bool, nil) in hexadecimal
+// notation. Any nil value is returned as zero. Rune and byte types are already uint32 and uint8, respectively, by definition.
+// Other types return 'NaN'
+//
+// exponents are powers of two
+//  e.g. ToBinary() returns -0x1.23abcp+20
 func ToBinary(v interface{}) string {
     switch v := v.(type) {
     case nil:

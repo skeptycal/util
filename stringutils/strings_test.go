@@ -10,6 +10,38 @@ package strings
 
 import "testing"
 
+func BenchmarkIsWhiteSpace(b *testing.B) {
+    for i := 0; i < b.N; i++ {
+        IsWhiteSpace('A')
+        IsWhiteSpace('0')
+        IsWhiteSpace('\n')
+    }
+}
+
+func BenchmarkIsAlphaNum(b *testing.B) {
+    for i := 0; i < b.N; i++ {
+        IsAlphaNum('A')
+        IsAlphaNum('0')
+        IsAlphaNum('\n')
+    }
+}
+
+func BenchmarkIsAlpha(b *testing.B) {
+    for i := 0; i < b.N; i++ {
+        IsAlpha('A')
+        IsAlpha('0')
+        IsAlpha('\n')
+    }
+}
+
+func BenchmarkIsDigit(b *testing.B) {
+    for i := 0; i < b.N; i++ {
+        IsDigit('A')
+        IsDigit('0')
+        IsDigit('\n')
+    }
+}
+
 func TestIsWhiteSpace(t *testing.T) {
 	type args struct {
 		c rune

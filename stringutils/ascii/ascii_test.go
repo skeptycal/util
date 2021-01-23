@@ -141,9 +141,9 @@ func TestToBinary(t *testing.T) {
 		want string
 	}{
         // TODO: Add test cases.
-		{"1.234", args{1.234}, "0x1.3be76c8b43958p+00"},
-		{"2.43e22", args{2.43e22}, "0x1.49538f9945421p+74"},
-		{"0.00000008", args{0.00000008}, "0x1.5798ee2308c3ap-24"},
+		{"1.234", args{1.234}, "5557441940175192p-52"},
+		{"2.43e22", args{2.43e22}, "5793571472167969p+22"},
+		{"0.00000008", args{0.00000008}, "6044629098073146p-76"},
 		{"2", args{2}, "10"},
 		{"17", args{17}, "10001"},
 		{"100", args{100}, "1100100"},
@@ -152,14 +152,14 @@ func TestToBinary(t *testing.T) {
 		{"1000000000", args{1000000000}, "111011100110101100101000000000"},
 		{"32767", args{32767}, "111111111111111"},
 		{"1e12", args{1e12}, "8192000000000000p-13"},
-		{"-0x1.23abcp+20", args{-0x1.23abcp+20}, "5131128709054464p-32"},
-		{"nil", args{nil}, "0x0"},
+		{"-0x1.23abcp+20", args{-0x1.23abcp+20}, "-5131128709054464p-32"},
+		{"nil", args{nil}, "0b0"},
 		{"empty slice", args{[]byte{}}, "NaN"},
 		{"slice", args{[]byte{50}}, "NaN"},
 		{"map", args{make(map[int]int)}, "NaN"},
 		{"map", args{make(map[int]int, 4)}, "NaN"},
-		{"true", args{true}, "0x1"},
-		{"false", args{false}, "0x0"},
+		{"true", args{true}, "0b1"},
+		{"false", args{false}, "0b0"},
 		{"string", args{"string"}, "NaN"},
 	}
 	for _, tt := range tests {
