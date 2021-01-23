@@ -28,7 +28,7 @@ func BenchmarkGetFileUsingExec(b *testing.B) {
 
 func BenchmarkGetFile(b *testing.B) {
     for i := 0; i < b.N; i++ {
-        getFile("/dev/null")
+        GetFile("/dev/null")
     }
 }
 
@@ -69,14 +69,14 @@ func Test_getFile(t *testing.T) {
 		{"main.go first word", args{"main.go"}, "package"},
 	}
 	for _, tt := range tests {
-        contents, err := getFile(tt.args.filename)
+        contents, err := GetFile(tt.args.filename)
         if err != nil {
             t.Errorf("error opening config file: %v", err)
         }
 		t.Run(tt.name, func(t *testing.T) {
 			got := strings.Split(string(contents), " ")[0]
 			if got != tt.want {
-				t.Errorf("getFile() = %v, want %v", got, tt.want)
+				t.Errorf("GetFile() = %v, want %v", got, tt.want)
 			}
 		})
 	}

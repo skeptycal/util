@@ -25,7 +25,7 @@ func myfile(filename string) string {
     return path.Join(home, filename)
 }
 
-// GetFileUsingExec is an alternative to getFile using exec.Command()
+// GetFileUsingExec is an alternative to GetFile using exec.Command()
 // along with cmd.Output() to gather file contents.
 //
 // In benchmarks, it is ~230 times slower than os.Open() with ioutil.ReadAll()
@@ -39,7 +39,7 @@ func GetFileUsingExec(filename string) []byte {
     return b
 }
 
-func getFile(filename string) (string,error) {
+func GetFile(filename string) (string,error) {
     f, err := os.Open(filename)
     if err != nil {
         return "", err
@@ -95,7 +95,9 @@ func main() {
 //     return results
 // }
 
-func findOccurrence(buf,sub string) (start, end int) {
+// FindOccurrence find the start and end of the first occurrence of
+// sub in buf and returns the string positions.
+func FindOccurrence(buf,sub string) (start, end int) {
     start = strings.Index(buf, sub)
 
     if start < 0 {
@@ -109,7 +111,7 @@ func findOccurrence(buf,sub string) (start, end int) {
 // ChangeCharAfter finds the first occurrence of 'find' in 'content' and
 // replaces one character with 'replace'
 func ChangeCharAfter(content, find, replace string) (string, error){
-    start, end := findOccurrence(content, find)
+    start, end := FindOccurrence(content, find)
     if start < 0 {
         return "", fmt.Errorf("option not found in config file: %v",string(find))
     }
@@ -123,32 +125,35 @@ func ChangeCharAfter(content, find, replace string) (string, error){
     return sb.String(), nil
 }
 
+// changeDevMode changes the debug 'DEV' mode in the .zshrc utility file
+// named in the constant configFile to 'mode'
+//
+// values of mode may be 0 - 3
 func changeDevMode(filename string, mode int) error {
 
-    contents, err:= getFile(filename)
+    // get file
+    contents, err:= GetFile(filename)
     if err != nil {
-        return err
+        return fmt.Errorf("error reading file %v: %v", filename, err)
     }
 
+    // change contents
     find := "declare -ix SET_DEBUG="
     contents, err = ChangeCharAfter(contents,find,fmt.Sprintf("%d",mode))
     if err != nil {
-        return err
+        return fmt.Errorf("error changing contents of file %v: %v", filename, err)
     }
 
     // make a backup copy
     err = filecopy(filename, filename+".bak")
     if err != nil {
-        log.Fatal(err)
+        return fmt.Errorf("error copying backup file %v: %v", filename + ".bak", err)
     }
 
     // write new file
-    fmt.Println(contents)
-
-
-    err = ioutil.WriteFile("test.bak",[]byte(contents),0644)
+    err = ioutil.WriteFile(filename,[]byte(contents),0644)
     if err != nil {
-        return fmt.Errorf("error writing file %v: %v", bakfile, err)
+        return fmt.Errorf("error writing file %v: %v", filename, err)
     }
     return nil
 }
