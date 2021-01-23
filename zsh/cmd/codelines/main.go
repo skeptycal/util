@@ -14,7 +14,6 @@ func main() {
     if err != nil {
         log.Fatal(err)
     }
-
     err = filepath.Walk(pwd,
         func(path string, info os.FileInfo, err error) error {
             if err != nil {
