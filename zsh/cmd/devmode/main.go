@@ -50,7 +50,7 @@ func getFile(filename string) ([]byte,error) {
     if err != nil {
         return nil, err
     }
-    return b, nil
+    return string(b), nil
 }
 
 func main() {
@@ -102,7 +102,7 @@ func findOccurrence(buf []byte, sub []byte) (start, end int) {
     }
 
     end = start + len(sub) - 1
-    // fmt.Println("findocc start-end: ", string(buf[start:end]))
+    fmt.Println("findocc start-end: ", string(buf[start:end]))
     return
 }
 
@@ -115,9 +115,11 @@ func changeDevMode(filename string, mode int) error {
 
     // fmt.Println(contents)
 
-
     find := []byte("declare -ix SET_DEBUG=0")
     // fmt.Print(find)
+
+    i := bytes.Index(contents, find)
+    fmt.Printf("Index: %d\n",i)
 
     splitchar := []byte("d")
     secondSplit := []byte("=")
@@ -128,10 +130,10 @@ func changeDevMode(filename string, mode int) error {
         sublist := bytes.Split(b, secondSplit)
         if len(sublist) > 1 {
             fmt.Printf("%d:  %s\n\n",i,string(b))
-        for j, bb := range sublist {
-            fmt.Printf("%d:  %s\n\n",j,string(bb))
+            for j, bb := range sublist {
+                fmt.Printf("%d:  %s\n\n",j,string(bb))
+            }
         }
-    }
 
         // fmt.Printf("%d :  %v\n%s\n\n",i,b,string(b))
     }
@@ -161,10 +163,10 @@ func changeDevMode(filename string, mode int) error {
     // fmt.Println(buf.String())
 
 
-    err = ioutil.WriteFile(filename,buf.Bytes(),0644)
-    if err != nil {
-        return fmt.Errorf("error writing file %v: %v", bakfile, err)
-    }
+    // err = ioutil.WriteFile("test.bak",buf.Bytes(),0644)
+    // if err != nil {
+    //     return fmt.Errorf("error writing file %v: %v", bakfile, err)
+    // }
     return nil
 }
 
