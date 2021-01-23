@@ -97,12 +97,12 @@ func main() {
 
 func findOccurrence(buf,sub string) (start, end int) {
     start = strings.Index(buf, sub)
+
     if start < 0 {
         return -1,-1
     }
 
-    end = start + len(sub) - 1
-    fmt.Println("findocc start-end: ", string(buf[start:end]))
+    end = start + len(sub)
     return
 }
 
@@ -113,10 +113,8 @@ func changeDevMode(filename string, mode int) error {
         return err
     }
 
-    find := "declare -ix SET_DEBUG=0"
-
+    find := "declare -ix SET_DEBUG="
     start, end := findOccurrence(contents, find)
-    fmt.Printf("%d : %d\n",start,end)
 
     if start < 0 {
         return fmt.Errorf("option not found in config file: %v",string(find))
