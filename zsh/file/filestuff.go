@@ -82,38 +82,32 @@ func ChangeCharAfter(content, find, replace string) (string, error){
 
 // FileCopy copies the contents of src to dst using a buffered ReadWriter.
 // Creates or truncates the dst. If dst already exists, it is truncated.
-func FileCopy(src, dst string) (n int, err error) {
+func FileCopy(src, dst string) ( int,  error) {
     fi, err := os.Stat(src)
     if err != nil {
-        return err
+        return 0,err
     }
 
     BUFFERSIZE := int(((fi.Size() / bytes.MinRead) + 1) * bytes.MinRead)
 
     source, err := os.Open(src)
     if err != nil {
-        return err
+        return 0,err
     }
 
     destination, err := os.Create(dst)
     if err != nil {
-        return err
+        return 0,err
     }
-
-    // buf := make([]byte, BUFFERSIZE)
-
 
     rw := bufio.NewReadWriter(bufio.NewReaderSize(source, BUFFERSIZE), bufio.NewWriterSize(destination, BUFFERSIZE))
 
     n, err :=rw.WriteTo(rw)
     if err != nil {
-        return err
+        return  int(n),err
     }
 
-    fmt.Printf("%v bytes written",n)
-
-
-    return nil
+    return int(n), nil
 }
 
 // // Reference: https://stackoverflow.com/a/52684989

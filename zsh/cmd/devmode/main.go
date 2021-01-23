@@ -62,7 +62,7 @@ func changeDevMode(filename string, mode int) error {
     }
 
     // make a backup copy
-    err = file.FileCopy(filename, filename+".bak")
+    n, err := file.FileCopy(filename, filename+".bak")
     if err != nil {
         return fmt.Errorf("error copying backup file %v: %v", filename + ".bak", err)
     }
@@ -72,6 +72,9 @@ func changeDevMode(filename string, mode int) error {
     if err != nil {
         return fmt.Errorf("error writing file %v: %v", filename, err)
     }
+
+    fmt.Printf("%v bytes written\n",n)
+
     return nil
 }
 
