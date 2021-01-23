@@ -20,20 +20,51 @@ func Quoted(s string) string {
 // Hexed returns a number in hexadecimal notation (with decimal power of two exponent),
 //  e.g. Hexed() returns -0x1.23abcp+20
 func Hexed(v interface{}) string {
-	return fmt.Sprintf("%x", v)
+        switch v := v.(type) {
+    case nil:
+        return "0o0"
+    case bool:
+        if v {
+            return "0o1"
+        }
+        return "0o0"
+    case  int,int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, float32, float64:
+    return fmt.Sprintf("%x", v)
+    default:
+        return "NaN"
+    }
 }
 
-// Binned returns a number in binary notation (with decimal power of two exponent),
-//  e.g. Binned() returns -0x1.23abcp+20
-func Binned(v interface{}) string {
+func ToOctal(v interface{}) string {
     switch v := v.(type) {
+    case nil:
+        return "0o0"
     case bool:
-        return fmt.Sprintf("%t", v)
-    case  int,int8, int16, int32, int64, uint8, uint16, uint32, uint:
-        return fmt.Sprintf("%b", v)
-    case float32, float64:
+        if v {
+            return "0o1"
+        }
+        return "0o0"
+    case  int,int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, float32, float64:
+        return fmt.Sprintf("%O", v)
+    default:
+        return "NaN"
+    }
+}
+
+// ToBinary returns a number in binary notation (with decimal power of two exponent),
+//  e.g. Binned() returns -0x1.23abcp+20
+func ToBinary(v interface{}) string {
+    switch v := v.(type) {
+    case nil:
+        return "0b0"
+    case bool:
+        if v {
+            return "0b1"
+        }
+        return "0b0"
+    case  int,int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, float32, float64:
         return fmt.Sprintf("%b", v)
     default:
-        return fmt.Sprintf("%b", v)
+        return "NaN"
     }
 }
