@@ -5,6 +5,8 @@ import (
 	"path"
 	"strings"
 	"testing"
+
+	"github.com/skeptycal/util/zsh/file"
 )
 
 /* Benchmark results
@@ -22,13 +24,13 @@ BenchmarkGetFile-8            	       102792	        11759 ns/op	          632 B
 
 func BenchmarkGetFileUsingExec(b *testing.B) {
     for i := 0; i < b.N; i++ {
-        GetFileUsingExec("/dev/null")
+        file.GetFileUsingExec("/dev/null")
     }
 }
 
 func BenchmarkGetFile(b *testing.B) {
     for i := 0; i < b.N; i++ {
-        GetFile("/dev/null")
+        file.GetFile("/dev/null")
     }
 }
 
@@ -47,7 +49,7 @@ func Test_getFileUsingExec(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := strings.Split(string(GetFileUsingExec(tt.args.filename)), " ")[0]
+			got := strings.Split(string(file.GetFileUsingExec(tt.args.filename)), " ")[0]
 			if got != tt.want {
 				t.Errorf("GetFileUsingExec() = %v, want %v", got, tt.want)
 			}
@@ -69,7 +71,7 @@ func Test_getFile(t *testing.T) {
 		{"main.go first word", args{"main.go"}, "package"},
 	}
 	for _, tt := range tests {
-        contents, err := GetFile(tt.args.filename)
+        contents, err := file.GetFile(tt.args.filename)
         if err != nil {
             t.Errorf("error opening config file: %v", err)
         }
@@ -82,7 +84,7 @@ func Test_getFile(t *testing.T) {
 	}
 }
 
-func Test_myfile(t *testing.T) {
+func Test_MyFile(t *testing.T) {
 
         home, err := os.UserHomeDir()
     if err != nil {
@@ -102,8 +104,8 @@ func Test_myfile(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := myfile(tt.args.filename); got != tt.want {
-				t.Errorf("myfile() = %v, want %v", got, tt.want)
+			if got := file.MyFile(tt.args.filename); got != tt.want {
+				t.Errorf("MyFile() = %v, want %v", got, tt.want)
 			}
 		})
 	}

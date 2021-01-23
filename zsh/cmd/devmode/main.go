@@ -1,61 +1,22 @@
 package main
 
 import (
-	"bufio"
-	"bytes"
 	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
-	"os/exec"
-	"path"
-	"strings"
+
+	"github.com/skeptycal/util/zsh/file"
 )
 
 const (
     configFile = `.dotfiles/zshrc_inc/dev_mode.zsh`
 )
 
-func myfile(filename string) string {
-    home, err := os.UserHomeDir()
-    if err != nil {
-        log.Fatal(err)
-    }
-    return path.Join(home, filename)
-}
-
-// GetFileUsingExec is an alternative to GetFile using exec.Command()
-// along with cmd.Output() to gather file contents.
-//
-// In benchmarks, it is ~230 times slower than os.Open() with ioutil.ReadAll()
-func GetFileUsingExec(filename string) []byte {
-    cmd := exec.Command("cat", filename )
-    b, err := cmd.Output()
-    if err != nil {
-        log.Fatal(err)
-        return nil
-    }
-    return b
-}
-
-func GetFile(filename string) (string,error) {
-    f, err := os.Open(filename)
-    if err != nil {
-        return "", err
-    }
-    defer f.Close()
-
-    b, err := ioutil.ReadAll(f)
-    if err != nil {
-        return "", err
-    }
-    return string(b), nil
-}
-
 func main() {
 
-    filename := myfile( configFile)
+    filename := file.MyFile( configFile)
 
     modeFlag := flag.Int("mode",-1,"mode for dev output (0-3)")
     helpFlag := flag.Bool("help",false,helpText)
@@ -81,50 +42,6 @@ func main() {
 
 }
 
-// // Reference: https://stackoverflow.com/a/52684989
-// func findAllOccurrences(data []byte, searches []string) map[string][]int {
-//     results := make(map[string][]int)
-//     for _, search := range searches {
-//         searchData := data
-//         term := []byte(search)
-//         for x, d := bytes.Index(searchData, term), 0; x > -1; x, d = bytes.Index(searchData, term), d+x+1 {
-//             results[search] = append(results[search], x+d)
-//             searchData = searchData[x+1 : ]
-//         }
-//     }
-//     return results
-// }
-
-// FindOccurrence find the start and end of the first occurrence of
-// sub in buf and returns the string positions.
-func FindOccurrence(buf,sub string) (start, end int) {
-    start = strings.Index(buf, sub)
-
-    if start < 0 {
-        return -1,-1
-    }
-
-    end = start + len(sub)
-    return
-}
-
-// ChangeCharAfter finds the first occurrence of 'find' in 'content' and
-// replaces one character with 'replace'
-func ChangeCharAfter(content, find, replace string) (string, error){
-    start, end := FindOccurrence(content, find)
-    if start < 0 {
-        return "", fmt.Errorf("option not found in config file: %v",string(find))
-    }
-
-    sb := strings.Builder{}
-    defer sb.Reset()
-
-    sb.WriteString(content[:end])
-    sb.WriteString(replace)
-    sb.WriteString(content[end+1:])
-    return sb.String(), nil
-}
-
 // changeDevMode changes the debug 'DEV' mode in the .zshrc utility file
 // named in the constant configFile to 'mode'
 //
@@ -132,20 +49,20 @@ func ChangeCharAfter(content, find, replace string) (string, error){
 func changeDevMode(filename string, mode int) error {
 
     // get file
-    contents, err:= GetFile(filename)
+    contents, err:= file.GetFile(filename)
     if err != nil {
         return fmt.Errorf("error reading file %v: %v", filename, err)
     }
 
     // change contents
     find := "declare -ix SET_DEBUG="
-    contents, err = ChangeCharAfter(contents,find,fmt.Sprintf("%d",mode))
+    contents, err = file.ChangeCharAfter(contents,find,fmt.Sprintf("%d",mode))
     if err != nil {
         return fmt.Errorf("error changing contents of file %v: %v", filename, err)
     }
 
     // make a backup copy
-    err = filecopy(filename, filename+".bak")
+    err = file.FileCopy(filename, filename+".bak")
     if err != nil {
         return fmt.Errorf("error copying backup file %v: %v", filename + ".bak", err)
     }
@@ -158,53 +75,7 @@ func changeDevMode(filename string, mode int) error {
     return nil
 }
 
-func filecopy(src, dst string) (err error) {
-    fi, err := os.Stat(src)
-    if err != nil {
-        return err
-    }
 
-    BUFFERSIZE := int(((fi.Size() / bytes.MinRead) + 1) * bytes.MinRead)
-
-    source, err := os.Open(src)
-    if err != nil {
-        return err
-    }
-
-    destination, err := os.Create(dst)
-    if err != nil {
-        return err
-    }
-
-    // buf := make([]byte, BUFFERSIZE)
-
-
-    rw := bufio.NewReadWriter(bufio.NewReaderSize(source, BUFFERSIZE), bufio.NewWriterSize(destination, BUFFERSIZE))
-
-    n, err :=rw.WriteTo(rw)
-    if err != nil {
-        return err
-    }
-
-    fmt.Printf("%v bytes written",n)
-
-
-    // for {
-    //     n, err := source.Read(buf)
-    //     if err != nil && err != io.EOF {
-    //             return err
-    //     }
-    //     if n == 0 {
-    //             break
-    //     }
-
-    //     if _, err := destination.Write(buf[:n]); err != nil {
-    //             return err
-    //     }
-    // }
-        // buf = nil
-    return nil
-}
 
 
 const (
