@@ -5,28 +5,32 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/exec"
+	"strings"
 )
 
 func main() {
 
+    fmt.Println("gosh - the go shell")
+    fmt.Println("\n(type 'exit' to exit ...)\n ")
     r := bufio.NewReader(os.Stdin)
-    w := bufio.NewWriter(os.Stdout)
-
-    rw := bufio.NewReadWriter(r,w)
 
     for {
-        read, err := rw.ReadString('\n')
+        read, err := r.ReadString('\n')
         if err != nil {
             log.Fatal(err)
         }
 
-        n, err := rw.WriteString(read)
+        args := strings.Split(read, " ")
+
+        exec.Command(args)
+
+        n, err := fmt.Println(read)
         if err != nil {
             log.Fatal(err)
         }
 
-        rw.WriteString(fmt.Sprintf(" (%d bytes written) "))
-        rw.WriteString("\n")
+        fmt.Printf(" (%d bytes written)\n>",n)
 
     }
 }
