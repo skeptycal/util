@@ -10,12 +10,12 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"strings"
 )
 
 const (
     configFile = `.dotfiles/zshrc_inc/dev_mode.zsh`
 )
-
 
 func myfile(filename string) string {
     home, err := os.UserHomeDir()
@@ -39,16 +39,16 @@ func GetFileUsingExec(filename string) []byte {
     return b
 }
 
-func getFile(filename string) ([]byte,error) {
+func getFile(filename string) (string,error) {
     f, err := os.Open(filename)
     if err != nil {
-        return nil, err
+        return "", err
     }
     defer f.Close()
 
     b, err := ioutil.ReadAll(f)
     if err != nil {
-        return nil, err
+        return "", err
     }
     return string(b), nil
 }
@@ -95,8 +95,8 @@ func main() {
 //     return results
 // }
 
-func findOccurrence(buf []byte, sub []byte) (start, end int) {
-    start = bytes.Index(buf, sub)
+func findOccurrence(buf,sub string) (start, end int) {
+    start = strings.Index(buf, sub)
     if start < 0 {
         return -1,-1
     }
@@ -113,54 +113,31 @@ func changeDevMode(filename string, mode int) error {
         return err
     }
 
-    // fmt.Println(contents)
+    find := "declare -ix SET_DEBUG=0"
 
-    find := []byte("declare -ix SET_DEBUG=0")
-    // fmt.Print(find)
-
-    i := bytes.Index(contents, find)
-    fmt.Printf("Index: %d\n",i)
-
-    splitchar := []byte("d")
-    secondSplit := []byte("=")
-
-    list := bytes.Split(contents, splitchar)
-
-    for i, b := range list {
-        sublist := bytes.Split(b, secondSplit)
-        if len(sublist) > 1 {
-            fmt.Printf("%d:  %s\n\n",i,string(b))
-            for j, bb := range sublist {
-                fmt.Printf("%d:  %s\n\n",j,string(bb))
-            }
-        }
-
-        // fmt.Printf("%d :  %v\n%s\n\n",i,b,string(b))
-    }
-
-    start, end := findOccurrence(contents, splitchar)
+    start, end := findOccurrence(contents, find)
     fmt.Printf("%d : %d\n",start,end)
 
     if start < 0 {
         return fmt.Errorf("option not found in config file: %v",string(find))
     }
 
-    buf := bytes.NewBuffer(contents[:end])
-    defer buf.Reset()
+    sb := strings.Builder{}
+    defer sb.Reset()
 
+    sb.WriteString(contents[:end])
+    sb.WriteRune(rune(mode+48))
+    sb.WriteString(contents[end+1:])
 
-    bakfile :=filename + ".bak"
 
     // make a backup copy first
-    err = filecopy(filename, bakfile)
+    err = filecopy(filename, filename+".bak")
     if err != nil {
         log.Fatal(err)
     }
 
-    buf.WriteRune(rune(mode+48))
-    buf.Write(contents[end+1:])
 
-    // fmt.Println(buf.String())
+    // fmt.Println(sb.String())
 
 
     // err = ioutil.WriteFile("test.bak",buf.Bytes(),0644)
