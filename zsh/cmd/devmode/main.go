@@ -82,7 +82,8 @@ func changeDevMode(filename string, mode int) error {
 
 
 const (
-    helpText string = `DEVMODE(1)                       User Commands                      DEVMODE(1)
+    helpText string = `
+DEVMODE(1)                       User Commands                      DEVMODE(1)
 
 
 
