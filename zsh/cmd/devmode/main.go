@@ -19,25 +19,25 @@ func main() {
     filename := file.MyFile( configFile)
 
     modeFlag := flag.Int("mode",-1,"mode for dev output (0-3)")
-    helpFlag := flag.Bool("help",false,helpText)
+    helpFlag := flag.Bool("help", false, helpText)
 
     flag.Parse()
 
     mode := *modeFlag
     help := *helpFlag
 
-    if help {
-        fmt.Printf(helpText,filename)
-        os.Exit(0)
-    }
-
-
-    // parse mode 0 .. 3
     if mode > -1 && mode < 4 {
         err := changeDevMode(filename, mode)
         if err != nil {
             log.Fatal(err)
         }
+    } else {
+        help=true
+    }
+
+    if help {
+        fmt.Printf(helpText,filename)
+        os.Exit(0)
     }
 
 }
@@ -77,9 +77,6 @@ func changeDevMode(filename string, mode int) error {
 
     return nil
 }
-
-
-
 
 const (
     helpText string = `
