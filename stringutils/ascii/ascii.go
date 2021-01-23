@@ -18,7 +18,9 @@ func Quoted(s string) string {
 	return fmt.Sprintf("%q", s)
 }
 
-// Hexed returns a number in hexadecimal notation (with decimal power of two exponent),
+// Hexed returns a value (int, float, bool, nil) in hexadecimal
+// notation. Other types return 'NaN'
+// exponents are powers of two
 //  e.g. Hexed() returns -0x1.23abcp+20
 //
 // Use of lowercase is the convention based on minimal research:
@@ -56,8 +58,10 @@ func ToOctal(v interface{}) string {
             return "0o1"
         }
         return "0o0"
-    case  int,int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, float32, float64:
+    case  int,int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
         return fmt.Sprintf("%O", v)
+    case float32, float64:
+        return "float"
     default:
         return "NaN"
     }

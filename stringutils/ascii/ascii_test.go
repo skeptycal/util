@@ -76,7 +76,11 @@ func TestHexed(t *testing.T) {
 		{"1000000000", args{1000000000}, "3b9aca00"},
 		{"32767", args{32767}, "7fff"},
 		{"1e12", args{1e12}, "0x1.d1a94a2p+39"},
-		{"-0x1.23abcp+20", args{-0x1.23abcp+20}, "-0x1.23abcp+20"},
+        {"-0x1.23abcp+20", args{-0x1.23abcp+20}, "-0x1.23abcp+20"},
+        {"nil", args{nil}, "0x0"},
+        {"true", args{true}, "0x1"},
+        {"false", args{false}, "0x0"},
+        {"string", args{"string"}, "NaN"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -96,7 +100,24 @@ func TestToOctal(t *testing.T) {
 		args args
 		want string
 	}{
-		// TODO: Add test cases.
+        // TODO: Add test cases.
+		{"1.234", args{1.234}, "float"},
+		{"2.43e22", args{2.43e22}, "float"},
+		{"0.00000008", args{0.00000008}, "float"},
+		{"2", args{2}, "0o2"},
+		{"17", args{17}, "0o21"},
+		{"100", args{100}, "0o144"},
+		{"255", args{255}, "0o377"},
+		{"256", args{256}, "0o400"},
+		{"1000000000", args{1000000000}, "0o7346545000"},
+		{"32767", args{32767}, "0o77777"},
+		{"1e12", args{1e12}, "float"},
+        {"-0x1.23abcp+20", args{-0x1.23abcp+20}, "float"},
+        {"nil", args{nil}, "0o0"},
+        {"true", args{true}, "0o1"},
+        {"false", args{false}, "0o0"},
+        {"string", args{"string"}, "NaN"},
+
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
