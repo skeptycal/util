@@ -8,7 +8,7 @@
 // For information about UTF-8 strings in Go, see https://blog.golang.org/strings.
 package strings
 
-const digits = "0123456789abcdefghijklmnopqrstuvwxyz"
+// const alphanumerics = "0123456789abcdefghijklmnopqrstuvwxyz"
 
 func IsDigit(c byte) bool {
 	if c >= '0' && c <= '9' {
@@ -18,14 +18,14 @@ func IsDigit(c byte) bool {
 }
 
 func IsAlpha(c byte) bool {
-	if c >= 'a' && c <= 'z' && c >= 'A' && c <= 'Z' {
+	if (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') {
 		return true
 	}
 	return false
 }
 
 func IsAlphaNum(c byte) bool {
-	if c >= 'a' && c <= 'z' && c >= 'A' && c <= 'Z' && c >= '0' && c <= '9' {
+	if (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') {
 		return true
 	}
 	return false
