@@ -7,6 +7,8 @@ import (
 	"fmt"
 )
 
+type ansiColor = byte
+
 // AnsiSet implements the Ansi standard in strings. There are methods
 // to wrap strings, encode streams, and unmarshal data structures.
 //
@@ -14,7 +16,7 @@ type AnsiSet interface {
 	String() string
 	BG() string
 	FG() string
-    SetColors(fg, bg, ef color)
+    SetColors(fg, bg, ef ansiColor)
     Info() string
     Output() string
 }
@@ -41,7 +43,7 @@ type AnsiSet interface {
 // These are encoded as RGB(xxx,xxx,xxx) values. Users could also
 // implement a map of colors that can be updated, adjusted to match
 // a photo or camera view, or simply change as the sun sets.
-func NewAnsiSet(depth AnsiStyle, fg, bg, ef color) AnsiSet {
+func NewAnsiSet(depth AnsiStyle, fg, bg, ef ansiColor) AnsiSet {
     a := &ansiSetType{
         depth: depth,
         format: styleFormat[depth],
@@ -75,7 +77,7 @@ func (a ansiSetType) BG() string     { return fmt.Sprintf(a.format,background,a.
 func (a ansiSetType) FG() string     { return fmt.Sprintf(a.format,foreground,a.fg) }
 func (a ansiSetType) Info() string {  return fmt.Sprintf("fg: %q;bg: %q; ef: %q",  a.fg, a.bg,a.ef) }
 func (a ansiSetType) Output() string { return fmt.Sprintf("%v;%v;%v", a.ef, a.fg, a.bg) }
-func (a ansiSetType) SetColors(fg, bg, ef color) {
+func (a ansiSetType) SetColors(fg, bg, ef ansiColor) {
     a.fg = fg
     a.bg = bg
     a.ef = ef
@@ -114,7 +116,7 @@ func (a ansiBasic) String() string {return a.out}
 //      fg, bg, ef     byte - stored from args
 //      out    string   // made from fg() BG(), and a
 //                                  generic ansi effects string
-func (a ansiBasic) SetColors(fg, bg, ef color) {
+func (a ansiBasic) SetColors(fg, bg, ef ansiColor) {
     a.format = styleFormat[a.depth]
 
     a.fg = fg
@@ -144,14 +146,6 @@ func (a *ansi24) String() string { return a.out }
 // 	mu sync.Mutex
 // }
 
-
-
-type ansi  byte
-
-func (a *ansi) String() string {
-
-}
-
 type fbType = byte
 
 const (
@@ -159,7 +153,7 @@ const (
 	background fbType = 4
 )
 
-type AnsiStyle ansi
+type AnsiStyle = byte
 
 const (
 	StyleNormal AnsiStyle = iota

@@ -82,8 +82,9 @@ func (w *stringWriter) loadString() {
 // ... focus on
 //  utf8.DecodeRuneInString(s string) (r rune, size int)
 func Reverse(s string) string {
-	sb := strings.Builder{}
-	buf := sb.Link()
+    sb := strings.Builder{}
+    defer sb.Reset()
+
 	for i := len(s) - 1; i > -1; i-- {
 		sb.WriteByte(s[i])
 	}
