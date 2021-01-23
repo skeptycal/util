@@ -11,34 +11,34 @@ import (
 )
 
 const (
-    configFile = `.dotfiles/zshrc_inc/dev_mode.zsh`
+	configFile = `.dotfiles/zshrc_inc/dev_mode.zsh`
 )
 
 func main() {
 
-    filename := file.MyFile( configFile)
+	filename := file.MyFile(configFile)
 
-    modeFlag := flag.Int("mode",-1,"mode for dev output (0-3)")
-    helpFlag := flag.Bool("help", false, helpText)
+	modeFlag := flag.Int("mode", -1, "mode for dev output (0-3)")
+	helpFlag := flag.Bool("help", false, helpText)
 
-    flag.Parse()
+	flag.Parse()
 
-    mode := *modeFlag
-    help := *helpFlag
+	mode := *modeFlag
+	help := *helpFlag
 
-    if mode > -1 && mode < 4 {
-        err := changeDevMode(filename, mode)
-        if err != nil {
-            log.Fatal(err)
-        }
-    } else {
-        help=true
-    }
+	if mode > -1 && mode < 4 {
+		err := changeDevMode(filename, mode)
+		if err != nil {
+			log.Fatal(err)
+		}
+	} else {
+		help = true
+	}
 
-    if help {
-        fmt.Printf(helpText,filename)
-        os.Exit(0)
-    }
+	if help {
+		fmt.Printf(helpText, filename)
+		os.Exit(0)
+	}
 
 }
 
@@ -48,38 +48,38 @@ func main() {
 // values of mode may be 0 - 3
 func changeDevMode(filename string, mode int) error {
 
-    // get file
-    contents, err:= file.GetFile(filename)
-    if err != nil {
-        return fmt.Errorf("error reading file %v: %v", filename, err)
-    }
+	// get file
+	contents, err := file.GetFile(filename)
+	if err != nil {
+		return fmt.Errorf("error reading file %v: %v", filename, err)
+	}
 
-    // change contents
-    find := "declare -ix SET_DEBUG="
-    contents, err = file.ChangeCharAfter(contents,find,fmt.Sprintf("%d",mode))
-    if err != nil {
-        return fmt.Errorf("error changing contents of file %v: %v", filename, err)
-    }
+	// change contents
+	find := "declare -ix SET_DEBUG="
+	contents, err = file.ChangeCharAfter(contents, find, fmt.Sprintf("%d", mode))
+	if err != nil {
+		return fmt.Errorf("error changing contents of file %v: %v", filename, err)
+	}
 
-    // make a backup copy
-    n, err := file.FileCopy(filename, filename+".bak")
-    if err != nil {
-        return fmt.Errorf("error copying backup file %v: %v", filename + ".bak", err)
-    }
+	// make a backup copy
+	n, err := file.FileCopy(filename, filename+".bak")
+	if err != nil {
+		return fmt.Errorf("error copying backup file %v: %v", filename+".bak", err)
+	}
 
-    // write new file
-    err = ioutil.WriteFile(filename,[]byte(contents),0644)
-    if err != nil {
-        return fmt.Errorf("error writing file %v: %v", filename, err)
-    }
+	// write new file
+	err = ioutil.WriteFile(filename, []byte(contents), 0644)
+	if err != nil {
+		return fmt.Errorf("error writing file %v: %v", filename, err)
+	}
 
-    fmt.Printf("%v bytes written\n",n)
+	fmt.Printf("%v bytes written\n", n)
 
-    return nil
+	return nil
 }
 
 const (
-    helpText string = `
+	helpText string = `
 DEVMODE(1)                       User Commands                      DEVMODE(1)
 
 
