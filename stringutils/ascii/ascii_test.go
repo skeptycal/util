@@ -78,13 +78,16 @@ func TestHexed(t *testing.T) {
 		{"1e12", args{1e12}, "0x1.d1a94a2p+39"},
         {"-0x1.23abcp+20", args{-0x1.23abcp+20}, "-0x1.23abcp+20"},
         {"nil", args{nil}, "0x0"},
+        {"empty slice", args{[]byte{}}, "NaN"},
+        {"slice", args{[]byte{50}}, "NaN"},
+        {"map", args{make(map[int]int,4)}, "NaN"},
         {"true", args{true}, "0x1"},
         {"false", args{false}, "0x0"},
         {"string", args{"string"}, "NaN"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := Hexed(tt.args.v); got != tt.want {
+			if got := ToHex(tt.args.v); got != tt.want {
 				t.Errorf("Hexed() = %v, want %v", got, tt.want)
 			}
 		})
