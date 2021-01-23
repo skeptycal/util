@@ -106,6 +106,23 @@ func findOccurrence(buf,sub string) (start, end int) {
     return
 }
 
+// ChangeCharAfter finds the first occurrence of 'find' in 'content' and
+// replaces one character with 'replace'
+func ChangeCharAfter(content, find, replace string) (string, error){
+    start, end := findOccurrence(content, find)
+    if start < 0 {
+        return "", fmt.Errorf("option not found in config file: %v",string(find))
+    }
+
+    sb := strings.Builder{}
+    defer sb.Reset()
+
+    sb.WriteString(content[:end])
+    sb.WriteString(replace)
+    sb.WriteString(content[end+1:])
+    return sb.String(), nil
+}
+
 func changeDevMode(filename string, mode int) error {
 
     contents, err:= getFile(filename)
@@ -114,34 +131,25 @@ func changeDevMode(filename string, mode int) error {
     }
 
     find := "declare -ix SET_DEBUG="
-    start, end := findOccurrence(contents, find)
-
-    if start < 0 {
-        return fmt.Errorf("option not found in config file: %v",string(find))
+    contents, err = ChangeCharAfter(contents,find,fmt.Sprintf("%d",mode))
+    if err != nil {
+        return err
     }
 
-    sb := strings.Builder{}
-    defer sb.Reset()
-
-    sb.WriteString(contents[:end])
-    sb.WriteRune(rune(mode+48))
-    sb.WriteString(contents[end+1:])
-
-
-    // make a backup copy first
+    // make a backup copy
     err = filecopy(filename, filename+".bak")
     if err != nil {
         log.Fatal(err)
     }
 
+    // write new file
+    fmt.Println(contents)
 
-    // fmt.Println(sb.String())
 
-
-    // err = ioutil.WriteFile("test.bak",buf.Bytes(),0644)
-    // if err != nil {
-    //     return fmt.Errorf("error writing file %v: %v", bakfile, err)
-    // }
+    err = ioutil.WriteFile("test.bak",[]byte(contents),0644)
+    if err != nil {
+        return fmt.Errorf("error writing file %v: %v", bakfile, err)
+    }
     return nil
 }
 
