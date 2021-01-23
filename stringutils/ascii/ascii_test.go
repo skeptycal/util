@@ -80,6 +80,7 @@ func TestHexed(t *testing.T) {
         {"nil", args{nil}, "0x0"},
         {"empty slice", args{[]byte{}}, "NaN"},
         {"slice", args{[]byte{50}}, "NaN"},
+        {"map", args{make(map[int]int)}, "NaN"},
         {"map", args{make(map[int]int,4)}, "NaN"},
         {"true", args{true}, "0x1"},
         {"false", args{false}, "0x0"},
