@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func TestToAscii(t *testing.T) {
+func TestToASCII(t *testing.T) {
 	type args struct {
 		s string
 	}
@@ -23,8 +23,8 @@ func TestToAscii(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := ToAscii(tt.args.s); got != tt.want {
-				t.Errorf("ToAscii() = %s, want %s", got, tt.want)
+			if got := ToASCII(tt.args.s); got != tt.want {
+				t.Errorf("ToASCII() = %s, want %s", got, tt.want)
 			}
 		})
 	}
@@ -82,6 +82,26 @@ func TestHexed(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := Hexed(tt.args.v); got != tt.want {
 				t.Errorf("Hexed() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestToOctal(t *testing.T) {
+	type args struct {
+		v interface{}
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := ToOctal(tt.args.v); got != tt.want {
+				t.Errorf("ToOctal() = %v, want %v", got, tt.want)
 			}
 		})
 	}
