@@ -17,6 +17,10 @@ var (
     mutex = &sync.Mutex{} // from medium article
 )
 
+type stringMutex struct {
+    list []string
+    mu sync.Mutex
+}
 
 type builders struct {
     pool []*builder
@@ -35,11 +39,11 @@ type builder struct {
 }
 
 
-func mediumUpdate(item *string) {
+func mediumUpdate(item string) {
     mutex.Lock()
     // Update shared variable (e.g. slice, pointer on a structure, etc.)
-    if *item == "" {
-        *item = "item"
+    if item == "" {
+        item = "item"
     }
     mutex.Unlock()
 }
@@ -56,11 +60,11 @@ func mediumUpdate(item *string) {
 // You can think of sync.Cond as solving this problem: "I want to take action as soon as some condition is satisfied, but I can't just write a spin-loop, because those are inefficient. What I really want is to check the condition whenever it may have changed, and otherwise wait."
 //
 // That's why sync.Cond is almost always called in a loop. Imagine we have some goroutines that are processing a slice of items, and in another goroutine, we want to take some action when len(items) == 0. We could write a spin-loop:
-func loopBad(items []*string) {
+func loopBad(smu *stringMutex) {
     for done := false; !done; {
         mu.Lock()
         // process 'items' ...
-        done = len(items) == 0
+        done = len(smu.list) == 0
         mu.Unlock()
     }
 }
@@ -73,38 +77,51 @@ func loopBad(items []*string) {
 // Then, any time a goroutine modifies items, it should call
 // cond.Signal(). This way, we can ensure that this loop only
 // runs when the condition might be satisfied.
-func loopGood(items []*string) {
+func loopGood(smu *stringMutex) {
     cond.L.Lock()
-    for len(items) != 0 {
+    for len(smu.list) != 0 {
         cond.Wait()
+        cond.Signal()
     }
     cond.L.Unlock()
 }
 
 
-func makeItems(n int) (*string, []*string) {
+func makeItems(n int) (string, []string) {
     var itemValue = "foo"
-    var item  =  &itemValue
+    var item  =  itemValue
 
-    var items = make([]*string,n)
+    var items = make([]string,n)
 
     // Create slice of pointers to strings
     for i := 0; i < n; i++ {
-         tmp := fmt.Sprintf("%v-%d", *item, i)
-        items = append(items, &tmp)
+         tmp := fmt.Sprintf("%v-%d", item, i)
+        items = append(items, tmp)
     }
 
     return item, items
 }
 
+func makeStrings(n int) (*stringMutex) {
+
+    smu := stringMutex{}
+    smu.mu.Lock()
+    smu.list = make([]string,n)
+    smu.mu.Unlock()
+
+    return &smu
+}
+
 func Tryout(){
 
     bs := builders{}
-    bs := append(bs, builder{})
+    bs .add(&builder{&strings.Builder{}})
 
-    item, items := makeItems(24)
+    item, _ := makeItems(8)
 
     mediumUpdate(item)
+
+    items := makeStrings(8)
 
     loopBad(items)
 

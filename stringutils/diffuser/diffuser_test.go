@@ -1,5 +1,5 @@
+// Reference
 /*
-
 Reference: https://teivah.medium.com/a-closer-look-at-go-sync-package-9f4e4a28c35a
 
 The article discusses the broadcasting functionality of sync.Cond, but overlooks its primary usecase: synchronizing based on a condition (it's right in the name!).
@@ -14,8 +14,21 @@ package diffuser
 
 import "testing"
 
+func BenchmarkMakeItems(b *testing.B) {
+    for i := 0; i < b.N; i++ {
+        _, _ = makeItems(8)
+    }
+}
+
+// makeStrings
+func BenchmarkMakeStrings(b *testing.B) {
+    for i := 0; i < b.N; i++ {
+        _ = makeStrings(8)
+    }
+}
+
 func BenchmarkLoopBad(b *testing.B) {
-    _, items := makeItems(24)
+    items := makeStrings(8)
 
     for i := 0; i < b.N; i++ {
         loopBad(items)
@@ -23,7 +36,7 @@ func BenchmarkLoopBad(b *testing.B) {
 }
 
 func BenchmarkLoopGood(b *testing.B) {
-    _, items := makeItems(24)
+    items := makeStrings(8)
 
     for i := 0; i < b.N; i++ {
         loopGood(items)
@@ -31,9 +44,9 @@ func BenchmarkLoopGood(b *testing.B) {
 }
 
 func Test_loopBad(t *testing.T) {
-    _, itemList := makeItems(24)
+    itemList := makeStrings(8)
 	type args struct {
-		items []*string
+		items *stringMutex
     }
 	tests := []struct {
 		name string
