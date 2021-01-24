@@ -9,12 +9,17 @@ import (
 	. "github.com/skeptycal/util/stringutils/ansi"
 )
 
-var (
-	logColor = AnsiWriter.Build(Bold, RedBackground)
-)
 
+    var log = &logrus.Logger{
+        Out: os.Stderr,
+        Formatter: new(logrus.TextFormatter),
+        Hooks: make(logrus.LevelHooks),
+        Level: logrus.InfoLevel,
+    }
 func init() {
-	var log = logrus.New()
+    log.SetOutput(os.Stderr)
+    log.SetFormatter(new(logrus.TextFormatter))
+    log.SetLevel(logrus.InfoLevel)
 
 	log.SetOutput(NewRedLogger(os.Stderr))
 	log.Info("RedLogger enabled...")
@@ -22,7 +27,9 @@ func init() {
 }
 
 func NewRedLogger(w io.Writer) *redLogger {
-	bw := bufio.NewWriter(w)
+    a  := NewAnsiWriter(os.Stdout)
+    a.Build(Bold, Black, RedBackground)
+	bw := bufio.NewWriter(a)
 	return &redLogger{bw: bw}
 }
 
@@ -32,16 +39,30 @@ type redLogger struct {
 
 // Write wraps p with Ansi color codes and writes the result to the buffer.
 func (l *redLogger) Write(p []byte) (n int, err error) {
-	_, _ = l.bw.WriteString(logColor)
-	n, err = l.bw.Write(p)
-	_, _ = l.bw.WriteString(Reset)
-	return
+    n, err = l.bw.WriteString("--> redlogger Write()")
+    if err != nil {
+        return
+    }
+
+    n, err = l.bw.Write(p)
+    if err != nil {
+        return
+    }
+
+	return l.bw.WriteString(Reset)
 }
 
 // WriteString wraps p with Ansi color codes and writes the result to the buffer.
 func (l *redLogger) WriteString(s string) (n int, err error) {
-	_, _ = l.bw.WriteString(logColor)
-	n, err = l.bw.WriteString(s)
-	_, _ = l.bw.WriteString(Reset)
-	return
+    n, err = l.bw.WriteString("--> redlogger Write()")
+    if err != nil {
+        return
+    }
+
+    n, err = l.bw.WriteString(s)
+    if err != nil {
+        return
+    }
+
+	return l.bw.WriteString(Reset)
 }
