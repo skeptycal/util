@@ -60,7 +60,7 @@ func SetupCLI(a AnsiSet) AnsiSet{
 
 // APrint prints a basic ansi string based on the
 // variadic argument list of bytes
-func APrint(a ...byte) { fmt.Print(BuildAnsi(a...)) }
+func APrint(a ...ansiColor) { fmt.Print(BuildAnsi(a...)) }
 func CLS()             { fmt.Fprintf(os.Stdout, "\033c") }
 func HR(n int)         { fmt.Println(strings.Repeat(HrChar, n)) }
 func BR()              { fmt.Println("") }
@@ -108,7 +108,7 @@ func itoa(n int) []byte {
 
 // BuildAnsi returns a basic (3/4 bit) ANSI format code
 // from a variadic argument list of bytes
-func BuildAnsi(b ...byte) string {
+func BuildAnsi(b ...ansiColor) string {
 	sb := strings.Builder{}
 	defer sb.Reset()
 	for _, n := range b {
@@ -117,7 +117,7 @@ func BuildAnsi(b ...byte) string {
 	return sb.String()
 }
 
-func encodeAnsi(fb fbType, ef, c color) string {
+func encodeAnsi(fb fbType, ef, c ansiColor) string {
 	if fb != foreground && fb != background {
 		fb = foreground
 	}
