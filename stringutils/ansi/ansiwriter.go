@@ -12,10 +12,10 @@ import (
 	"os"
 )
 
-// NewAnsiWriter returns a new ANSI Writer for use in terminal output.
+// NewWriter returns a new ANSI Writer for use in terminal output.
 // If w is nil, the default (os.Stdout) is used.
 //
-func NewAnsiWriter(w io.Writer) ANSI {
+func NewWriter(w io.Writer) *AnsiWriter {
 	// if w is nil, use the default
 	if w == nil {
 		w = os.Stdout
@@ -35,9 +35,10 @@ func NewAnsiWriter(w io.Writer) ANSI {
 }
 
 type ANSI interface {
-	io.Writer
-	io.StringWriter
-	Build(b ...byte)
+    Write([]byte) (int, error)
+    WriteString(string) (int, error)
+    Build(b ...byte)
+    SetColors(s AnsiSet)
 	Flush() error
 	Wrap(s string)
 	String() string
@@ -60,13 +61,11 @@ func (a *AnsiWriter) String() string {
 // Wrap wraps the string in the default color and effects
 // set in the AnsiWriter.
 func (a *AnsiWriter) Wrap(s string) {
-    defer	a.WriteString(DefaultAll)
-
 	defer a.Writer.Flush()
 
     a.WriteString(a.config.ansi.String())
-
-	a.WriteString(s)
+    a.WriteString(s)
+	a.WriteString(DefaultAll)
 }
 
 // Build encodes a variadic list of bytes into ANSI codes

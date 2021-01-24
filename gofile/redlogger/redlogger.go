@@ -1,68 +1,65 @@
 package redlogger
 
 import (
-	"bufio"
 	"io"
 	"os"
 
 	"github.com/sirupsen/logrus"
-	. "github.com/skeptycal/util/stringutils/ansi"
+	"github.com/skeptycal/util/stringutils/ansi"
 )
 
 
+
+func init() {
     var log = &logrus.Logger{
-        Out: os.Stderr,
+        Out: New(os.Stderr),
         Formatter: new(logrus.TextFormatter),
         Hooks: make(logrus.LevelHooks),
         Level: logrus.InfoLevel,
     }
-func init() {
-    log.SetOutput(os.Stderr)
-    log.SetFormatter(new(logrus.TextFormatter))
+    // log.SetFormatter(new(logrus.TextFormatter))
     log.SetLevel(logrus.InfoLevel)
 
-	log.SetOutput(NewRedLogger(os.Stderr))
 	log.Info("RedLogger enabled...")
-
 }
 
-func NewRedLogger(w io.Writer) *redLogger {
-    a  := NewAnsiWriter(os.Stdout)
-    a.Build(Bold, Black, RedBackground)
-	bw := bufio.NewWriter(a)
-	return &redLogger{bw: bw}
+func New(w io.Writer) *ansi.AnsiWriter {
+    if w == nil {
+        w = os.Stdout
+    }
+    a  := ansi.NewWriter(w)
+    a.Build(ansi.Bold, ansi.Black, ansi.RedBackground)
+	return a
 }
 
-type redLogger struct {
-	bw *bufio.Writer
-}
+type redLogger ansi.AnsiWriter
 
 // Write wraps p with Ansi color codes and writes the result to the buffer.
 func (l *redLogger) Write(p []byte) (n int, err error) {
-    n, err = l.bw.WriteString("--> redlogger Write()")
+    n, err = l.WriteString("--> redlogger Write()")
     if err != nil {
         return
     }
 
-    n, err = l.bw.Write(p)
+    n, err = l.Write(p)
     if err != nil {
         return
     }
 
-	return l.bw.WriteString(Reset)
+	return l.WriteString(Reset)
 }
 
 // WriteString wraps p with Ansi color codes and writes the result to the buffer.
 func (l *redLogger) WriteString(s string) (n int, err error) {
-    n, err = l.bw.WriteString("--> redlogger Write()")
+    n, err = l.WriteString("--> redlogger WriteString()")
     if err != nil {
         return
     }
 
-    n, err = l.bw.WriteString(s)
+    n, err = l.WriteString(s)
     if err != nil {
         return
     }
 
-	return l.bw.WriteString(Reset)
+	return l.WriteString(Reset)
 }
