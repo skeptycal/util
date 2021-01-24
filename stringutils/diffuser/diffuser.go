@@ -11,7 +11,7 @@ import (
 )
 
 var (
-    mu sync.Mutex                // for loopBad
+    // mu sync.Mutex                // for loopBad
     cond sync.Cond               // for loopGood
 
     mutex = &sync.Mutex{} // from medium article
@@ -43,7 +43,7 @@ func mediumUpdate(item string) {
     mutex.Lock()
     // Update shared variable (e.g. slice, pointer on a structure, etc.)
     if item == "" {
-        item = "item"
+        item = "item"+fmt.Sprintf("%v",&item)
     }
     mutex.Unlock()
 }
@@ -62,10 +62,10 @@ func mediumUpdate(item string) {
 // That's why sync.Cond is almost always called in a loop. Imagine we have some goroutines that are processing a slice of items, and in another goroutine, we want to take some action when len(items) == 0. We could write a spin-loop:
 func loopBad(smu *stringMutex) {
     for done := false; !done; {
-        mu.Lock()
+        smu.mu.Lock()
         // process 'items' ...
         done = len(smu.list) == 0
-        mu.Unlock()
+        smu.mu.Unlock()
     }
 }
 

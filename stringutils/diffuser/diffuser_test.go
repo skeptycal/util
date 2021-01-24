@@ -20,7 +20,6 @@ func BenchmarkMakeItems(b *testing.B) {
     }
 }
 
-// makeStrings
 func BenchmarkMakeStrings(b *testing.B) {
     for i := 0; i < b.N; i++ {
         _ = makeStrings(8)
@@ -41,23 +40,4 @@ func BenchmarkLoopGood(b *testing.B) {
     for i := 0; i < b.N; i++ {
         loopGood(items)
     }
-}
-
-func Test_loopBad(t *testing.T) {
-    itemList := makeStrings(8)
-	type args struct {
-		items *stringMutex
-    }
-	tests := []struct {
-		name string
-		args args
-	}{
-        // TODO: Add test cases.
-        {"make24",args{itemList}},
-    }
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			loopBad(tt.args.items)
-		})
-	}
 }
