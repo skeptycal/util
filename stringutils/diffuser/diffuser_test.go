@@ -15,22 +15,33 @@ package diffuser
 import "testing"
 
 func BenchmarkLoopBad(b *testing.B) {
+    _, items := makeItems(24)
 
     for i := 0; i < b.N; i++ {
         loopBad(items)
     }
 }
 
+func BenchmarkLoopGood(b *testing.B) {
+    _, items := makeItems(24)
+
+    for i := 0; i < b.N; i++ {
+        loopGood(items)
+    }
+}
+
 func Test_loopBad(t *testing.T) {
+    _, itemList := makeItems(24)
 	type args struct {
 		items []*string
-	}
+    }
 	tests := []struct {
 		name string
 		args args
 	}{
-		// TODO: Add test cases.
-	}
+        // TODO: Add test cases.
+        {"make24",args{itemList}},
+    }
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			loopBad(tt.args.items)
