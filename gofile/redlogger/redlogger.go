@@ -28,7 +28,13 @@ func New(w io.Writer) *ansi.AnsiWriter {
         w = os.Stdout
     }
     a  := ansi.NewWriter(w)
-    a.Build(ansi.Bold, ansi.Black, ansi.RedBackground)
+    a.SetColors(
+        ansi.NewAnsiSet(
+            ansi.Bold,
+            ansi.Black,
+            ansi.RedBackground,
+            ansi.Bold,
+        ))
 	return a
 }
 
@@ -46,7 +52,7 @@ func (l *redLogger) Write(p []byte) (n int, err error) {
         return
     }
 
-	return l.WriteString(Reset)
+	return l.WriteString(ansi.Reset)
 }
 
 // WriteString wraps p with Ansi color codes and writes the result to the buffer.
@@ -61,5 +67,5 @@ func (l *redLogger) WriteString(s string) (n int, err error) {
         return
     }
 
-	return l.WriteString(Reset)
+	return l.WriteString(ansi.Reset)
 }
