@@ -8,7 +8,10 @@
 // For information about UTF-8 strings in Go, see https://blog.golang.org/strings.
 package stringutils
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 /* Benchmark results
 BenchmarkIsWhiteSpace-8    	957675391	         1.31 ns/op	       0 B/op	       0 allocs/op
@@ -29,23 +32,54 @@ BenchmarkIsAlphaNum2-8     	1000000000	         0.923 ns/op	       0 B/op	      
 BenchmarkIsAlpha-8         	967973194	         1.31 ns/op	       0 B/op	       0 allocs/op
 BenchmarkIsDigit-8         	971392962	         1.21 ns/op	       0 B/op	       0 allocs/op
 */
+
+func RuneSamples()[]rune {
+    return []rune{'A','0',65,'t','n','f','r','v','\t','\n','\f','\r','\v',48,12,' ',0x20,8,}
+}
+
+func ByteSamples()[]byte {
+    return []byte{'A','0',65,'t','n','f','r','v','\t','\n','\f','\r','\v',48,12,' ',0x20,8,}
+}
 func BenchmarkIsWhiteSpace(b *testing.B) {
     for i := 0; i < b.N; i++ {
-        IsWhiteSpace(65) // A
-        IsWhiteSpace(48) // 0
-        IsWhiteSpace(12) // \n
+IsWhiteSpace2(65)               // A
+        IsWhiteSpace2('t')               // t
+        IsWhiteSpace2('n')               // n
+        IsWhiteSpace2('f')               // f
+        IsWhiteSpace2('r')               // r
+        IsWhiteSpace2('v')               // v
+        IsWhiteSpace2('\t')               // \t
+        IsWhiteSpace2('\n')               // \n
+        IsWhiteSpace2('\f')               // \f
+        IsWhiteSpace2('\r')               // \r
+        IsWhiteSpace2('\v')               // \v
+        IsWhiteSpace2(48)               // 0
+        IsWhiteSpace2(12)               // \n
+        IsWhiteSpace2(' ')              // space
+        IsWhiteSpace2(0x20)             // space
+        IsWhiteSpace2(8)                // tab
     }
 }
 
 func BenchmarkIsWhiteSpace2(b *testing.B) {
+    // 	case ' ', '\t', '\n', '\f', '\r', '\v':
     for i := 0; i < b.N; i++ {
-        IsWhiteSpace2(65)       // A
-        IsWhiteSpace2(48)       // 0
-        IsWhiteSpace2(12)       // \n
-        IsWhiteSpace2(' ')      // space
-        IsWhiteSpace2(0x20) // space
-        IsWhiteSpace2(12) // \n
-        IsWhiteSpace2(12) // \n
+        IsWhiteSpace2(65)               // A
+        IsWhiteSpace2('t')               // t
+        IsWhiteSpace2('n')               // n
+        IsWhiteSpace2('f')               // f
+        IsWhiteSpace2('r')               // r
+        IsWhiteSpace2('v')               // v
+        IsWhiteSpace2('\t')               // \t
+        IsWhiteSpace2('\n')               // \n
+        IsWhiteSpace2('\f')               // \f
+        IsWhiteSpace2('\r')               // \r
+        IsWhiteSpace2('\v')               // \v
+        IsWhiteSpace2(48)               // 0
+        IsWhiteSpace2(12)               // \n
+        IsWhiteSpace2(' ')              // space
+        IsWhiteSpace2(0x20)             // space
+        IsWhiteSpace2(8)                // tab
     }
 }
 
@@ -62,6 +96,22 @@ func BenchmarkIsAlphaNum(b *testing.B) {
         IsAlphaNum('A')
         IsAlphaNum('0')
         IsAlphaNum('\n')
+        IsAlphaNum(65)               // A
+        IsAlphaNum('t')               // t
+        IsAlphaNum('n')               // n
+        IsAlphaNum('f')               // f
+        IsAlphaNum('r')               // r
+        IsAlphaNum('v')               // v
+        IsAlphaNum('\t')               // \t
+        IsAlphaNum('\n')               // \n
+        IsAlphaNum('\f')               // \f
+        IsAlphaNum('\r')               // \r
+        IsAlphaNum('\v')               // \v
+        IsAlphaNum(48)               // 0
+        IsAlphaNum(12)               // \n
+        IsAlphaNum(' ')              // space
+        IsAlphaNum(0x20)             // space
+        IsAlphaNum(8)                // tab
     }
 }
 
@@ -70,6 +120,22 @@ func BenchmarkIsAlphaNum2(b *testing.B) {
         IsAlphaNum2('A')
         IsAlphaNum2('0')
         IsAlphaNum2('\n')
+        IsAlphaNum2(65)               // A
+        IsAlphaNum2('t')               // t
+        IsAlphaNum2('n')               // n
+        IsAlphaNum2('f')               // f
+        IsAlphaNum2('r')               // r
+        IsAlphaNum2('v')               // v
+        IsAlphaNum2('\t')               // \t
+        IsAlphaNum2('\n')               // \n
+        IsAlphaNum2('\f')               // \f
+        IsAlphaNum2('\r')               // \r
+        IsAlphaNum2('\v')               // \v
+        IsAlphaNum2(48)               // 0
+        IsAlphaNum2(12)               // \n
+        IsAlphaNum2(' ')              // space
+        IsAlphaNum2(0x20)             // space
+        IsAlphaNum2(8)                // tab
     }
 }
 
@@ -90,36 +156,17 @@ func BenchmarkIsDigit(b *testing.B) {
 }
 
 func TestIsWhiteSpace(t *testing.T) {
-	type args struct {
-		c rune
-	}
-	tests := []struct {
-		args args
-		want bool
-	}{
-        // TODO: Add test cases.
-        { args{'\n'}, true},
-        { args{'\t'}, true},
-        { args{'\r'}, true},
-        { args{'\v'}, true},
-        { args{'\f'}, true},
-        { args{' '}, true},
-        { args{'A'}, false},
-        { args{'c'}, false},
-        { args{'0'}, false},
-        { args{'7'}, false},
-        { args{'='}, false},
-        { args{'?'}, false},
-        { args{'/'}, false},
-        { args{'%'}, false},
-	}
-	for _, tt := range tests {
-		t.Run(string(tt.args.c), func(t *testing.T) {
-			if got := IsWhiteSpace(tt.args.c); got != tt.want {
-				t.Errorf("IsWhiteSpace() = %v, want %v", got, tt.want)
-			}
-		})
-	}
+    for _, c := range RuneSamples() {
+        name := fmt.Sprintf("IsWhiteSpace: %v",c)
+            t.Run(name, func(t *testing.T) {
+                got := IsWhiteSpace(c)
+                want := strings.IsWhiteSpace(c)
+                if got != want {
+                    t.Errorf("IsWhiteSpace() = %v, want %v", got, want)
+                }
+            })
+
+    }
 }
 
 func TestIsAlpha(t *testing.T) {
