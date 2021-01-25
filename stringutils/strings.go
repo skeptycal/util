@@ -11,6 +11,7 @@ package stringutils
 import (
 	"fmt"
 	"strconv"
+	"unicode"
 )
 
 // const alphanumerics = "0123456789abcdefghijklmnopqrstuvwxyz"
@@ -95,4 +96,34 @@ func IsWhiteSpace(c rune) bool {
 
 func IsWhiteSpace2(c rune) bool {
     return c == ' ' || c == '\t' || c == '\n' || c == '\f' || c == '\r' || c == '\v'
+}
+
+func IsWhiteSpace3(c rune) bool {
+    spaceMap := map[string]string {
+        "U+0020":	"SPACE",
+        "U+00A0":	"NO-BREAK SPACE",
+        "U+1680":	"OGHAM SPACE MARK",
+        "U+2000":	"EN QUAD",
+        "U+2001":	"EM QUAD",
+        "U+2002":	"EN SPACE",
+        "U+2003":	"EM SPACE",
+        "U+2004":	"THREE-PER-EM SPACE",
+        "U+2005":	"FOUR-PER-EM SPACE",
+        "U+2006":	"SIX-PER-EM SPACE",
+        "U+2007":	"FIGURE SPACE",
+        "U+2008":	"PUNCTUATION SPACE",
+        "U+2009":	"THIN SPACE",
+        "U+200A":	"HAIR SPACE",
+        "U+202F":	"NARROW NO-BREAK SPACE",
+        "U+205F":	"MEDIUM MATHEMATICAL SPACE",
+        "U+3000":	"IDEOGRAPHIC SPACE",
+    }
+    unicode.IsSpace(c)
+}
+
+func RuneInfo(c rune) {
+    s := "日本語"
+    fmt.Printf("Glyph:   %q\n", s)
+    fmt.Printf("UTF-8:   [% x]\n", []byte(s))
+    fmt.Printf("Unicode: %U\n", []rune(s))
 }
