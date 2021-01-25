@@ -8,6 +8,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 	"github.com/skeptycal/util/gofile"
+	"github.com/skeptycal/util/stringutils"
 	"github.com/skeptycal/util/zsh"
 )
 

@@ -15,7 +15,7 @@ func main() {
     fmt.Println("a.String() before ",a.String(), "...after")
 
 
-    w := ansi.NewAnsiWriter(nil)
+    w := ansi.NewWriter(nil)
 
 
 

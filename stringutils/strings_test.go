@@ -6,7 +6,7 @@
 // .../go/1.15.3/libexec/src/strings/strings.go
 //
 // For information about UTF-8 strings in Go, see https://blog.golang.org/strings.
-package strings
+package stringutils
 
 import "testing"
 
@@ -16,12 +16,36 @@ BenchmarkIsAlphaSwitch-8   	644505457	         1.84 ns/op	       0 B/op	       0
 BenchmarkIsAlphaNum-8      	773480662	         1.54 ns/op	       0 B/op	       0 allocs/op
 BenchmarkIsAlpha-8         	977785057	         1.23 ns/op	       0 B/op	       0 allocs/op
 BenchmarkIsDigit-8         	944950424	         1.25 ns/op	       0 B/op	       0 allocs/op
+
+BenchmarkIsWhiteSpace-8    	899743548	         1.28 ns/op	       0 B/op	       0 allocs/op
+BenchmarkIsAlphaSwitch-8   	660817269	         1.81 ns/op	       0 B/op	       0 allocs/op
+
+
+BenchmarkIsAlphaNum-8      	770840788	         1.51 ns/op	       0 B/op	       0 allocs/op
+// removing the 'if' and simply returning the boolean result is 50% faster
+BenchmarkIsAlphaNum2-8     	1000000000	         0.923 ns/op	       0 B/op	       0 allocs/op
+
+
+BenchmarkIsAlpha-8         	967973194	         1.31 ns/op	       0 B/op	       0 allocs/op
+BenchmarkIsDigit-8         	971392962	         1.21 ns/op	       0 B/op	       0 allocs/op
 */
 func BenchmarkIsWhiteSpace(b *testing.B) {
     for i := 0; i < b.N; i++ {
         IsWhiteSpace(65) // A
         IsWhiteSpace(48) // 0
         IsWhiteSpace(12) // \n
+    }
+}
+
+func BenchmarkIsWhiteSpace2(b *testing.B) {
+    for i := 0; i < b.N; i++ {
+        IsWhiteSpace2(65)       // A
+        IsWhiteSpace2(48)       // 0
+        IsWhiteSpace2(12)       // \n
+        IsWhiteSpace2(' ')      // space
+        IsWhiteSpace2(0x20) // space
+        IsWhiteSpace2(12) // \n
+        IsWhiteSpace2(12) // \n
     }
 }
 
@@ -38,6 +62,14 @@ func BenchmarkIsAlphaNum(b *testing.B) {
         IsAlphaNum('A')
         IsAlphaNum('0')
         IsAlphaNum('\n')
+    }
+}
+
+func BenchmarkIsAlphaNum2(b *testing.B) {
+    for i := 0; i < b.N; i++ {
+        IsAlphaNum2('A')
+        IsAlphaNum2('0')
+        IsAlphaNum2('\n')
     }
 }
 
