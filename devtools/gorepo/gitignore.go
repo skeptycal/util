@@ -11,14 +11,14 @@ import (
 	"github.com/skeptycal/util/webtools/http"
 )
 
-func ReturnCheck(f func()) ([]interface{}, error) {
+func returnCheck(f func()) ([]interface{}, error) {
 	foo := reflect.TypeOf(f)
 
 	fmt.Printf("f is type: %v", foo)
 	return nil, nil
 }
 
-func CreateGitIgnore(force bool) error {
+func createGitIgnore(force bool) error {
 
 	if gofile.Exists(".gitignore") {
 		if !force {
@@ -31,7 +31,9 @@ func CreateGitIgnore(force bool) error {
 		return err
 	}
 
-	log.Infof("Creating gitignore file %v", f.Name())
+    log.Infof("Creating gitignore file %v", f.Name())
+
+    _, err := f.WriteString()
 
 	return nil
 }
@@ -50,7 +52,7 @@ func gitIgnoreAPIList() []string {
 	return list
 }
 
-// gi returns a string response from the www.gitignore.io API containing
+// gitIgnoreAPI returns a string response from the www.gitignore.io API containing
 // standard .gitignore items for the args given.
 //
 //      default: "macos linux windows ssh vscode go zsh node vue nuxt python django"
@@ -78,21 +80,25 @@ func gitIgnoreAPI(args string) string {
 //      default: "macos linux windows ssh vscode go zsh node vue nuxt python django"
 //
 // using: https://www.toptal.com/developers/gitignore/api/macos,linux,windows,ssh,vscode,go,zsh,node,vue,nuxt,python,django
-func GitIgnore(reponame, personalItems, repoSpecific string) error {
+func GitIgnore(reponame, personalItems, repoSpecific, args string) error {
 	if args == "" {
 		args = defaultGitIgnoreItemsSpace
 	}
 
 	if personalItems == "" {
 		personalItems = personalPreferenceItems
-	}
+    }
+
+    if repoSpecific == "" {
+        repoSpecific == repoSpecificItems
+    }
 
 	var sb strings.Builder
 	defer sb.Reset()
 
-	gifmt := fmt.Sprintf(giFormatString, reponame, gi(args))
+	gifmt := fmt.Sprintf(giFormatString, reponame, gitIgnoreAPI(args))
 
-	sb.WriteString(gi(args))
+	sb.WriteString(gifmt)
 
 	return gofile.WriteFile(".gitignore", sb.String())
 }
@@ -107,8 +113,7 @@ const ( // for gitignore.go
 
 	// personalPreferenceItems is a list of personal
 	// preferences in addition to the www.gitignore.io API
-	personalPreferenceItems = `
-ideas
+	personalPreferenceItems = `ideas
 notes.md
 `
 	// repoSpecificItems is a list of rare or unusual

@@ -9,7 +9,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 	"github.com/skeptycal/util/gofile"
-	"github.com/skeptycal/util/zsh"
+	"github.com/skeptycal/zsh"
 )
 
 const (
