@@ -4,7 +4,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// interfaceEqual protects against panics from doing equality tests on
+// InterfaceEqual protects against panics from doing equality tests on
 // two interfaces with non-comparable underlying types.
 // adapted from:
 //
