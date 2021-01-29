@@ -11,7 +11,6 @@ package stringutils
 import (
 	"fmt"
 	"strconv"
-	"unicode"
 )
 
 // const alphanumerics = "0123456789abcdefghijklmnopqrstuvwxyz"
@@ -86,7 +85,8 @@ func IsAlphaNum(c byte) bool {
 	return false
 }
 
-func IsWhiteSpace(c rune) bool {
+
+func isWhiteSpace2(c rune) bool {
 	switch c {
 	case ' ', '\t', '\n', '\f', '\r', '\v':
 		return true
@@ -94,7 +94,7 @@ func IsWhiteSpace(c rune) bool {
 	return false
 }
 
-func IsWhiteSpace2(c rune) bool {
+func IsWhiteSpace(c rune) bool {
     return c == ' ' || c == '\t' || c == '\n' || c == '\f' || c == '\r' || c == '\v'
 }
 
@@ -118,7 +118,12 @@ func IsWhiteSpace3(c rune) bool {
         "U+205F":	"MEDIUM MATHEMATICAL SPACE",
         "U+3000":	"IDEOGRAPHIC SPACE",
     }
-    unicode.IsSpace(c)
+
+    if _, ok := spaceMap[string(c)]; ok {
+        return true
+    }
+    return false
+    // return unicode.IsSpace(c)
 }
 
 func RuneInfo(c rune) {

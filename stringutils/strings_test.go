@@ -11,6 +11,7 @@ package stringutils
 import (
 	"fmt"
 	"testing"
+	"unicode"
 )
 
 /* Benchmark results
@@ -31,142 +32,117 @@ BenchmarkIsAlphaNum2-8     	1000000000	         0.923 ns/op	       0 B/op	      
 
 BenchmarkIsAlpha-8         	967973194	         1.31 ns/op	       0 B/op	       0 allocs/op
 BenchmarkIsDigit-8         	971392962	         1.21 ns/op	       0 B/op	       0 allocs/op
+
+================================================================
+BenchmarkIsWhiteSpace-8    	227064271	         5.06 ns/op	       0 B/op	       0 allocs/op
+BenchmarkIsWhiteSpace2-8   	235199743	         5.08 ns/op	       0 B/op	       0 allocs/op
+BenchmarkIsAlphaSwitch-8   	585296522	         1.94 ns/op	       0 B/op	       0 allocs/op
+BenchmarkIsAlphaNum-8      	124885717	         9.30 ns/op	       0 B/op	       0 allocs/op
+BenchmarkIsAlphaNum2-8     	195595128	         6.16 ns/op	       0 B/op	       0 allocs/op
+BenchmarkIsAlpha-8         	990591926	         1.27 ns/op	       0 B/op	       0 allocs/op
+BenchmarkIsDigit-8         	937417184	         1.30 ns/op	       0 B/op	       0 allocs/op
+
+================================================================
+With ByteSamples() and RuneSamples()  ... consistent samples
+
+BenchmarkIsAlpha-8         	45196527	        25.7 ns/op	       0 B/op	       0 allocs/op
+BenchmarkIsDigit-8         	51888256	        22.9 ns/op	       0 B/op	       0 allocs/op
+BenchmarkIsAlphaSwitch-8   	34407850	        33.7 ns/op	       0 B/op	       0 allocs/op
+BenchmarkIsWhiteSpace-8    	164546520	         7.41 ns/op	       0 B/op	       0 allocs/op
+BenchmarkIsWhiteSpace2-8   	52679346	        22.6 ns/op	       0 B/op	       0 allocs/op
+BenchmarkIsAlphaNum-8      	44141539	        26.3 ns/op	       0 B/op	       0 allocs/op
+BenchmarkIsAlphaNum2-8     	71749123	        15.7 ns/op	       0 B/op	       0 allocs/op
 */
 
-func RuneSamples()[]rune {
-    return []rune{'A','0',65,'t','n','f','r','v','\t','\n','\f','\r','\v',48,12,' ',0x20,8,}
+func RuneSamples() []rune {
+	return []rune{'A', '0', 65, 't', 'n', 'f', 'r', 'v', '\t', '\n', '\f', '\r', '\v', 48, 12, ' ', 0x20, 8}
 }
 
-func ByteSamples()[]byte {
-    return []byte{'A','0',65,'t','n','f','r','v','\t','\n','\f','\r','\v',48,12,' ',0x20,8,}
-}
-func BenchmarkIsWhiteSpace(b *testing.B) {
-    for i := 0; i < b.N; i++ {
-IsWhiteSpace2(65)               // A
-        IsWhiteSpace2('t')               // t
-        IsWhiteSpace2('n')               // n
-        IsWhiteSpace2('f')               // f
-        IsWhiteSpace2('r')               // r
-        IsWhiteSpace2('v')               // v
-        IsWhiteSpace2('\t')               // \t
-        IsWhiteSpace2('\n')               // \n
-        IsWhiteSpace2('\f')               // \f
-        IsWhiteSpace2('\r')               // \r
-        IsWhiteSpace2('\v')               // \v
-        IsWhiteSpace2(48)               // 0
-        IsWhiteSpace2(12)               // \n
-        IsWhiteSpace2(' ')              // space
-        IsWhiteSpace2(0x20)             // space
-        IsWhiteSpace2(8)                // tab
-    }
+func ByteSamples() []byte {
+	return []byte{'A', '0', 65, 't', 'n', 'f', 'r', 'v', '\t', '\n', '\f', '\r', '\v', 48, 12, ' ', 0x20, 8}
 }
 
-func BenchmarkIsWhiteSpace2(b *testing.B) {
-    // 	case ' ', '\t', '\n', '\f', '\r', '\v':
-    for i := 0; i < b.N; i++ {
-        IsWhiteSpace2(65)               // A
-        IsWhiteSpace2('t')               // t
-        IsWhiteSpace2('n')               // n
-        IsWhiteSpace2('f')               // f
-        IsWhiteSpace2('r')               // r
-        IsWhiteSpace2('v')               // v
-        IsWhiteSpace2('\t')               // \t
-        IsWhiteSpace2('\n')               // \n
-        IsWhiteSpace2('\f')               // \f
-        IsWhiteSpace2('\r')               // \r
-        IsWhiteSpace2('\v')               // \v
-        IsWhiteSpace2(48)               // 0
-        IsWhiteSpace2(12)               // \n
-        IsWhiteSpace2(' ')              // space
-        IsWhiteSpace2(0x20)             // space
-        IsWhiteSpace2(8)                // tab
-    }
-}
-
-func BenchmarkIsAlphaSwitch(b *testing.B) {
-    for i := 0; i < b.N; i++ {
-        IsAlphaSwitch(65) // A
-        IsAlphaSwitch(48) // 0
-        IsAlphaSwitch(12) // \n
-    }
-}
-
-func BenchmarkIsAlphaNum(b *testing.B) {
-    for i := 0; i < b.N; i++ {
-        IsAlphaNum('A')
-        IsAlphaNum('0')
-        IsAlphaNum('\n')
-        IsAlphaNum(65)               // A
-        IsAlphaNum('t')               // t
-        IsAlphaNum('n')               // n
-        IsAlphaNum('f')               // f
-        IsAlphaNum('r')               // r
-        IsAlphaNum('v')               // v
-        IsAlphaNum('\t')               // \t
-        IsAlphaNum('\n')               // \n
-        IsAlphaNum('\f')               // \f
-        IsAlphaNum('\r')               // \r
-        IsAlphaNum('\v')               // \v
-        IsAlphaNum(48)               // 0
-        IsAlphaNum(12)               // \n
-        IsAlphaNum(' ')              // space
-        IsAlphaNum(0x20)             // space
-        IsAlphaNum(8)                // tab
-    }
-}
-
-func BenchmarkIsAlphaNum2(b *testing.B) {
-    for i := 0; i < b.N; i++ {
-        IsAlphaNum2('A')
-        IsAlphaNum2('0')
-        IsAlphaNum2('\n')
-        IsAlphaNum2(65)               // A
-        IsAlphaNum2('t')               // t
-        IsAlphaNum2('n')               // n
-        IsAlphaNum2('f')               // f
-        IsAlphaNum2('r')               // r
-        IsAlphaNum2('v')               // v
-        IsAlphaNum2('\t')               // \t
-        IsAlphaNum2('\n')               // \n
-        IsAlphaNum2('\f')               // \f
-        IsAlphaNum2('\r')               // \r
-        IsAlphaNum2('\v')               // \v
-        IsAlphaNum2(48)               // 0
-        IsAlphaNum2(12)               // \n
-        IsAlphaNum2(' ')              // space
-        IsAlphaNum2(0x20)             // space
-        IsAlphaNum2(8)                // tab
-    }
-}
+var (
+	byteSamples []byte = ByteSamples()
+	runeSamples []rune = RuneSamples()
+)
 
 func BenchmarkIsAlpha(b *testing.B) {
-    for i := 0; i < b.N; i++ {
-        IsAlpha('A')
-        IsAlpha('0')
-        IsAlpha('\n')
-    }
+	samples := ByteSamples()
+	for i := 0; i < b.N; i++ {
+		for _, c := range samples {
+			IsAlpha(c)
+		}
+	}
 }
 
 func BenchmarkIsDigit(b *testing.B) {
-    for i := 0; i < b.N; i++ {
-        IsDigit('A')
-        IsDigit('0')
-        IsDigit('\n')
-    }
+	samples := ByteSamples()
+	for i := 0; i < b.N; i++ {
+		for _, c := range samples {
+			IsDigit(c)
+		}
+	}
+}
+
+func BenchmarkIsAlphaSwitch(b *testing.B) {
+	samples := ByteSamples()
+	for i := 0; i < b.N; i++ {
+		for _, c := range samples {
+			IsAlphaSwitch(c)
+		}
+	}
+}
+
+func BenchmarkIsWhiteSpace(b *testing.B) {
+	samples := RuneSamples()
+	for i := 0; i < b.N; i++ {
+		for _, r := range samples {
+			IsWhiteSpace(r)
+		}
+	}
+}
+
+func BenchmarkIsWhiteSpace2(b *testing.B) {
+	// 	case ' ', '\t', '\n', '\f', '\r', '\v':
+	samples := RuneSamples()
+	for i := 0; i < b.N; i++ {
+		for _, r := range samples {
+			isWhiteSpace2(r)
+		}
+	}
+}
+
+func BenchmarkIsAlphaNum(b *testing.B) {
+	samples := ByteSamples()
+	for i := 0; i < b.N; i++ {
+		for _, c := range samples {
+			IsAlphaNum(c)
+		}
+	}
+}
+
+func BenchmarkIsAlphaNum2(b *testing.B) {
+	samples := ByteSamples()
+	for i := 0; i < b.N; i++ {
+		for _, c := range samples {
+			IsAlphaNum2(c)
+		}
+	}
 }
 
 func TestIsWhiteSpace(t *testing.T) {
-    for _, c := range RuneSamples() {
-        name := fmt.Sprintf("IsWhiteSpace: %v",c)
-            t.Run(name, func(t *testing.T) {
-                got := IsWhiteSpace(c)
-                want := strings.IsWhiteSpace(c)
-                if got != want {
-                    t.Errorf("IsWhiteSpace() = %v, want %v", got, want)
-                }
-            })
+	for _, c := range RuneSamples() {
+		name := fmt.Sprintf("IsWhiteSpace: %v", c)
+		t.Run(name, func(t *testing.T) {
+			got := IsWhiteSpace(c)
+			want := unicode.IsSpace(c)
+			if got != want {
+				t.Errorf("IsWhiteSpace() = %v, want %v", got, want)
+			}
+		})
 
-    }
+	}
 }
 
 func TestIsAlpha(t *testing.T) {
@@ -177,21 +153,21 @@ func TestIsAlpha(t *testing.T) {
 		args args
 		want bool
 	}{
-        // TODO: Add test cases.
-        { args{'\n'}, false},
-        { args{'\t'}, false},
-        { args{'\r'}, false},
-        { args{'\v'}, false},
-        { args{'\f'}, false},
-        { args{' '}, false},
-        { args{'A'}, true},
-        { args{'c'}, true},
-        { args{'0'}, false},
-        { args{'7'}, false},
-        { args{'='}, false},
-        { args{'?'}, false},
-        { args{'/'}, false},
-        { args{'%'}, false},
+		// TODO: Add test cases.
+		{args{'\n'}, false},
+		{args{'\t'}, false},
+		{args{'\r'}, false},
+		{args{'\v'}, false},
+		{args{'\f'}, false},
+		{args{' '}, false},
+		{args{'A'}, true},
+		{args{'c'}, true},
+		{args{'0'}, false},
+		{args{'7'}, false},
+		{args{'='}, false},
+		{args{'?'}, false},
+		{args{'/'}, false},
+		{args{'%'}, false},
 	}
 	for _, tt := range tests {
 		t.Run(string(tt.args.c), func(t *testing.T) {
@@ -202,7 +178,6 @@ func TestIsAlpha(t *testing.T) {
 	}
 }
 
-
 func TestIsDigit(t *testing.T) {
 	type args struct {
 		c byte
@@ -211,21 +186,21 @@ func TestIsDigit(t *testing.T) {
 		args args
 		want bool
 	}{
-        // TODO: Add test cases.
-        { args{'\n'}, false},
-        { args{'\t'}, false},
-        { args{'\r'}, false},
-        { args{'\v'}, false},
-        { args{'\f'}, false},
-        { args{' '}, false},
-        { args{'A'}, false},
-        { args{'c'}, false},
-        { args{'0'}, true},
-        { args{'7'}, true},
-        { args{'='}, false},
-        { args{'?'}, false},
-        { args{'/'}, false},
-        { args{'%'}, false},
+		// TODO: Add test cases.
+		{args{'\n'}, false},
+		{args{'\t'}, false},
+		{args{'\r'}, false},
+		{args{'\v'}, false},
+		{args{'\f'}, false},
+		{args{' '}, false},
+		{args{'A'}, false},
+		{args{'c'}, false},
+		{args{'0'}, true},
+		{args{'7'}, true},
+		{args{'='}, false},
+		{args{'?'}, false},
+		{args{'/'}, false},
+		{args{'%'}, false},
 	}
 	for _, tt := range tests {
 		t.Run(string(tt.args.c), func(t *testing.T) {
@@ -244,21 +219,21 @@ func TestIsAlphaNum(t *testing.T) {
 		args args
 		want bool
 	}{
-        // TODO: Add test cases.
-        { args{'\n'}, false},
-        { args{'\t'}, false},
-        { args{'\r'}, false},
-        { args{'\v'}, false},
-        { args{'\f'}, false},
-        { args{' '}, false},
-        { args{'A'}, true},
-        { args{'c'}, true},
-        { args{'0'}, true},
-        { args{'7'}, true},
-        { args{'='}, false},
-        { args{'?'}, false},
-        { args{'/'}, false},
-        { args{'%'}, false},
+		// TODO: Add test cases.
+		{args{'\n'}, false},
+		{args{'\t'}, false},
+		{args{'\r'}, false},
+		{args{'\v'}, false},
+		{args{'\f'}, false},
+		{args{' '}, false},
+		{args{'A'}, true},
+		{args{'c'}, true},
+		{args{'0'}, true},
+		{args{'7'}, true},
+		{args{'='}, false},
+		{args{'?'}, false},
+		{args{'/'}, false},
+		{args{'%'}, false},
 	}
 	for _, tt := range tests {
 		t.Run(string(tt.args.c), func(t *testing.T) {
@@ -277,21 +252,21 @@ func TestIsIsAlphaSwitch(t *testing.T) {
 		args args
 		want bool
 	}{
-        // TODO: Add test cases.
-        { args{'\n'}, false},
-        { args{'\t'}, false},
-        { args{'\r'}, false},
-        { args{'\v'}, false},
-        { args{'\f'}, false},
-        { args{' '}, false},
-        { args{'A'}, true},
-        { args{'c'}, true},
-        { args{'0'}, true},
-        { args{'7'}, true},
-        { args{'='}, false},
-        { args{'?'}, false},
-        { args{'/'}, false},
-        { args{'%'}, false},
+		// TODO: Add test cases.
+		{args{'\n'}, false},
+		{args{'\t'}, false},
+		{args{'\r'}, false},
+		{args{'\v'}, false},
+		{args{'\f'}, false},
+		{args{' '}, false},
+		{args{'A'}, true},
+		{args{'c'}, true},
+		{args{'0'}, true},
+		{args{'7'}, true},
+		{args{'='}, false},
+		{args{'?'}, false},
+		{args{'/'}, false},
+		{args{'%'}, false},
 	}
 	for _, tt := range tests {
 		t.Run(string(tt.args.c), func(t *testing.T) {
