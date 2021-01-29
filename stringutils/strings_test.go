@@ -10,6 +10,7 @@ package stringutils
 
 import (
 	"fmt"
+	"math/rand"
 	"testing"
 	"unicode"
 )
@@ -33,6 +34,7 @@ BenchmarkIsAlphaNum2-8     	1000000000	         0.923 ns/op	       0 B/op	      
 BenchmarkIsAlpha-8         	967973194	         1.31 ns/op	       0 B/op	       0 allocs/op
 BenchmarkIsDigit-8         	971392962	         1.21 ns/op	       0 B/op	       0 allocs/op
 
+Small sample size
 ================================================================
 BenchmarkIsWhiteSpace-8    	227064271	         5.06 ns/op	       0 B/op	       0 allocs/op
 BenchmarkIsWhiteSpace2-8   	235199743	         5.08 ns/op	       0 B/op	       0 allocs/op
@@ -45,59 +47,117 @@ BenchmarkIsDigit-8         	937417184	         1.30 ns/op	       0 B/op	       0
 ================================================================
 With ByteSamples() and RuneSamples()  ... consistent samples
 
-BenchmarkIsAlpha-8         	45196527	        25.7 ns/op	       0 B/op	       0 allocs/op
-BenchmarkIsDigit-8         	51888256	        22.9 ns/op	       0 B/op	       0 allocs/op
-BenchmarkIsAlphaSwitch-8   	34407850	        33.7 ns/op	       0 B/op	       0 allocs/op
-BenchmarkIsWhiteSpace-8    	164546520	         7.41 ns/op	       0 B/op	       0 allocs/op
-BenchmarkIsWhiteSpace2-8   	52679346	        22.6 ns/op	       0 B/op	       0 allocs/op
-BenchmarkIsAlphaNum-8      	44141539	        26.3 ns/op	       0 B/op	       0 allocs/op
-BenchmarkIsAlphaNum2-8     	71749123	        15.7 ns/op	       0 B/op	       0 allocs/op
+BenchmarkIsAlpha-8         	47187997	        25.0 ns/op	       0 B/op	       0 allocs/op
+BenchmarkIsDigit-8         	51663846	        21.4 ns/op	       0 B/op	       0 allocs/op
+BenchmarkIsAlphaSwitch-8   	36453657	        32.5 ns/op	       0 B/op	       0 allocs/op
+BenchmarkIsWhiteSpace-8    	162498454	         7.37 ns/op	       0 B/op	       0 allocs/op
+BenchmarkIsWhiteSpace2-8   	48987033	        24.3 ns/op	       0 B/op	       0 allocs/op
+BenchmarkIsAlphaNum-8      	43917738	        26.9 ns/op	       0 B/op	       0 allocs/op
+BenchmarkIsAlphaNum2-8     	58560900	        19.4 ns/op	       0 B/op	       0 allocs/op
+
+================================================================
+sample size x8
+
+BenchmarkIsAlpha-8         	 4349080	       273 ns/op	     144 B/op	       1 allocs/op
+BenchmarkIsDigit-8         	 5197915	       231 ns/op	     144 B/op	       1 allocs/op
+BenchmarkIsAlphaSwitch-8   	 3905835	       309 ns/op	     144 B/op	       1 allocs/op
+BenchmarkIsWhiteSpace-8    	 6110427	       196 ns/op	     576 B/op	       1 allocs/op
+BenchmarkIsWhiteSpace2-8   	 3619970	       332 ns/op	     576 B/op	       1 allocs/op
+BenchmarkIsAlphaNum-8      	 4399827	       282 ns/op	     144 B/op	       1 allocs/op
+BenchmarkIsAlphaNum2-8     	 2731586	       444 ns/op	     144 B/op	       1 allocs/op
+
+================================================================
+using declared variables for ByteSamples() and RuneSamples()  byteSamples / runeSamples (this is slightly slower??  )
+
+BenchmarkIsAlpha-8         	44298718	        29.5 ns/op	       0 B/op	       0 allocs/op
+BenchmarkIsDigit-8         	49668928	        25.1 ns/op	       0 B/op	       0 allocs/op
+BenchmarkIsAlphaSwitch-8   	35638029	        33.1 ns/op	       0 B/op	       0 allocs/op
+BenchmarkIsWhiteSpace-8    	124931196	         9.48 ns/op	       0 B/op	       0 allocs/op
+BenchmarkIsWhiteSpace2-8   	51955320	        23.3 ns/op	       0 B/op	       0 allocs/op
+BenchmarkIsAlphaNum-8      	44332395	        26.5 ns/op	       0 B/op	       0 allocs/op
+BenchmarkIsAlphaNum2-8     	74700576	        15.9 ns/op	       0 B/op	       0 allocs/op
+
+================================================================
+using declared variables for func names ... this is MUCH slower .. it must be preventing compiler optimization since the
+function is a variable and might ... vary. Thus cannot be replaced at compile time (??)
+// byteSamples  = ByteSamples
+// for _, c := range byteSamples()
+
+BenchmarkIsAlpha-8         	20974160	        53.0 ns/op	      32 B/op	       1 allocs/op
+BenchmarkIsDigit-8         	25314271	        49.0 ns/op	      32 B/op	       1 allocs/op
+BenchmarkIsAlphaSwitch-8   	21365545	        56.5 ns/op	      32 B/op	       1 allocs/op
+BenchmarkIsWhiteSpace-8    	26824587	        45.6 ns/op	      80 B/op	       1 allocs/op
+BenchmarkIsWhiteSpace2-8   	19660117	        59.6 ns/op	      80 B/op	       1 allocs/op
+BenchmarkIsAlphaNum-8      	22809402	        53.9 ns/op	      32 B/op	       1 allocs/op
+BenchmarkIsAlphaNum2-8     	25673344	        46.1 ns/op	      32 B/op	       1 allocs/op
 */
 
+func Samples(n int)  []byte {
+    retval := make([]byte,n)
+    for i := 0; i < n; i++ {
+        retval := append(retval,rand.Intn(126))
+    }
+}
+
 func RuneSamples() []rune {
-	return []rune{'A', '0', 65, 't', 'n', 'f', 'r', 'v', '\t', '\n', '\f', '\r', '\v', 48, 12, ' ', 0x20, 8}
+	return []rune{
+		'A', '0', 65, 't', 'n', 'f', 'r', 'v', '\t', '\n', '\f', '\r', '\v', 48, 12, ' ', 0x20, 8,
+		'A', '0', 65, 't', 'n', 'f', 'r', 'v', '\t', '\n', '\f', '\r', '\v', 48, 12, ' ', 0x20, 8,
+		'A', '0', 65, 't', 'n', 'f', 'r', 'v', '\t', '\n', '\f', '\r', '\v', 48, 12, ' ', 0x20, 8,
+		'A', '0', 65, 't', 'n', 'f', 'r', 'v', '\t', '\n', '\f', '\r', '\v', 48, 12, ' ', 0x20, 8,
+		'A', '0', 65, 't', 'n', 'f', 'r', 'v', '\t', '\n', '\f', '\r', '\v', 48, 12, ' ', 0x20, 8,
+		'A', '0', 65, 't', 'n', 'f', 'r', 'v', '\t', '\n', '\f', '\r', '\v', 48, 12, ' ', 0x20, 8,
+		'A', '0', 65, 't', 'n', 'f', 'r', 'v', '\t', '\n', '\f', '\r', '\v', 48, 12, ' ', 0x20, 8,
+		'A', '0', 65, 't', 'n', 'f', 'r', 'v', '\t', '\n', '\f', '\r', '\v', 48, 12, ' ', 0x20, 8,
+	}
 }
 
 func ByteSamples() []byte {
-	return []byte{'A', '0', 65, 't', 'n', 'f', 'r', 'v', '\t', '\n', '\f', '\r', '\v', 48, 12, ' ', 0x20, 8}
+	return []byte{
+		'A', '0', 65, 't', 'n', 'f', 'r', 'v', '\t', '\n', '\f', '\r', '\v', 48, 12, ' ', 0x20, 8,
+		'A', '0', 65, 't', 'n', 'f', 'r', 'v', '\t', '\n', '\f', '\r', '\v', 48, 12, ' ', 0x20, 8,
+		'A', '0', 65, 't', 'n', 'f', 'r', 'v', '\t', '\n', '\f', '\r', '\v', 48, 12, ' ', 0x20, 8,
+		'A', '0', 65, 't', 'n', 'f', 'r', 'v', '\t', '\n', '\f', '\r', '\v', 48, 12, ' ', 0x20, 8,
+		'A', '0', 65, 't', 'n', 'f', 'r', 'v', '\t', '\n', '\f', '\r', '\v', 48, 12, ' ', 0x20, 8,
+		'A', '0', 65, 't', 'n', 'f', 'r', 'v', '\t', '\n', '\f', '\r', '\v', 48, 12, ' ', 0x20, 8,
+		'A', '0', 65, 't', 'n', 'f', 'r', 'v', '\t', '\n', '\f', '\r', '\v', 48, 12, ' ', 0x20, 8,
+		'A', '0', 65, 't', 'n', 'f', 'r', 'v', '\t', '\n', '\f', '\r', '\v', 48, 12, ' ', 0x20, 8,
+	}
 }
 
-var (
-	byteSamples []byte = ByteSamples()
-	runeSamples []rune = RuneSamples()
-)
+// This is a horrible idea ... much slower
+// var (
+// 	byteSamples  = ByteSamples
+// 	runeSamples  = RuneSamples
+// )
 
 func BenchmarkIsAlpha(b *testing.B) {
-	samples := ByteSamples()
 	for i := 0; i < b.N; i++ {
-		for _, c := range samples {
+		for _, c := range ByteSamples() {
 			IsAlpha(c)
 		}
 	}
 }
 
 func BenchmarkIsDigit(b *testing.B) {
-	samples := ByteSamples()
 	for i := 0; i < b.N; i++ {
-		for _, c := range samples {
+		for _, c := range ByteSamples() {
 			IsDigit(c)
 		}
 	}
 }
 
 func BenchmarkIsAlphaSwitch(b *testing.B) {
-	samples := ByteSamples()
 	for i := 0; i < b.N; i++ {
-		for _, c := range samples {
+		for _, c := range ByteSamples() {
 			IsAlphaSwitch(c)
 		}
 	}
 }
 
 func BenchmarkIsWhiteSpace(b *testing.B) {
-	samples := RuneSamples()
 	for i := 0; i < b.N; i++ {
-		for _, r := range samples {
+		for _, r := range RuneSamples() {
 			IsWhiteSpace(r)
 		}
 	}
@@ -105,27 +165,24 @@ func BenchmarkIsWhiteSpace(b *testing.B) {
 
 func BenchmarkIsWhiteSpace2(b *testing.B) {
 	// 	case ' ', '\t', '\n', '\f', '\r', '\v':
-	samples := RuneSamples()
 	for i := 0; i < b.N; i++ {
-		for _, r := range samples {
+		for _, r := range RuneSamples() {
 			isWhiteSpace2(r)
 		}
 	}
 }
 
 func BenchmarkIsAlphaNum(b *testing.B) {
-	samples := ByteSamples()
 	for i := 0; i < b.N; i++ {
-		for _, c := range samples {
+		for _, c := range ByteSamples() {
 			IsAlphaNum(c)
 		}
 	}
 }
 
 func BenchmarkIsAlphaNum2(b *testing.B) {
-	samples := ByteSamples()
 	for i := 0; i < b.N; i++ {
-		for _, c := range samples {
+		for _, c := range ByteSamples() {
 			IsAlphaNum2(c)
 		}
 	}
