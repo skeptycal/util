@@ -141,7 +141,13 @@ func isWhiteSpace4(c rune) bool {
 	return false
 }
 
-// In computer programming, whitespace is any character or series of characters that represent horizontal or vertical space in typography. When rendered, a whitespace character does not correspond to a visible mark, but typically does occupy an area on a page. For example, the common whitespace symbol U+0020   SPACE (also ASCII 32) represents a blank space punctuation character in text, used as a word divider in Western scripts.
+// In computer programming, whitespace is any character or series of
+// characters that represent horizontal or vertical space in typography.
+// When rendered, a whitespace character does not correspond to a visible
+// mark, but typically does occupy an area on a page. For example, the
+// common whitespace symbol U+0020 SPACE (also ASCII 32) represents a
+// blank space punctuation character in text, used as a word divider in
+// Western scripts.
 var spaceMap5 = map[rune]bool{
     0x0009: true, // CHARACTER TABULATION <TAB>
     0x000A: true, // ASCII LF
@@ -151,22 +157,30 @@ var spaceMap5 = map[rune]bool{
 	0x0020: true, // SPACE <SP>
     0x00A0: true, // NO-BREAK SPACE <NBSP>
     0x0085: true, // NEL; Next Line
-	0x1680: true, // ogham space mark
-	0x2000: true, // en quad; 0x2002 is preferred
-	0x2001: true,
-	0x2002: true,
-	0x2003: true,
-	0x2004: true,
-	0x2005: true,
-	0x2006: true,
-	0x2007: true,
-	0x2008: true,
-	0x2009: true,
-	0x200A: true,
-	0x202F: true,
-	0x205F: true,
-    0x3000: true,
-    0xFFEF: true, // ZERO WIDTH NO-BREAK SPACE <ZWNBSP>
+	0x1680: true, // Ogham space mark, interword separation in Ogham text
+	0x2000: true, // EN QUAD, 0x2002 is preferred
+	0x2001: true, // EM QUAD, mutton quad, 0x2003 is preferred
+	0x2002: true, // EN SPACE, "nut", &ensp, LaTeX: '\enspace'
+	0x2003: true, // EM SPACE, "mutton", &emsp;, LaTeX: '\quad'
+	0x2004: true, // THREE-PER-EM SPACE, "thick space", &emsp13;
+	0x2005: true, // four-per-em space, "mid space", &emsp14;
+	0x2006: true, // SIX-PER-EM SPACE, sometimes equated to U+2009
+	0x2007: true, // FIGURE SPACE, width of monospaced char, &numsp;
+	0x2008: true, // PUNCTUATION SPACE, width of period or comma, &puncsp;
+	0x2009: true, // THIN SPACE, 1/5th em, thousands sep, &thinsp;; LaTeX: '\,'
+    0x200A: true, // HAIR SPACE, &hairsp;
+    0x2028: true, // LINE SEPARATOR
+    0x2029: true, // PARAGRAPH SEPARATOR
+	0x202F: true, // NARROW NO-BREAK SPACE
+	0x205F: true, // MEDIUM MATHEMATICAL SPACE, MMSP, &MediumSpace, 4/18 em
+    0x3000: true, // IDEOGRAPHIC SPACE, full width CJK character cell
+    0xFFEF: true, // ZERO WIDTH NO-BREAK SPACE <ZWNBSP> (BOM), deprecated Unicode 3.2 (use U+2060)
+    // Related Unicode characters property White_Space=no
+    0x180E: true, // MONGOLIAN VOWEL SEPARATOR, not whitespace as of Unicode 6.3.0
+    0x200B: true, // ZERO WIDTH SPACE, ZWSP, "soft hyphen", &ZeroWidthSpace;
+    0x200C: true, // ZERO WIDTH NON-JOINER, ZWNJ, &zwnj;
+    0x200D: true, // ZERO WIDTH JOINER, ZWJ, &zwj;
+    0x2060: true, // WORD JOINER, WJ, not a line break, &NoBreak;
 }
 
 func isWhiteSpace5(c rune) bool {
