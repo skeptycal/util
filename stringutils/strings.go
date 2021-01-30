@@ -103,7 +103,7 @@ func IsUnicodeSpace(r rune) bool {
 
 // IsASCIISpace tests for the most common ASCII whitespace characters:
 //  ' ', '\t', '\n', '\f', '\r', '\v', U+0085 (NEL), U+00A0 (NBSP)
-func IsASCIISpace(c rune) bool {
+func IsASCIISpace(c byte) bool {
 	return c == ' ' || c == '\n' || c == '\t' || c == '\r' || c == '\f' || c == '\v' || c == 0x0085 || c == 0x00A0
 }
 
