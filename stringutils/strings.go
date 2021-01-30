@@ -10,8 +10,11 @@ package stringutils
 
 import (
 	"fmt"
+	"regexp"
 	"strconv"
 )
+
+var reSpace = regexp.MustCompile(`\s+`)
 
 // const alphanumerics = "0123456789abcdefghijklmnopqrstuvwxyz"
 

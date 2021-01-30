@@ -159,7 +159,7 @@ BenchmarkIsWhiteSpace5-8   	 7355563	       164 ns/op	      16 B/op	       2 all
 */
 
 const (
-	defaultSamples = 1<<2 - 1  // 1<<8 - 1
+	defaultSamples = 1<<8 - 1  // 1<<8 - 1
 	maxSamples     = 1<<32 - 1
 )
 
@@ -448,9 +448,10 @@ func TestIsWhiteSpace2(t *testing.T) {
 }
 func TestIsWhiteSpace3(t *testing.T) {
 	for _, c := range RuneSamples() {
-		name := fmt.Sprintf("IsWhiteSpace3: %v", c)
+		name := fmt.Sprintf("IsWhiteSpace3: (%q)", c)
 		t.Run(name, func(t *testing.T) {
-			got := isWhiteSpace3(c)
+            got := isWhiteSpace3(c)
+            want := unicode.IsSpace(c)
 			want := unicode.IsSpace(c)
 			if got != want {
 				t.Errorf("IsWhiteSpace3() = %v, want %v", got, want)
