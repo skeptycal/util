@@ -98,8 +98,7 @@ func IsWhiteSpace(c rune) bool {
     return c == ' ' || c == '\t' || c == '\n' || c == '\f' || c == '\r' || c == '\v'
 }
 
-func isWhiteSpace3(c rune) bool {
-    var spaceMap = map[string]string {
+var spaceMap3 = map[string]string {
         "U+0020":	"SPACE",
         "U+00A0":	"NO-BREAK SPACE",
         "U+1680":	"OGHAM SPACE MARK",
@@ -118,13 +117,12 @@ func isWhiteSpace3(c rune) bool {
         "U+205F":	"MEDIUM MATHEMATICAL SPACE",
         "U+3000":	"IDEOGRAPHIC SPACE",
     }
+func isWhiteSpace3(c rune) bool {
 
-    _, ok := spaceMap[string(c)]
-    return ok
-    // ok {
-    //     return true
-    // }
-    // return false
+    if _, ok := spaceMap3[string(c)]; ok {
+        return true
+    }
+    return false
     // return unicode.IsSpace(c)
 }
 
