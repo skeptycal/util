@@ -142,6 +142,7 @@ func isWhiteSpace4(c rune) bool {
 }
 
 var spaceMap5 = map[rune]bool{
+    0x000A: true,
 	0x0020: true,
 	0x00A0: true,
 	0x1680: true,

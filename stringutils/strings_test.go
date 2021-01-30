@@ -159,15 +159,15 @@ BenchmarkIsWhiteSpace5-8   	 7355563	       164 ns/op	      16 B/op	       2 all
 
 
 3 is replaced with unicode.IsSpace(c)
-BenchmarkIsWhiteSpace-8    	  181396	      6644 ns/op	    1280 B/op	       2 allocs/op
-BenchmarkIsWhiteSpace2-8   	  174225	      6878 ns/op	    1280 B/op	       2 allocs/op
-BenchmarkIsWhiteSpace3-8   	  150616	      8072 ns/op	    1280 B/op	       2 allocs/op
-BenchmarkIsWhiteSpace4-8   	  110077	     11209 ns/op	    1280 B/op	       2 allocs/op
-BenchmarkIsWhiteSpace5-8   	  109063	     11026 ns/op	    1280 B/op	       2 allocs/op
+BenchmarkIsWhiteSpace-8    	10207522	       118 ns/op	      16 B/op	       2 allocs/op
+BenchmarkIsWhiteSpace2-8   	10175007	       123 ns/op	      16 B/op	       2 allocs/op
+BenchmarkIsWhiteSpace3-8   	 8766572	       129 ns/op	      16 B/op	       2 allocs/op
+BenchmarkIsWhiteSpace4-8   	 7361227	       166 ns/op	      16 B/op	       2 allocs/op
+BenchmarkIsWhiteSpace5-8   	 6595645	       173 ns/op	      16 B/op	       2 allocs/op
 */
 
 const (
-	defaultSamples = 1<<2 - 1  // 1<<8 - 1
+	defaultSamples = 1<<4 - 1  // 1<<8 - 1
 	maxSamples     = 1<<32 - 1
 )
 
