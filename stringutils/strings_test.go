@@ -17,15 +17,7 @@ import (
 
 // Benchmark results
 /*
-BenchmarkIsWhiteSpace-8    	957675391	         1.31 ns/op	       0 B/op	       0 allocs/op
-BenchmarkIsAlphaSwitch-8   	644505457	         1.84 ns/op	       0 B/op	       0 allocs/op
-BenchmarkIsAlphaNum-8      	773480662	         1.54 ns/op	       0 B/op	       0 allocs/op
-BenchmarkIsAlpha-8         	977785057	         1.23 ns/op	       0 B/op	       0 allocs/op
-BenchmarkIsDigit-8         	944950424	         1.25 ns/op	       0 B/op	       0 allocs/op
-
-BenchmarkIsWhiteSpace-8    	899743548	         1.28 ns/op	       0 B/op	       0 allocs/op
-BenchmarkIsAlphaSwitch-8   	660817269	         1.81 ns/op	       0 B/op	       0 allocs/op
-
+IsWhiteSpace switch/case is significantly slower than multiple || with 6 checks
 
 BenchmarkIsAlphaNum-8      	770840788	         1.51 ns/op	       0 B/op	       0 allocs/op
 // removing the 'if' and simply returning the boolean result is 50% faster
@@ -101,6 +93,10 @@ BenchmarkIsWhiteSpace2-8   	     688	   1718280 ns/op	  327681 B/op	       2 all
 BenchmarkIsAlphaNum-8      	     643	   1875367 ns/op	   65536 B/op	       1 allocs/op
 BenchmarkIsAlphaNum2-8     	     690	   1746706 ns/op	   65536 B/op	       1 allocs/op
 
+(with special 'common' case of space)
+BenchmarkIsWhiteSpace-8    	     657	   1740744 ns/op	  327681 B/op	       2 allocs/op
+BenchmarkIsWhiteSpace2-8   	     676	   1800894 ns/op	  327681 B/op	       2 allocs/op
+
 (no preallocation)
 BenchmarkIsAlpha-8         	     613	   1914118 ns/op	  284666 B/op	      23 allocs/op
 BenchmarkIsDigit-8         	     702	   1726401 ns/op	  284666 B/op	      23 allocs/op
@@ -138,6 +134,16 @@ BenchmarkIsWhiteSpace-8    	26824587	        45.6 ns/op	      80 B/op	       1 a
 BenchmarkIsWhiteSpace2-8   	19660117	        59.6 ns/op	      80 B/op	       1 allocs/op
 BenchmarkIsAlphaNum-8      	22809402	        53.9 ns/op	      32 B/op	       1 allocs/op
 BenchmarkIsAlphaNum2-8     	25673344	        46.1 ns/op	      32 B/op	       1 allocs/op
+
+================================================================
+using maps for checks (3 [string]string/ 4 [rune]string ) (this is much worse than I expected!!)
+BenchmarkIsWhiteSpace-8    	     708	   1681603 ns/op	  327680 B/op	       2 allocs/op
+BenchmarkIsWhiteSpace2-8   	     666	   1775882 ns/op	  327681 B/op	       2 allocs/op
+
+BenchmarkIsWhiteSpace3-8   	      18	  63820745 ns/op	76760858 B/op	   68792 allocs/op
+BenchmarkIsWhiteSpace4-8   	      22	  51020315 ns/op	47036008 B/op	   68787 allocs/op
+BenchmarkIsWhiteSpace5-8   	      30	  38028585 ns/op	15449897 B/op	   78547 allocs/op
+
 */
 
 const (
@@ -225,6 +231,30 @@ func BenchmarkIsWhiteSpace2(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		for _, r := range RuneSamples() {
 			isWhiteSpace2(r)
+		}
+	}
+}
+
+func BenchmarkIsWhiteSpace3(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		for _, r := range RuneSamples() {
+			isWhiteSpace3(r)
+		}
+	}
+}
+
+func BenchmarkIsWhiteSpace4(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		for _, r := range RuneSamples() {
+			isWhiteSpace4(r)
+		}
+	}
+}
+
+func BenchmarkIsWhiteSpace5(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		for _, r := range RuneSamples() {
+			isWhiteSpace5(r)
 		}
 	}
 }
