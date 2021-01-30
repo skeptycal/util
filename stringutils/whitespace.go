@@ -33,6 +33,7 @@ func isWhiteSpace(c byte) bool {
     	return c == ' ' || c == '\n' || c == '\t' || c == '\r' || c == '\f' || c == '\v' || c == 0x0085 || c == 0x00A0
 }
 
+
 func isWhiteSpace2(c byte) bool {
 	switch c {
 	case ' ':
