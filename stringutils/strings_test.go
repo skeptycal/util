@@ -15,7 +15,8 @@ import (
 	"unicode"
 )
 
-/* Benchmark results
+// Benchmark results
+/*
 BenchmarkIsWhiteSpace-8    	957675391	         1.31 ns/op	       0 B/op	       0 allocs/op
 BenchmarkIsAlphaSwitch-8   	644505457	         1.84 ns/op	       0 B/op	       0 allocs/op
 BenchmarkIsAlphaNum-8      	773480662	         1.54 ns/op	       0 B/op	       0 allocs/op
@@ -67,6 +68,53 @@ BenchmarkIsAlphaNum-8      	 4399827	       282 ns/op	     144 B/op	       1 all
 BenchmarkIsAlphaNum2-8     	 2731586	       444 ns/op	     144 B/op	       1 allocs/op
 
 ================================================================
+using n = 1024
+BenchmarkIsAlpha-8         	   39996	     30380 ns/op	    1024 B/op	       1 allocs/op
+BenchmarkIsDigit-8         	   42748	     28097 ns/op	    1024 B/op	       1 allocs/op
+BenchmarkIsAlphaSwitch-8   	   39072	     31276 ns/op	    1024 B/op	       1 allocs/op
+BenchmarkIsWhiteSpace-8    	   44443	     27086 ns/op	    5120 B/op	       2 allocs/op
+BenchmarkIsWhiteSpace2-8   	   43936	     27800 ns/op	    5120 B/op	       2 allocs/op
+BenchmarkIsAlphaNum-8      	   40113	     29856 ns/op	    1024 B/op	       1 allocs/op
+BenchmarkIsAlphaNum2-8     	   43183	     28851 ns/op	    1024 B/op	       1 allocs/op
+
+(without preallocation of rune make buffer; e.g. the 'n' in retval := make([]byte, 0, n)
+BenchmarkIsWhiteSpace-8    	   43213	     28103 ns/op	    9208 B/op	      11 allocs/op
+BenchmarkIsWhiteSpace2-8   	   41742	     29355 ns/op	    9208 B/op	      11 allocs/op
+
+(without preallocation of either buffer)
+BenchmarkIsAlpha-8         	   39459	     30819 ns/op	    2040 B/op	       8 allocs/op
+BenchmarkIsDigit-8         	   44440	     26921 ns/op	    2040 B/op	       8 allocs/op
+BenchmarkIsAlphaSwitch-8   	   39086	     31031 ns/op	    2040 B/op	       8 allocs/op
+BenchmarkIsWhiteSpace-8    	   42594	     28711 ns/op	   10224 B/op	      18 allocs/op
+BenchmarkIsWhiteSpace2-8   	   40940	     30592 ns/op	   10224 B/op	      18 allocs/op
+BenchmarkIsAlphaNum-8      	   39778	     30075 ns/op	    2040 B/op	       8 allocs/op
+BenchmarkIsAlphaNum2-8     	   43225	     28086 ns/op	    2040 B/op	       8 allocs/op
+
+================================================================
+n = 65535 (with preallocation) ( ... preallocation is generally good)
+
+BenchmarkIsAlpha-8         	     619	   1899081 ns/op	   65539 B/op	       1 allocs/op
+BenchmarkIsDigit-8         	     721	   1660150 ns/op	   65536 B/op	       1 allocs/op
+BenchmarkIsAlphaSwitch-8   	     636	   1888789 ns/op	   65536 B/op	       1 allocs/op
+BenchmarkIsWhiteSpace-8    	     708	   1717852 ns/op	  327681 B/op	       2 allocs/op
+BenchmarkIsWhiteSpace2-8   	     688	   1718280 ns/op	  327681 B/op	       2 allocs/op
+BenchmarkIsAlphaNum-8      	     643	   1875367 ns/op	   65536 B/op	       1 allocs/op
+BenchmarkIsAlphaNum2-8     	     690	   1746706 ns/op	   65536 B/op	       1 allocs/op
+
+(no preallocation)
+BenchmarkIsAlpha-8         	     613	   1914118 ns/op	  284666 B/op	      23 allocs/op
+BenchmarkIsDigit-8         	     702	   1726401 ns/op	  284666 B/op	      23 allocs/op
+BenchmarkIsAlphaSwitch-8   	     594	   1990682 ns/op	  284669 B/op	      23 allocs/op
+BenchmarkIsWhiteSpace-8    	     608	   1941723 ns/op	 1693433 B/op	      49 allocs/op
+BenchmarkIsWhiteSpace2-8   	     594	   2052508 ns/op	 1693435 B/op	      49 allocs/op
+BenchmarkIsAlphaNum-8      	     614	   1972096 ns/op	  284665 B/op	      23 allocs/op
+BenchmarkIsAlphaNum2-8     	     666	   1828022 ns/op	  284666 B/op	      23 allocs/op
+
+*/
+
+// Alternate methods that generated worse results...
+/*
+================================================================
 using declared variables for ByteSamples() and RuneSamples()  byteSamples / runeSamples (this is slightly slower??  )
 
 BenchmarkIsAlpha-8         	44298718	        29.5 ns/op	       0 B/op	       0 allocs/op
@@ -92,37 +140,46 @@ BenchmarkIsAlphaNum-8      	22809402	        53.9 ns/op	      32 B/op	       1 a
 BenchmarkIsAlphaNum2-8     	25673344	        46.1 ns/op	      32 B/op	       1 allocs/op
 */
 
+const (
+    defaultSamples = 1<<16-1
+    maxSamples = 1<<32-1
+)
 func Samples(n int)  []byte {
-    retval := make([]byte,n)
-    for i := 0; i < n; i++ {
-        retval := append(retval,rand.Intn(126))
+    if n < 2 || n > maxSamples {
+        n = defaultSamples
     }
+    retval := make([]byte, 0, n)
+    for i := 0; i < n; i++ {
+        retval = append(retval,byte(rand.Intn(126)))
+    }
+    return retval
 }
 
-func RuneSamples() []rune {
+func SmallRuneSamples() []rune {
 	return []rune{
 		'A', '0', 65, 't', 'n', 'f', 'r', 'v', '\t', '\n', '\f', '\r', '\v', 48, 12, ' ', 0x20, 8,
-		'A', '0', 65, 't', 'n', 'f', 'r', 'v', '\t', '\n', '\f', '\r', '\v', 48, 12, ' ', 0x20, 8,
-		'A', '0', 65, 't', 'n', 'f', 'r', 'v', '\t', '\n', '\f', '\r', '\v', 48, 12, ' ', 0x20, 8,
-		'A', '0', 65, 't', 'n', 'f', 'r', 'v', '\t', '\n', '\f', '\r', '\v', 48, 12, ' ', 0x20, 8,
-		'A', '0', 65, 't', 'n', 'f', 'r', 'v', '\t', '\n', '\f', '\r', '\v', 48, 12, ' ', 0x20, 8,
-		'A', '0', 65, 't', 'n', 'f', 'r', 'v', '\t', '\n', '\f', '\r', '\v', 48, 12, ' ', 0x20, 8,
-		'A', '0', 65, 't', 'n', 'f', 'r', 'v', '\t', '\n', '\f', '\r', '\v', 48, 12, ' ', 0x20, 8,
+	}
+}
+
+func SmallByteSamples() []byte {
+	return []byte{
 		'A', '0', 65, 't', 'n', 'f', 'r', 'v', '\t', '\n', '\f', '\r', '\v', 48, 12, ' ', 0x20, 8,
 	}
 }
 
 func ByteSamples() []byte {
-	return []byte{
-		'A', '0', 65, 't', 'n', 'f', 'r', 'v', '\t', '\n', '\f', '\r', '\v', 48, 12, ' ', 0x20, 8,
-		'A', '0', 65, 't', 'n', 'f', 'r', 'v', '\t', '\n', '\f', '\r', '\v', 48, 12, ' ', 0x20, 8,
-		'A', '0', 65, 't', 'n', 'f', 'r', 'v', '\t', '\n', '\f', '\r', '\v', 48, 12, ' ', 0x20, 8,
-		'A', '0', 65, 't', 'n', 'f', 'r', 'v', '\t', '\n', '\f', '\r', '\v', 48, 12, ' ', 0x20, 8,
-		'A', '0', 65, 't', 'n', 'f', 'r', 'v', '\t', '\n', '\f', '\r', '\v', 48, 12, ' ', 0x20, 8,
-		'A', '0', 65, 't', 'n', 'f', 'r', 'v', '\t', '\n', '\f', '\r', '\v', 48, 12, ' ', 0x20, 8,
-		'A', '0', 65, 't', 'n', 'f', 'r', 'v', '\t', '\n', '\f', '\r', '\v', 48, 12, ' ', 0x20, 8,
-		'A', '0', 65, 't', 'n', 'f', 'r', 'v', '\t', '\n', '\f', '\r', '\v', 48, 12, ' ', 0x20, 8,
-	}
+    return Samples(defaultSamples)
+}
+
+func RuneSamples() []rune {
+    const n = defaultSamples
+
+    retval := make([]rune,0, n)
+
+    for _, c := range Samples(n) {
+        retval = append(retval, rune(c))
+    }
+    return retval
 }
 
 // This is a horrible idea ... much slower
