@@ -247,15 +247,44 @@ BenchmarkIsAnySpace-8            	  111583	     10591 ns/op	    1024 B/op	      
 BenchmarkUnicode_IsSpace-8       	  109530	     11113 ns/op	    1024 B/op	       1 allocs/op
 
 ================================================================
-n = 1<<10
+n = 1<<12
 ================================================================
+BenchmarkIsASCIISpace-8          	   12034	    100013 ns/op	    4096 B/op	       1 allocs/op
+BenchmarkIsWhiteSpace-8          	   12196	    100702 ns/op	    4096 B/op	       1 allocs/op
+BenchmarkIsWhiteSpace2-8         	   10000	    103272 ns/op	    4096 B/op	       1 allocs/op
+BenchmarkIsWhiteSpace6-8         	   10000	    114599 ns/op	   16384 B/op	       1 allocs/op
+BenchmarkIsUnicodeWhiteSpace-8   	    6301	    193826 ns/op	   16384 B/op	       1 allocs/op
+BenchmarkIsAnySpace-8            	    6343	    192879 ns/op	   16384 B/op	       1 allocs/op
+BenchmarkUnicode_IsSpace-8       	    6753	    190504 ns/op	   16384 B/op	       1 allocs/op
+
+================================================================
+n = 1<<16 - 1
+================================================================
+BenchmarkIsASCIISpace-8          	     614	   1665135 ns/op	   65539 B/op	       1 allocs/op
+BenchmarkIsWhiteSpace-8          	     754	   1581501 ns/op	   65536 B/op	       1 allocs/op
+BenchmarkIsWhiteSpace2-8         	     726	   1659465 ns/op	   65536 B/op	       1 allocs/op
+BenchmarkIsWhiteSpace6-8         	     654	   1885503 ns/op	  262145 B/op	       1 allocs/op
+BenchmarkIsUnicodeWhiteSpace-8   	     386	   3095246 ns/op	  262145 B/op	       1 allocs/op
+BenchmarkIsAnySpace-8            	     382	   3108825 ns/op	  262144 B/op	       1 allocs/op
+BenchmarkUnicode_IsSpace-8       	     416	   2908501 ns/op	  262145 B/op	       1 allocs/op
+
+================================================================
+n = 1<<24 - 1
+================================================================
+BenchmarkIsASCIISpace-8          	       3	 394559021 ns/op	16777312 B/op	       2 allocs/op
+BenchmarkIsWhiteSpace-8          	       3	 394949234 ns/op	16777248 B/op	       1 allocs/op
+BenchmarkIsWhiteSpace2-8         	       3	 419641493 ns/op	16777218 B/op	       1 allocs/op
+BenchmarkIsWhiteSpace6-8         	       3	 454344906 ns/op	67108864 B/op	       1 allocs/op
+BenchmarkIsUnicodeWhiteSpace-8   	       2	 675746892 ns/op	67108912 B/op	       1 allocs/op
+BenchmarkIsAnySpace-8            	       2	 674386516 ns/op	67108864 B/op	       1 allocs/op
+BenchmarkUnicode_IsSpace-8       	       2	 714679118 ns/op	67108864 B/op	       1 allocs/op
 */
 
 const (
 	defaultSamples = 1<<8 - 1
     maxSamples     = 1<<32 - 1
 
-    numSamples = 1<<12
+    numSamples = 1<<24
 )
 
 func init() {
@@ -551,7 +580,7 @@ func TestIsIsAlphaSwitch(t *testing.T) {
 }
 
 func TestIsWhiteSpace(t *testing.T) {
-	for _, c := range ByteSamples() {
+	for _, c := range SmallByteSamples() {
 		name := fmt.Sprintf("IsWhiteSpace: %v", c)
 		t.Run(name, func(t *testing.T) {
 			got := isWhiteSpace(c)
@@ -563,7 +592,7 @@ func TestIsWhiteSpace(t *testing.T) {
 	}
 }
 func TestIsWhiteSpace2(t *testing.T) {
-	for _, c := range ByteSamples() {
+	for _, c := range SmallByteSamples() {
 		name := fmt.Sprintf("IsWhiteSpace2: %v", c)
 		t.Run(name, func(t *testing.T) {
 			got := isWhiteSpace2(c)
@@ -575,7 +604,7 @@ func TestIsWhiteSpace2(t *testing.T) {
 	}
 }
 func TestIsWhiteSpace3(t *testing.T) {
-	for _, c := range RuneSamples() {
+	for _, c := range SmallRuneSamples() {
 		name := fmt.Sprintf("IsWhiteSpace3: (%q)", c)
 		t.Run(name, func(t *testing.T) {
 			got := isWhiteSpace3(c)
@@ -587,7 +616,7 @@ func TestIsWhiteSpace3(t *testing.T) {
 	}
 }
 func TestIsWhiteSpace4(t *testing.T) {
-	for _, c := range RuneSamples() {
+	for _, c := range SmallRuneSamples() {
 		name := fmt.Sprintf("IsWhiteSpace4: %q", c)
 		t.Run(name, func(t *testing.T) {
 			got := isWhiteSpace4(c)
@@ -599,7 +628,7 @@ func TestIsWhiteSpace4(t *testing.T) {
 	}
 }
 func TestIsWhiteSpace5(t *testing.T) {
-	for _, c := range RuneSamples() {
+	for _, c := range SmallRuneSamples() {
 		name := fmt.Sprintf("IsWhiteSpace5: %v", c)
 		t.Run(name, func(t *testing.T) {
 			got := isWhiteSpaceBoolMap(c)

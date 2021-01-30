@@ -111,7 +111,7 @@ func IsASCIISpace(c byte) bool {
 	return c == ' ' || c == '\n' || c == '\t' || c == '\r' || c == '\f' || c == '\v' || c == 0x0085 || c == 0x00A0
 }
 
-// IsAnySpace reports whether the rune is any utf8 whitespace character
+// IsUnicodeWhiteSpace reports whether the rune is any utf8 whitespace character
 // using the broadest and most complete definition.
 //
 // The speed of this implementation ~25% slower than that of
