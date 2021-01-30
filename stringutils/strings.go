@@ -107,49 +107,7 @@ func IsASCIISpace(c byte) bool {
 	return c == ' ' || c == '\n' || c == '\t' || c == '\r' || c == '\f' || c == '\v' || c == 0x0085 || c == 0x00A0
 }
 
-// In computer programming, whitespace is any character or series of
-// characters that represent horizontal or vertical space in typography.
-// When rendered, a whitespace character does not correspond to a visible
-// mark, but typically does occupy an area on a page. For example, the
-// common whitespace symbol U+0020 SPACE (also ASCII 32) represents a
-// blank space punctuation character in text, used as a word divider in
-// Western scripts.
-//
-// Reference: https://en.wikipedia.org/wiki/Whitespace_character
-var UnicodeWhiteSpaceMap = map[rune]string{
-	0x0009: `CHARACTER TABULATION <TAB>`,
-	0x000A: `ASCII LF`,
-	0x000B: `LINE TABULATION <VT>`,
-	0x000C: `FORM FEED <FF>`,
-	0x000D: `ASCII CR`,
-	0x0020: `SPACE <SP>`,
-	0x00A0: `NO-BREAK SPACE <NBSP>`,
-	0x0085: `NEL; Next Line`,
-	0x1680: `Ogham space mark, interword separation in Ogham text`,
-	0x2000: `EN QUAD, 0x2002 is preferred`,
-	0x2001: `EM QUAD, mutton quad, 0x2003 is preferred`,
-	0x2002: `EN SPACE, "nut", &ensp, LaTeX: '\enspace'`,
-	0x2003: `EM SPACE, "mutton", &emsp;, LaTeX: '\quad'`,
-	0x2004: `THREE-PER-EM SPACE, "thick space", &emsp13;`,
-	0x2005: `four-per-em space, "mid space", &emsp14;`,
-	0x2006: `SIX-PER-EM SPACE, sometimes equated to U+2009`,
-	0x2007: `FIGURE SPACE, width of monospaced char, &numsp;`,
-	0x2008: `PUNCTUATION SPACE, width of period or comma, &puncsp;`,
-	0x2009: `THIN SPACE, 1/5th em, thousands sep, &thinsp;; LaTeX: '\,'`,
-	0x200A: `HAIR SPACE, &hairsp;`,
-	0x2028: `LINE SEPARATOR`,
-	0x2029: `PARAGRAPH SEPARATOR`,
-	0x202F: `NARROW NO-BREAK SPACE`,
-	0x205F: `MEDIUM MATHEMATICAL SPACE, MMSP, &MediumSpace, 4/18 em`,
-	0x3000: `IDEOGRAPHIC SPACE, full width CJK character cell`,
-	0xFFEF: `ZERO WIDTH NO-BREAK SPACE <ZWNBSP> (BOM), deprecated Unicode 3.2 (use U+2060)`,
-	// Related Unicode characters property White_Space=no
-	0x180E: `MONGOLIAN VOWEL SEPARATOR, not whitespace as of Unicode 6.3.0`,
-	0x200B: `ZERO WIDTH SPACE, ZWSP, "soft hyphen", &ZeroWidthSpace;`,
-	0x200C: `ZERO WIDTH NON-JOINER, ZWNJ, &zwnj;`,
-	0x200D: `ZERO WIDTH JOINER, ZWJ, &zwj;`,
-	0x2060: `WORD JOINER, WJ, not a line break, &NoBreak;`,
-}
+
 
 // IsAnySpace reports whether the rune is any utf8 whitespace character
 // using the broadest and most complete definition.
@@ -303,4 +261,48 @@ func RuneInfo(c rune) {
 	fmt.Printf("Glyph:   %q\n", s)
 	fmt.Printf("UTF-8:   [% x]\n", []byte(s))
 	fmt.Printf("Unicode: %U\n", []rune(s))
+}
+
+// In computer programming, whitespace is any character or series of
+// characters that represent horizontal or vertical space in typography.
+// When rendered, a whitespace character does not correspond to a visible
+// mark, but typically does occupy an area on a page. For example, the
+// common whitespace symbol U+0020 SPACE (also ASCII 32) represents a
+// blank space punctuation character in text, used as a word divider in
+// Western scripts.
+//
+// Reference: https://en.wikipedia.org/wiki/Whitespace_character
+var UnicodeWhiteSpaceMap = map[rune]string{
+	0x0009: `CHARACTER TABULATION <TAB>`,
+	0x000A: `ASCII LF`,
+	0x000B: `LINE TABULATION <VT>`,
+	0x000C: `FORM FEED <FF>`,
+	0x000D: `ASCII CR`,
+	0x0020: `SPACE <SP>`,
+	0x00A0: `NO-BREAK SPACE <NBSP>`,
+	0x0085: `NEL; Next Line`,
+	0x1680: `Ogham space mark, interword separation in Ogham text`,
+	0x2000: `EN QUAD, 0x2002 is preferred`,
+	0x2001: `EM QUAD, mutton quad, 0x2003 is preferred`,
+	0x2002: `EN SPACE, "nut", &ensp, LaTeX: '\enspace'`,
+	0x2003: `EM SPACE, "mutton", &emsp;, LaTeX: '\quad'`,
+	0x2004: `THREE-PER-EM SPACE, "thick space", &emsp13;`,
+	0x2005: `four-per-em space, "mid space", &emsp14;`,
+	0x2006: `SIX-PER-EM SPACE, sometimes equated to U+2009`,
+	0x2007: `FIGURE SPACE, width of monospaced char, &numsp;`,
+	0x2008: `PUNCTUATION SPACE, width of period or comma, &puncsp;`,
+	0x2009: `THIN SPACE, 1/5th em, thousands sep, &thinsp;; LaTeX: '\,'`,
+	0x200A: `HAIR SPACE, &hairsp;`,
+	0x2028: `LINE SEPARATOR`,
+	0x2029: `PARAGRAPH SEPARATOR`,
+	0x202F: `NARROW NO-BREAK SPACE`,
+	0x205F: `MEDIUM MATHEMATICAL SPACE, MMSP, &MediumSpace, 4/18 em`,
+	0x3000: `IDEOGRAPHIC SPACE, full width CJK character cell`,
+	0xFFEF: `ZERO WIDTH NO-BREAK SPACE <ZWNBSP> (BOM), deprecated Unicode 3.2 (use U+2060)`,
+	// Related Unicode characters property White_Space=no
+	0x180E: `MONGOLIAN VOWEL SEPARATOR, not whitespace as of Unicode 6.3.0`,
+	0x200B: `ZERO WIDTH SPACE, ZWSP, "soft hyphen", &ZeroWidthSpace;`,
+	0x200C: `ZERO WIDTH NON-JOINER, ZWNJ, &zwnj;`,
+	0x200D: `ZERO WIDTH JOINER, ZWJ, &zwj;`,
+	0x2060: `WORD JOINER, WJ, not a line break, &NoBreak;`,
 }

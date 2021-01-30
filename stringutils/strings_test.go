@@ -189,20 +189,13 @@ BenchmarkIsUnicodeWhiteSpace-8   	10632638	       118 ns/op	      16 B/op	      
 */
 
 const (
-	defaultSamples = 1<<2 - 1 // 1<<8 - 1
-	maxSamples     = 1<<32 - 1
+	defaultSamples = 1<<8 - 1
+    maxSamples     = 1<<32 - 1
+
+    numSamples = 1<<2 - 1
 )
 
-func Samples(n int) []byte {
-	if n < 2 || n > maxSamples {
-		n = defaultSamples
-	}
-	retval := make([]byte, 0, n)
-	for i := 0; i < n; i++ {
-		retval = append(retval, byte(rand.Intn(126)))
-	}
-	return retval
-}
+
 
 func SmallRuneSamples() []rune {
 	return []rune{
@@ -217,16 +210,24 @@ func SmallByteSamples() []byte {
 }
 
 func ByteSamples() []byte {
-	return Samples(defaultSamples)
-}
+    n := numSamples
+	if n < 2 || n > maxSamples {
+		n = defaultSamples
+	}
+	retval := make([]byte, 0, n)
+	for i := 0; i < n; i++ {
+		retval = append(retval, byte(rand.Intn(126)))
+	}
+	return retval}
 
 func RuneSamples() []rune {
-	const n = defaultSamples
-
+    n := numSamples
+	if n < 2 || n > maxSamples {
+		n = defaultSamples
+	}
 	retval := make([]rune, 0, n)
-
-	for _, c := range Samples(n) {
-		retval = append(retval, rune(c))
+	for i := 0; i < n; i++ {
+        retval = append(retval, rune(rand.Intn(0x3000)))
 	}
 	return retval
 }
@@ -301,6 +302,14 @@ func BenchmarkIsWhiteSpace2(b *testing.B) {
 	}
 }
 
+func BenchmarkIsWhiteSpace6(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		for _, r := range RuneSamples() {
+			isWhiteSpace6(r)
+		}
+	}
+}
+
 func BenchmarkIsUnicodeWhiteSpace(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		for _, r := range RuneSamples() {
@@ -325,21 +334,23 @@ func BenchmarkUnicode_IsSpace(b *testing.B) {
 	}
 }
 
-func BenchmarkIsWhiteSpace5(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		for _, r := range RuneSamples() {
-			isWhiteSpace5(r)
-		}
-	}
-}
 
-func BenchmarkIsWhiteSpace4(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		for _, r := range RuneSamples() {
-			isWhiteSpace4(r)
-		}
-	}
-}
+
+// func BenchmarkIsWhiteSpace5(b *testing.B) {
+// 	for i := 0; i < b.N; i++ {
+// 		for _, r := range RuneSamples() {
+// 			isWhiteSpace5(r)
+// 		}
+// 	}
+// }
+
+// func BenchmarkIsWhiteSpace4(b *testing.B) {
+// 	for i := 0; i < b.N; i++ {
+// 		for _, r := range RuneSamples() {
+// 			isWhiteSpace4(r)
+// 		}
+// 	}
+// }
 
 func TestIsAlpha(t *testing.T) {
 	type args struct {
