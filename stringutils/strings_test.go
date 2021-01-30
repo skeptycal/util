@@ -140,25 +140,38 @@ using maps for checks (3 [string]string/ 4 [rune]string ) (this is much worse th
 BenchmarkIsWhiteSpace-8    	     708	   1681603 ns/op	  327680 B/op	       2 allocs/op
 BenchmarkIsWhiteSpace2-8   	     666	   1775882 ns/op	  327681 B/op	       2 allocs/op
 
+ using map [string]string
 BenchmarkIsWhiteSpace3-8   	      18	  63820745 ns/op	76760858 B/op	   68792 allocs/op
+ using [rune]string
 BenchmarkIsWhiteSpace4-8   	      22	  51020315 ns/op	47036008 B/op	   68787 allocs/op
+ using [rune]bool (returned on the fly from a function call)
 BenchmarkIsWhiteSpace5-8   	      30	  38028585 ns/op	15449897 B/op	   78547 allocs/op
+ using [rune]bool from var(map literal)
+BenchmarkIsWhiteSpace5-8   	     417	   2779469 ns/op	  327681 B/op	       2 allocs/op
 
+
+using pre-made maps (var = map literal) for 4 and 5 .. 3 is still generated within function
+BenchmarkIsWhiteSpace-8    	10117532	       119 ns/op	      16 B/op	       2 allocs/op
+BenchmarkIsWhiteSpace2-8   	 9799669	       117 ns/op	      16 B/op	       2 allocs/op
+BenchmarkIsWhiteSpace3-8   	  402494	      2942 ns/op	    3515 B/op	       5 allocs/op
+BenchmarkIsWhiteSpace4-8   	 7176753	       164 ns/op	      16 B/op	       2 allocs/op
+BenchmarkIsWhiteSpace5-8   	 7355563	       164 ns/op	      16 B/op	       2 allocs/op
 */
 
 const (
-    defaultSamples = 1<<16-1
-    maxSamples = 1<<32-1
+	defaultSamples = 1<<2 - 1  // 1<<8 - 1
+	maxSamples     = 1<<32 - 1
 )
-func Samples(n int)  []byte {
-    if n < 2 || n > maxSamples {
-        n = defaultSamples
-    }
-    retval := make([]byte, 0, n)
-    for i := 0; i < n; i++ {
-        retval = append(retval,byte(rand.Intn(126)))
-    }
-    return retval
+
+func Samples(n int) []byte {
+	if n < 2 || n > maxSamples {
+		n = defaultSamples
+	}
+	retval := make([]byte, 0, n)
+	for i := 0; i < n; i++ {
+		retval = append(retval, byte(rand.Intn(126)))
+	}
+	return retval
 }
 
 func SmallRuneSamples() []rune {
@@ -174,18 +187,18 @@ func SmallByteSamples() []byte {
 }
 
 func ByteSamples() []byte {
-    return Samples(defaultSamples)
+	return Samples(defaultSamples)
 }
 
 func RuneSamples() []rune {
-    const n = defaultSamples
+	const n = defaultSamples
 
-    retval := make([]rune,0, n)
+	retval := make([]rune, 0, n)
 
-    for _, c := range Samples(n) {
-        retval = append(retval, rune(c))
-    }
-    return retval
+	for _, c := range Samples(n) {
+		retval = append(retval, rune(c))
+	}
+	return retval
 }
 
 // This is a horrible idea ... much slower
@@ -275,19 +288,6 @@ func BenchmarkIsAlphaNum2(b *testing.B) {
 	}
 }
 
-func TestIsWhiteSpace(t *testing.T) {
-	for _, c := range RuneSamples() {
-		name := fmt.Sprintf("IsWhiteSpace: %v", c)
-		t.Run(name, func(t *testing.T) {
-			got := IsWhiteSpace(c)
-			want := unicode.IsSpace(c)
-			if got != want {
-				t.Errorf("IsWhiteSpace() = %v, want %v", got, want)
-			}
-		})
-
-	}
-}
 
 func TestIsAlpha(t *testing.T) {
 	type args struct {
@@ -416,6 +416,68 @@ func TestIsIsAlphaSwitch(t *testing.T) {
 		t.Run(string(tt.args.c), func(t *testing.T) {
 			if got := IsAlphaSwitch(tt.args.c); got != tt.want {
 				t.Errorf("IsAlphaSwitch() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+
+func TestIsWhiteSpace(t *testing.T) {
+	for _, c := range RuneSamples() {
+		name := fmt.Sprintf("IsWhiteSpace: %v", c)
+		t.Run(name, func(t *testing.T) {
+			got := IsWhiteSpace(c)
+			want := unicode.IsSpace(c)
+			if got != want {
+				t.Errorf("IsWhiteSpace() = %v, want %v", got, want)
+			}
+		})
+	}
+}
+func TestIsWhiteSpace2(t *testing.T) {
+	for _, c := range RuneSamples() {
+		name := fmt.Sprintf("IsWhiteSpace2: %v", c)
+		t.Run(name, func(t *testing.T) {
+			got := isWhiteSpace2(c)
+			want := unicode.IsSpace(c)
+			if got != want {
+				t.Errorf("IsWhiteSpace2() = %v, want %v", got, want)
+			}
+		})
+	}
+}
+func TestIsWhiteSpace3(t *testing.T) {
+	for _, c := range RuneSamples() {
+		name := fmt.Sprintf("IsWhiteSpace3: %v", c)
+		t.Run(name, func(t *testing.T) {
+			got := isWhiteSpace3(c)
+			want := unicode.IsSpace(c)
+			if got != want {
+				t.Errorf("IsWhiteSpace3() = %v, want %v", got, want)
+			}
+		})
+	}
+}
+func TestIsWhiteSpace4(t *testing.T) {
+	for _, c := range RuneSamples() {
+		name := fmt.Sprintf("IsWhiteSpace4: %v", c)
+		t.Run(name, func(t *testing.T) {
+			got := isWhiteSpace4(c)
+			want := unicode.IsSpace(c)
+			if got != want {
+				t.Errorf("IsWhiteSpace4() = %v, want %v", got, want)
+			}
+		})
+	}
+}
+func TestIsWhiteSpace5(t *testing.T) {
+	for _, c := range RuneSamples() {
+		name := fmt.Sprintf("IsWhiteSpace5: %v", c)
+		t.Run(name, func(t *testing.T) {
+			got := isWhiteSpace5(c)
+			want := unicode.IsSpace(c)
+			if got != want {
+				t.Errorf("IsWhiteSpace5() = %v, want %v", got, want)
 			}
 		})
 	}

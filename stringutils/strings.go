@@ -99,7 +99,7 @@ func IsWhiteSpace(c rune) bool {
 }
 
 func isWhiteSpace3(c rune) bool {
-    spaceMap := map[string]string {
+    var spaceMap = map[string]string {
         "U+0020":	"SPACE",
         "U+00A0":	"NO-BREAK SPACE",
         "U+1680":	"OGHAM SPACE MARK",
@@ -128,8 +128,7 @@ func isWhiteSpace3(c rune) bool {
     // return unicode.IsSpace(c)
 }
 
-func isWhiteSpace4(c rune) bool {
-    spaceMap := map[rune]string {
+var spaceMap4 = map[rune]string{
         0x0020:	"SPACE",
         0x00A0:	"NO-BREAK SPACE",
         0x1680:	"OGHAM SPACE MARK",
@@ -149,17 +148,15 @@ func isWhiteSpace4(c rune) bool {
         0x3000:	"IDEOGRAPHIC SPACE",
     }
 
-    _, ok := spaceMap[c]
-    return ok
-    // ok {
-    //     return true
-    // }
-    // return false
-    // return unicode.IsSpace(c)
+func isWhiteSpace4(c rune) bool {
+
+    if _, ok := spaceMap4[c]; ok {
+        return true
+    }
+    return false
 }
 
-func spaceMap5() map[rune]bool {
-    return  map[rune]bool {
+var spaceMap5 = map[rune]bool{
         0x0020:	true,
         0x00A0:	true,
         0x1680:	true,
@@ -178,16 +175,15 @@ func spaceMap5() map[rune]bool {
         0x205F:	true,
         0x3000:	true,
     }
-}
+
 
 func isWhiteSpace5(c rune) bool {
 
-    _, ok := spaceMap5()[c]
-    return ok
-    // ok {
-    //     return true
-    // }
-    // return false
+    if v, ok := spaceMap5[c]; ok && v {
+        return true
+    }
+    return false
+
     // return unicode.IsSpace(c)
 }
 
