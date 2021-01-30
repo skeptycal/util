@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"math/rand"
 	"testing"
+	"time"
 	"unicode"
 )
 
@@ -188,13 +189,78 @@ BenchmarkIsWhiteSpace5-8         	 7419589	       160 ns/op	      16 B/op	      
 BenchmarkIsUnicodeWhiteSpace-8   	10632638	       118 ns/op	      16 B/op	       2 allocs/op
 */
 
+// Final Benchmark Results
+/*
+================================================================
+n = 3
+================================================================
+BenchmarkIsASCIISpace-8          	12261010	        92.3 ns/op	       3 B/op	       1 allocs/op
+BenchmarkIsWhiteSpace-8          	12955863	        89.8 ns/op	       3 B/op	       1 allocs/op
+BenchmarkIsWhiteSpace2-8         	11787762	        94.6 ns/op	       3 B/op	       1 allocs/op
+BenchmarkIsWhiteSpace6-8         	10821630	       117 ns/op	      16 B/op	       1 allocs/op
+BenchmarkIsUnicodeWhiteSpace-8   	 8072452	       144 ns/op	      16 B/op	       1 allocs/op
+BenchmarkIsAnySpace-8            	 8138602	       145 ns/op	      16 B/op	       1 allocs/op
+BenchmarkUnicode_IsSpace-8       	 7953177	       152 ns/op	      16 B/op	       1 allocs/op
+
+================================================================
+n = 1<<2
+================================================================
+BenchmarkIsASCIISpace-8          	10180090	       119 ns/op	       4 B/op	       1 allocs/op
+BenchmarkIsWhiteSpace-8          	10503676	       120 ns/op	       4 B/op	       1 allocs/op
+BenchmarkIsWhiteSpace2-8         	 9729558	       126 ns/op	       4 B/op	       1 allocs/op
+BenchmarkIsWhiteSpace6-8         	 8457750	       143 ns/op	      16 B/op	       1 allocs/op
+BenchmarkIsUnicodeWhiteSpace-8   	 6555621	       191 ns/op	      16 B/op	       1 allocs/op
+BenchmarkIsAnySpace-8            	 6257503	       186 ns/op	      16 B/op	       1 allocs/op
+BenchmarkUnicode_IsSpace-8       	 6285614	       195 ns/op	      16 B/op	       1 allocs/op
+
+================================================================
+n = 1<<3
+================================================================
+BenchmarkIsASCIISpace-8          	 5473182	       229 ns/op	       8 B/op	       1 allocs/op
+BenchmarkIsWhiteSpace-8          	 5677147	       235 ns/op	       8 B/op	       1 allocs/op
+BenchmarkIsWhiteSpace2-8         	 4445811	       257 ns/op	       8 B/op	       1 allocs/op
+BenchmarkIsWhiteSpace6-8         	 4806199	       262 ns/op	      32 B/op	       1 allocs/op
+BenchmarkIsUnicodeWhiteSpace-8   	 3098326	       374 ns/op	      32 B/op	       1 allocs/op
+BenchmarkIsAnySpace-8            	 3237192	       365 ns/op	      32 B/op	       1 allocs/op
+BenchmarkUnicode_IsSpace-8       	 3176928	       420 ns/op	      32 B/op	       1 allocs/op
+
+================================================================
+n = 1<<4
+================================================================
+BenchmarkIsASCIISpace-8          	 2850421	       426 ns/op	      16 B/op	       1 allocs/op
+BenchmarkIsWhiteSpace-8          	 2863578	       423 ns/op	      16 B/op	       1 allocs/op
+BenchmarkIsWhiteSpace2-8         	 2745991	       438 ns/op	      16 B/op	       1 allocs/op
+BenchmarkIsWhiteSpace6-8         	 2486973	       502 ns/op	      64 B/op	       1 allocs/op
+BenchmarkIsUnicodeWhiteSpace-8   	 1717446	       707 ns/op	      64 B/op	       1 allocs/op
+BenchmarkIsAnySpace-8            	 1688938	       700 ns/op	      64 B/op	       1 allocs/op
+BenchmarkUnicode_IsSpace-8       	 1641483	       738 ns/op	      64 B/op	       1 allocs/op
+
+================================================================
+n = 1<<8
+================================================================
+BenchmarkIsASCIISpace-8          	  171495	      6260 ns/op	     256 B/op	       1 allocs/op
+BenchmarkIsWhiteSpace-8          	  193882	      6198 ns/op	     256 B/op	       1 allocs/op
+BenchmarkIsWhiteSpace2-8         	  187462	      6511 ns/op	     256 B/op	       1 allocs/op
+BenchmarkIsWhiteSpace6-8         	  160911	      7757 ns/op	    1024 B/op	       1 allocs/op
+BenchmarkIsUnicodeWhiteSpace-8   	  110793	     10816 ns/op	    1024 B/op	       1 allocs/op
+BenchmarkIsAnySpace-8            	  111583	     10591 ns/op	    1024 B/op	       1 allocs/op
+BenchmarkUnicode_IsSpace-8       	  109530	     11113 ns/op	    1024 B/op	       1 allocs/op
+
+================================================================
+n = 1<<10
+================================================================
+*/
+
 const (
 	defaultSamples = 1<<8 - 1
     maxSamples     = 1<<32 - 1
 
-    numSamples = 1<<2 - 1
+    numSamples = 1<<12
 )
 
+func init() {
+    rand.Seed(time.Now().UnixNano())
+}
 
 
 func SmallRuneSamples() []rune {
@@ -305,7 +371,7 @@ func BenchmarkIsWhiteSpace2(b *testing.B) {
 func BenchmarkIsWhiteSpace6(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		for _, r := range RuneSamples() {
-			isWhiteSpace6(r)
+			isWhiteSpaceLogicChain(r)
 		}
 	}
 }
@@ -522,12 +588,12 @@ func TestIsWhiteSpace3(t *testing.T) {
 }
 func TestIsWhiteSpace4(t *testing.T) {
 	for _, c := range RuneSamples() {
-		name := fmt.Sprintf("IsWhiteSpace4: %v", c)
+		name := fmt.Sprintf("IsWhiteSpace4: %q", c)
 		t.Run(name, func(t *testing.T) {
 			got := isWhiteSpace4(c)
 			want := unicode.IsSpace(c)
 			if got != want {
-				t.Errorf("IsWhiteSpace4() = %v, want %v", got, want)
+				t.Errorf("IsWhiteSpace4(%q) = %v, want %v", c, got, want)
 			}
 		})
 	}
@@ -536,10 +602,10 @@ func TestIsWhiteSpace5(t *testing.T) {
 	for _, c := range RuneSamples() {
 		name := fmt.Sprintf("IsWhiteSpace5: %v", c)
 		t.Run(name, func(t *testing.T) {
-			got := isWhiteSpace5(c)
+			got := isWhiteSpaceBoolMap(c)
 			want := unicode.IsSpace(c)
 			if got != want {
-				t.Errorf("IsWhiteSpace5() = %v, want %v", got, want)
+				t.Errorf("IsWhiteSpace5(%q) = %v, want %v", c, got, want)
 			}
 		})
 	}
