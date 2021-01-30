@@ -156,10 +156,18 @@ BenchmarkIsWhiteSpace2-8   	 9799669	       117 ns/op	      16 B/op	       2 all
 BenchmarkIsWhiteSpace3-8   	  402494	      2942 ns/op	    3515 B/op	       5 allocs/op
 BenchmarkIsWhiteSpace4-8   	 7176753	       164 ns/op	      16 B/op	       2 allocs/op
 BenchmarkIsWhiteSpace5-8   	 7355563	       164 ns/op	      16 B/op	       2 allocs/op
+
+
+3 is replaced with unicode.IsSpace(c)
+BenchmarkIsWhiteSpace-8    	  181396	      6644 ns/op	    1280 B/op	       2 allocs/op
+BenchmarkIsWhiteSpace2-8   	  174225	      6878 ns/op	    1280 B/op	       2 allocs/op
+BenchmarkIsWhiteSpace3-8   	  150616	      8072 ns/op	    1280 B/op	       2 allocs/op
+BenchmarkIsWhiteSpace4-8   	  110077	     11209 ns/op	    1280 B/op	       2 allocs/op
+BenchmarkIsWhiteSpace5-8   	  109063	     11026 ns/op	    1280 B/op	       2 allocs/op
 */
 
 const (
-	defaultSamples = 1<<8 - 1  // 1<<8 - 1
+	defaultSamples = 1<<2 - 1  // 1<<8 - 1
 	maxSamples     = 1<<32 - 1
 )
 
@@ -452,7 +460,6 @@ func TestIsWhiteSpace3(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
             got := isWhiteSpace3(c)
             want := unicode.IsSpace(c)
-			want := unicode.IsSpace(c)
 			if got != want {
 				t.Errorf("IsWhiteSpace3() = %v, want %v", got, want)
 			}

@@ -12,15 +12,22 @@ import (
 	"fmt"
 	"regexp"
 	"strconv"
+	"strings"
+	"unicode"
 )
 
-var reSpace = regexp.MustCompile(`\s+`)
+
+var reWhitespace = regexp.MustCompile(`\s+`)
+
+func DedupeWhitespace(s string) string {
+	return reWhitespace.ReplaceAllString(strings.TrimSpace(s), " ")
+}
 
 // const alphanumerics = "0123456789abcdefghijklmnopqrstuvwxyz"
 
 // Stringer implements the fmt.Stringer interface (for clarity)
 type Stringer interface {
-    String() string
+	String() string
 }
 
 func ToString(any interface{}) string {
@@ -61,16 +68,16 @@ func IsAlpha(c byte) bool {
 }
 
 func IsAlphaSwitch(c byte) bool {
-    switch  {
-    case c>='a' && c<='z':
-        return true
-    case c>='A' && c<='Z':
-        return true
-    case c>='0' && c<='9':
-        return true
-    default:
-        return false
-    }
+	switch {
+	case c >= 'a' && c <= 'z':
+		return true
+	case c >= 'A' && c <= 'Z':
+		return true
+	case c >= '0' && c <= '9':
+		return true
+	default:
+		return false
+	}
 }
 
 func IsAlphaNum2(c uint8) bool {
@@ -86,111 +93,87 @@ func IsAlphaNum(c byte) bool {
 	return false
 }
 
-
 func isWhiteSpace2(c rune) bool {
 	switch c {
 	case ' ':
-        return true
-    case '\t', '\n', '\f', '\r', '\v':
-        return true
+		return true
+	case '\t', '\n', '\f', '\r', '\v':
+		return true
 	}
 	return false
 }
 
 func IsWhiteSpace(c rune) bool {
-    return c == ' ' || c == '\t' || c == '\n' || c == '\f' || c == '\r' || c == '\v'
+	return c == ' ' || c == '\t' || c == '\n' || c == '\f' || c == '\r' || c == '\v'
 }
 
-var spaceMap3 = map[string]string {
-        "U+0020":	"SPACE",
-        "U+00A0":	"NO-BREAK SPACE",
-        "U+1680":	"OGHAM SPACE MARK",
-        "U+2000":	"EN QUAD",
-        "U+2001":	"EM QUAD",
-        "U+2002":	"EN SPACE",
-        "U+2003":	"EM SPACE",
-        "U+2004":	"THREE-PER-EM SPACE",
-        "U+2005":	"FOUR-PER-EM SPACE",
-        "U+2006":	"SIX-PER-EM SPACE",
-        "U+2007":	"FIGURE SPACE",
-        "U+2008":	"PUNCTUATION SPACE",
-        "U+2009":	"THIN SPACE",
-        "U+200A":	"HAIR SPACE",
-        "U+202F":	"NARROW NO-BREAK SPACE",
-        "U+205F":	"MEDIUM MATHEMATICAL SPACE",
-        "U+3000":	"IDEOGRAPHIC SPACE",
-    }
-func isWhiteSpace3(c rune) bool {
 
-    if _, ok := spaceMap3[string(c)]; ok {
-        return true
-    }
-    return false
-    // return unicode.IsSpace(c)
+
+func isWhiteSpace3(c rune) bool {
+    return unicode.IsSpace(c)
 }
 
 var spaceMap4 = map[rune]string{
-        0x0020:	"SPACE",
-        0x00A0:	"NO-BREAK SPACE",
-        0x1680:	"OGHAM SPACE MARK",
-        0x2000:	"EN QUAD",
-        0x2001:	"EM QUAD",
-        0x2002:	"EN SPACE",
-        0x2003:	"EM SPACE",
-        0x2004:	"THREE-PER-EM SPACE",
-        0x2005:	"FOUR-PER-EM SPACE",
-        0x2006:	"SIX-PER-EM SPACE",
-        0x2007:	"FIGURE SPACE",
-        0x2008:	"PUNCTUATION SPACE",
-        0x2009:	"THIN SPACE",
-        0x200A:	"HAIR SPACE",
-        0x202F:	"NARROW NO-BREAK SPACE",
-        0x205F:	"MEDIUM MATHEMATICAL SPACE",
-        0x3000:	"IDEOGRAPHIC SPACE",
-    }
+	0x0020: "SPACE",
+	0x00A0: "NO-BREAK SPACE",
+	0x1680: "OGHAM SPACE MARK",
+	0x2000: "EN QUAD",
+	0x2001: "EM QUAD",
+	0x2002: "EN SPACE",
+	0x2003: "EM SPACE",
+	0x2004: "THREE-PER-EM SPACE",
+	0x2005: "FOUR-PER-EM SPACE",
+	0x2006: "SIX-PER-EM SPACE",
+	0x2007: "FIGURE SPACE",
+	0x2008: "PUNCTUATION SPACE",
+	0x2009: "THIN SPACE",
+	0x200A: "HAIR SPACE",
+	0x202F: "NARROW NO-BREAK SPACE",
+	0x205F: "MEDIUM MATHEMATICAL SPACE",
+	0x3000: "IDEOGRAPHIC SPACE",
+}
 
 func isWhiteSpace4(c rune) bool {
 
-    if _, ok := spaceMap4[c]; ok {
-        return true
-    }
-    return false
+	if _, ok := spaceMap4[c]; ok {
+		return true
+	}
+	return false
 }
 
 var spaceMap5 = map[rune]bool{
-        0x0020:	true,
-        0x00A0:	true,
-        0x1680:	true,
-        0x2000:	true,
-        0x2001:	true,
-        0x2002:	true,
-        0x2003:	true,
-        0x2004:	true,
-        0x2005:	true,
-        0x2006:	true,
-        0x2007:	true,
-        0x2008:	true,
-        0x2009:	true,
-        0x200A:	true,
-        0x202F:	true,
-        0x205F:	true,
-        0x3000:	true,
-    }
-
+	0x0020: true,
+	0x00A0: true,
+	0x1680: true,
+	0x2000: true,
+	0x2001: true,
+	0x2002: true,
+	0x2003: true,
+	0x2004: true,
+	0x2005: true,
+	0x2006: true,
+	0x2007: true,
+	0x2008: true,
+	0x2009: true,
+	0x200A: true,
+	0x202F: true,
+	0x205F: true,
+	0x3000: true,
+}
 
 func isWhiteSpace5(c rune) bool {
 
-    if v, ok := spaceMap5[c]; ok && v {
-        return true
-    }
-    return false
+	if v, ok := spaceMap5[c]; ok && v {
+		return true
+	}
+	return false
 
-    // return unicode.IsSpace(c)
+	// return unicode.IsSpace(c)
 }
 
 func RuneInfo(c rune) {
-    s := "日本語"
-    fmt.Printf("Glyph:   %q\n", s)
-    fmt.Printf("UTF-8:   [% x]\n", []byte(s))
-    fmt.Printf("Unicode: %U\n", []rune(s))
+	s := "日本語"
+	fmt.Printf("Glyph:   %q\n", s)
+	fmt.Printf("UTF-8:   [% x]\n", []byte(s))
+	fmt.Printf("Unicode: %U\n", []rune(s))
 }
