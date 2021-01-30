@@ -161,7 +161,7 @@ var UnicodeWhiteSpaceMap = map[rune]string{
 // standard library and covers nearly twice as many code points.
 func IsUnicodeWhiteSpace(r rune) bool {
 	if r < unicode.MaxLatin1 {
-		return r == ' ' || r == '\t' || r == '\n' || r == '\f' || r == '\r' || r == '\v' || r == 0x85 || r == 0xA0
+		return r == ' ' || (r > 8 && r < 14) || r == 0x85 || r == 0xA0
     }
 
 	if _, ok := UnicodeWhiteSpaceMap[r]; ok {
@@ -221,7 +221,17 @@ func isWhiteSpace4(c rune) bool {
 	return false
 }
 
-const NBSP = 0x00A0
+const (
+    TAB = 0x09  // '\t'
+    LF = 0x0A   // '\n'
+    VT = 0x0B   // '\v'
+    FF = 0x0C   // '\f'
+    CR = 0x0D   // '\r'
+    SPACE = ' '
+    RuneSelf = utf8.RuneSelf
+    NBSP = 0x00A0
+    NEL = 0x0085
+)
 
 // In computer programming, whitespace is any character or series of
 // characters that represent horizontal or vertical space in typography.
@@ -278,30 +288,14 @@ func isWhiteSpace6(r rune) bool {
     if r < unicode.MaxLatin1 {
 		return r == ' ' || r == '\t' || r == '\n' || r == '\f' || r == '\r' || r == '\v' || r == 0x85 || r == 0xA0
     }
-    if r >
 
-	0x2000
-	0x2001
-	0x2002
-	0x2003
-	0x2004
-	0x2005
-	0x2006
-	0x2007
-	0x2008
-	0x2009
-	0x200A
-	0x2028
-	0x2029
-	0x202F
-	0x205F
-	0x3000
-	// Related Unicode characters property White_Space=no
-	0x200B
-	0x200C
-	0x200D
-	0x2060
-    0x1680
+    // 0x2000, 0x2001, 0x2002, 0x2003, 0x2004, 0x2005, 0x2006,
+    // 0x2007, 0x2008, 0x2009, 0x200A,
+    // 0x2028, 0x2029, 0x202F, 0x205F, 0x3000,
+    // Related Unicode characters property White_Space=no
+    // 0x200B,	0x200C,	0x200D,	0x2060, 0x1680,
+    return (r >= 0X2000 && r <= 0X200A) || r == 0x2028 || r == 0x2029 || r == 0x202F || r == 0x205F || r == 0x3000 || r == 0x200B || r == 0x200C || r == 0x200D || r == 0x2060 || r == 0x1680
+
 }
 
 func RuneInfo(c rune) {

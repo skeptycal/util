@@ -189,7 +189,7 @@ BenchmarkIsUnicodeWhiteSpace-8   	10632638	       118 ns/op	      16 B/op	      
 */
 
 const (
-	defaultSamples = 1<<2 - 1  // 1<<8 - 1
+	defaultSamples = 1<<2 - 1 // 1<<8 - 1
 	maxSamples     = 1<<32 - 1
 )
 
@@ -206,7 +206,7 @@ func Samples(n int) []byte {
 
 func SmallRuneSamples() []rune {
 	return []rune{
-		'A', '0', 65, 't', 'n', 'f', 'r', 'v', '\t', '\n', '\f', '\r', '\v', 48, 12, ' ', 0x20, 8,
+		'A', '0', 65, 't', 'n', 'f', 'r', 'v', '\t', '\n', '\f', '\r', '\v', 48, 12, ' ', 0x20, 8, 0x2028, 0x3000, 0x1680,
 	}
 }
 
@@ -261,7 +261,6 @@ func RuneSamples() []rune {
 // 	}
 // }
 
-
 // func BenchmarkIsAlphaNum(b *testing.B) {
 // 	for i := 0; i < b.N; i++ {
 // 		for _, c := range ByteSamples() {
@@ -278,13 +277,6 @@ func RuneSamples() []rune {
 // 	}
 // }
 
-func BenchmarkIsSpace(b *testing.B) {
-    for i := 0; i < b.N; i++ {
-		for _, r := range RuneSamples() {
-			unicode.IsSpace(r)
-		}
-	}
-}
 func BenchmarkIsWhiteSpace(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		for _, r := range ByteSamples() {
@@ -302,18 +294,26 @@ func BenchmarkIsWhiteSpace2(b *testing.B) {
 	}
 }
 
-func BenchmarkIsWhiteSpace3(b *testing.B) {
+func BenchmarkIsUnicodeWhiteSpace(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		for _, r := range RuneSamples() {
-			isWhiteSpace3(r)
+			IsUnicodeWhiteSpace(r)
 		}
 	}
 }
 
-func BenchmarkIsWhiteSpace4(b *testing.B) {
+func BenchmarkIsAnySpace(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		for _, r := range RuneSamples() {
-			isWhiteSpace4(r)
+			IsAnySpace(r)
+		}
+	}
+}
+
+func BenchmarkUnicode_IsSpace(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		for _, r := range RuneSamples() {
+			unicode.IsSpace(r)
 		}
 	}
 }
@@ -326,14 +326,13 @@ func BenchmarkIsWhiteSpace5(b *testing.B) {
 	}
 }
 
-func BenchmarkIsUnicodeWhiteSpace(b *testing.B) {
+func BenchmarkIsWhiteSpace4(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		for _, r := range RuneSamples() {
-			IsUnicodeWhiteSpace(r)
+			isWhiteSpace4(r)
 		}
 	}
 }
-
 
 func TestIsAlpha(t *testing.T) {
 	type args struct {
@@ -467,7 +466,6 @@ func TestIsIsAlphaSwitch(t *testing.T) {
 	}
 }
 
-
 func TestIsWhiteSpace(t *testing.T) {
 	for _, c := range ByteSamples() {
 		name := fmt.Sprintf("IsWhiteSpace: %v", c)
@@ -496,8 +494,8 @@ func TestIsWhiteSpace3(t *testing.T) {
 	for _, c := range RuneSamples() {
 		name := fmt.Sprintf("IsWhiteSpace3: (%q)", c)
 		t.Run(name, func(t *testing.T) {
-            got := isWhiteSpace3(c)
-            want := unicode.IsSpace(c)
+			got := isWhiteSpace3(c)
+			want := unicode.IsSpace(c)
 			if got != want {
 				t.Errorf("IsWhiteSpace3() = %v, want %v", got, want)
 			}
