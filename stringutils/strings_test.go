@@ -164,10 +164,16 @@ BenchmarkIsWhiteSpace2-8   	10175007	       123 ns/op	      16 B/op	       2 all
 BenchmarkIsWhiteSpace3-8   	 8766572	       129 ns/op	      16 B/op	       2 allocs/op
 BenchmarkIsWhiteSpace4-8   	 7361227	       166 ns/op	      16 B/op	       2 allocs/op
 BenchmarkIsWhiteSpace5-8   	 6595645	       173 ns/op	      16 B/op	       2 allocs/op
+
+BenchmarkIsWhiteSpace-8    	 9804511	       122 ns/op	      16 B/op	       2 allocs/op
+BenchmarkIsWhiteSpace2-8   	 9558478	       128 ns/op	      16 B/op	       2 allocs/op
+BenchmarkIsWhiteSpace3-8   	 8892658	       129 ns/op	      16 B/op	       2 allocs/op
+BenchmarkIsWhiteSpace4-8   	 7139104	       165 ns/op	      16 B/op	       2 allocs/op
+BenchmarkIsWhiteSpace5-8   	 7252981	       166 ns/op	      16 B/op	       2 allocs/op
 */
 
 const (
-	defaultSamples = 1<<4 - 1  // 1<<8 - 1
+	defaultSamples = 1<<2 - 1  // 1<<8 - 1
 	maxSamples     = 1<<32 - 1
 )
 
@@ -242,7 +248,7 @@ func BenchmarkIsAlphaSwitch(b *testing.B) {
 func BenchmarkIsWhiteSpace(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		for _, r := range RuneSamples() {
-			IsWhiteSpace(r)
+			isWhiteSpace(r)
 		}
 	}
 }
@@ -434,7 +440,7 @@ func TestIsWhiteSpace(t *testing.T) {
 	for _, c := range RuneSamples() {
 		name := fmt.Sprintf("IsWhiteSpace: %v", c)
 		t.Run(name, func(t *testing.T) {
-			got := IsWhiteSpace(c)
+			got := isWhiteSpace(c)
 			want := unicode.IsSpace(c)
 			if got != want {
 				t.Errorf("IsWhiteSpace() = %v, want %v", got, want)
