@@ -9,11 +9,27 @@
 package stringutils
 
 import (
-	"fmt"
 	"math/rand"
-	"testing"
 	"time"
 	"unicode"
+	"unicode/utf8"
+)
+
+const (
+    TAB = 0x09  // '\t'
+    LF = 0x0A   // '\n'
+    VT = 0x0B   // '\v'
+    FF = 0x0C   // '\f'
+    CR = 0x0D   // '\r'
+    SPACE = ' '
+    RuneSelf = utf8.RuneSelf
+    NBSP = 0x00A0
+    NEL = 0x0085
+
+    defaultSamples = 1<<8 - 1
+    maxSamples     = 1<<32 - 1
+
+    numSamples = 1<<24
 )
 
 // Benchmark results
@@ -280,12 +296,9 @@ BenchmarkIsAnySpace-8            	       2	 674386516 ns/op	67108864 B/op	      
 BenchmarkUnicode_IsSpace-8       	       2	 714679118 ns/op	67108864 B/op	       1 allocs/op
 */
 
-const (
-	defaultSamples = 1<<8 - 1
-    maxSamples     = 1<<32 - 1
 
-    numSamples = 1<<24
-)
+var Want = unicode.IsSpace
+
 
 func init() {
     rand.Seed(time.Now().UnixNano())
@@ -373,63 +386,6 @@ func RuneSamples() []rune {
 // 	}
 // }
 
-func BenchmarkIsASCIISpace(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		for _, c := range ByteSamples() {
-			IsASCIISpace(c)
-		}
-	}
-}
-func BenchmarkIsWhiteSpace(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		for _, c := range ByteSamples() {
-			isWhiteSpace(c)
-		}
-	}
-}
-
-func BenchmarkIsWhiteSpace2(b *testing.B) {
-	// 	case ' ', '\t', '\n', '\f', '\r', '\v':
-	for i := 0; i < b.N; i++ {
-		for _, r := range ByteSamples() {
-			isWhiteSpace2(r)
-		}
-	}
-}
-
-func BenchmarkIsWhiteSpace6(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		for _, r := range RuneSamples() {
-			isWhiteSpaceLogicChain(r)
-		}
-	}
-}
-
-func BenchmarkIsUnicodeWhiteSpace(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		for _, r := range RuneSamples() {
-			IsUnicodeWhiteSpace(r)
-		}
-	}
-}
-
-func BenchmarkIsAnySpace(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		for _, r := range RuneSamples() {
-			IsAnySpace(r)
-		}
-	}
-}
-
-func BenchmarkUnicode_IsSpace(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		for _, r := range RuneSamples() {
-			unicode.IsSpace(r)
-		}
-	}
-}
-
-
 
 // func BenchmarkIsWhiteSpace5(b *testing.B) {
 // 	for i := 0; i < b.N; i++ {
@@ -446,196 +402,3 @@ func BenchmarkUnicode_IsSpace(b *testing.B) {
 // 		}
 // 	}
 // }
-
-func TestIsAlpha(t *testing.T) {
-	type args struct {
-		c byte
-	}
-	tests := []struct {
-		args args
-		want bool
-	}{
-		// TODO: Add test cases.
-		{args{'\n'}, false},
-		{args{'\t'}, false},
-		{args{'\r'}, false},
-		{args{'\v'}, false},
-		{args{'\f'}, false},
-		{args{' '}, false},
-		{args{'A'}, true},
-		{args{'c'}, true},
-		{args{'0'}, false},
-		{args{'7'}, false},
-		{args{'='}, false},
-		{args{'?'}, false},
-		{args{'/'}, false},
-		{args{'%'}, false},
-	}
-	for _, tt := range tests {
-		t.Run(string(tt.args.c), func(t *testing.T) {
-			if got := IsAlpha(tt.args.c); got != tt.want {
-				t.Errorf("IsAlpha() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestIsDigit(t *testing.T) {
-	type args struct {
-		c byte
-	}
-	tests := []struct {
-		args args
-		want bool
-	}{
-		// TODO: Add test cases.
-		{args{'\n'}, false},
-		{args{'\t'}, false},
-		{args{'\r'}, false},
-		{args{'\v'}, false},
-		{args{'\f'}, false},
-		{args{' '}, false},
-		{args{'A'}, false},
-		{args{'c'}, false},
-		{args{'0'}, true},
-		{args{'7'}, true},
-		{args{'='}, false},
-		{args{'?'}, false},
-		{args{'/'}, false},
-		{args{'%'}, false},
-	}
-	for _, tt := range tests {
-		t.Run(string(tt.args.c), func(t *testing.T) {
-			if got := IsDigit(tt.args.c); got != tt.want {
-				t.Errorf("IsDigit() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestIsAlphaNum(t *testing.T) {
-	type args struct {
-		c byte
-	}
-	tests := []struct {
-		args args
-		want bool
-	}{
-		// TODO: Add test cases.
-		{args{'\n'}, false},
-		{args{'\t'}, false},
-		{args{'\r'}, false},
-		{args{'\v'}, false},
-		{args{'\f'}, false},
-		{args{' '}, false},
-		{args{'A'}, true},
-		{args{'c'}, true},
-		{args{'0'}, true},
-		{args{'7'}, true},
-		{args{'='}, false},
-		{args{'?'}, false},
-		{args{'/'}, false},
-		{args{'%'}, false},
-	}
-	for _, tt := range tests {
-		t.Run(string(tt.args.c), func(t *testing.T) {
-			if got := IsAlphaNum(tt.args.c); got != tt.want {
-				t.Errorf("IsAlphaNum() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestIsIsAlphaSwitch(t *testing.T) {
-	type args struct {
-		c byte
-	}
-	tests := []struct {
-		args args
-		want bool
-	}{
-		// TODO: Add test cases.
-		{args{'\n'}, false},
-		{args{'\t'}, false},
-		{args{'\r'}, false},
-		{args{'\v'}, false},
-		{args{'\f'}, false},
-		{args{' '}, false},
-		{args{'A'}, true},
-		{args{'c'}, true},
-		{args{'0'}, true},
-		{args{'7'}, true},
-		{args{'='}, false},
-		{args{'?'}, false},
-		{args{'/'}, false},
-		{args{'%'}, false},
-	}
-	for _, tt := range tests {
-		t.Run(string(tt.args.c), func(t *testing.T) {
-			if got := IsAlphaSwitch(tt.args.c); got != tt.want {
-				t.Errorf("IsAlphaSwitch() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestIsWhiteSpace(t *testing.T) {
-	for _, c := range SmallByteSamples() {
-		name := fmt.Sprintf("IsWhiteSpace: %v", c)
-		t.Run(name, func(t *testing.T) {
-			got := isWhiteSpace(c)
-			want := unicode.IsSpace(rune(c))
-			if got != want {
-				t.Errorf("IsWhiteSpace() = %v, want %v", got, want)
-			}
-		})
-	}
-}
-func TestIsWhiteSpace2(t *testing.T) {
-	for _, c := range SmallByteSamples() {
-		name := fmt.Sprintf("IsWhiteSpace2: %v", c)
-		t.Run(name, func(t *testing.T) {
-			got := isWhiteSpace2(c)
-			want := unicode.IsSpace(rune(c))
-			if got != want {
-				t.Errorf("IsWhiteSpace2() = %v, want %v", got, want)
-			}
-		})
-	}
-}
-func TestIsWhiteSpace3(t *testing.T) {
-	for _, c := range SmallRuneSamples() {
-		name := fmt.Sprintf("IsWhiteSpace3: (%q)", c)
-		t.Run(name, func(t *testing.T) {
-			got := isWhiteSpace3(c)
-			want := unicode.IsSpace(c)
-			if got != want {
-				t.Errorf("IsWhiteSpace3() = %v, want %v", got, want)
-			}
-		})
-	}
-}
-func TestIsWhiteSpace4(t *testing.T) {
-	for _, c := range SmallRuneSamples() {
-		name := fmt.Sprintf("IsWhiteSpace4: %q", c)
-		t.Run(name, func(t *testing.T) {
-			got := isWhiteSpace4(c)
-			want := unicode.IsSpace(c)
-			if got != want {
-				t.Errorf("IsWhiteSpace4(%q) = %v, want %v", c, got, want)
-			}
-		})
-	}
-}
-func TestIsWhiteSpace5(t *testing.T) {
-	for _, c := range SmallRuneSamples() {
-		name := fmt.Sprintf("IsWhiteSpace5: %v", c)
-		t.Run(name, func(t *testing.T) {
-			got := isWhiteSpaceBoolMap(c)
-			want := unicode.IsSpace(c)
-			if got != want {
-				t.Errorf("IsWhiteSpace5(%q) = %v, want %v", c, got, want)
-			}
-		})
-	}
-}
