@@ -113,7 +113,7 @@ func TestIsWhiteSpace2(t *testing.T) {
 func TestIsUnicodeWhiteSpaceMap(t *testing.T) {
 	for _, c := range SmallRuneSamples() {
 		t.Run( fmt.Sprintf("IsUnicodeWhiteSpaceMap: (%q)", c), func(t *testing.T) {
-            if got := IsUnicodeWhiteSpaceMap(c); got != want {
+            if got := IsUnicodeWhiteSpaceMap(c); got != want(c) {
 				t.Errorf("IsWhiteSpace3() = %v, want %v", got, want)
 			}
 		})

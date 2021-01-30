@@ -51,6 +51,19 @@ func isWhiteSpace2(c byte) bool {
 //
 // The speed is ~7% faster than that of unicode.IsSpace(r rune) from the
 // standard library and covers nearly twice as many code points.
+//
+// isWhiteSpaceLogicChain checks for any unicode whitespace rune.
+//
+// Included:
+//  0x2000, 0x2001, 0x2002, 0x2003, 0x2004, 0x2005, 0x2006,
+//  0x2007, 0x2008, 0x2009, 0x200A,
+//  0x2028, 0x2029, 0x202F, 0x205F, 0x3000,
+//
+// Related Unicode characters property White_Space=no
+// Not included:
+//  0x200B,	0x200C,	0x200D,	0x2060, 0x1680,
+// add the following code to include these.
+//  || r == 0x200B || r == 0x200C || r == 0x200D || r == 0x2060 || r == 0x1680
 func IsUnicodeWhiteSpaceMap(r rune) bool {
 	if r < unicode.MaxLatin1 {
 		return r == ' ' || (r > 8 && r < 14) || r == 0x85 || r == 0xA0
@@ -87,6 +100,18 @@ func IsUnicodeWhiteSpaceMapSwitch(r rune) bool {
 }
 
 
+// isWhiteSpaceLogicChain checks for any unicode whitespace rune.
+//
+// Included:
+//  0x2000, 0x2001, 0x2002, 0x2003, 0x2004, 0x2005, 0x2006,
+//  0x2007, 0x2008, 0x2009, 0x200A,
+//  0x2028, 0x2029, 0x202F, 0x205F, 0x3000,
+//
+// Related Unicode characters property White_Space=no
+// Not included:
+//  0x200B,	0x200C,	0x200D,	0x2060, 0x1680,
+// add the following code to include these.
+//  || r == 0x200B || r == 0x200C || r == 0x200D || r == 0x2060 || r == 0x1680
 func isWhiteSpace4(c rune) bool {
 	if _, ok := UnicodeWhiteSpaceMap[c]; ok {
 		return true
@@ -94,6 +119,18 @@ func isWhiteSpace4(c rune) bool {
 	return false
 }
 
+// isWhiteSpaceLogicChain checks for any unicode whitespace rune.
+//
+// Included:
+//  0x2000, 0x2001, 0x2002, 0x2003, 0x2004, 0x2005, 0x2006,
+//  0x2007, 0x2008, 0x2009, 0x200A,
+//  0x2028, 0x2029, 0x202F, 0x205F, 0x3000,
+//
+// Related Unicode characters property White_Space=no
+// Not included:
+//  0x200B,	0x200C,	0x200D,	0x2060, 0x1680,
+// add the following code to include these.
+//  || r == 0x200B || r == 0x200C || r == 0x200D || r == 0x2060 || r == 0x1680
 func isWhiteSpaceBoolMap(c rune) bool {
 	if _, ok := unicodeWhiteSpaceMapBool[c]; ok {
 		return true
@@ -101,22 +138,29 @@ func isWhiteSpaceBoolMap(c rune) bool {
 	return false
 }
 
+// isWhiteSpaceLogicChain checks for any unicode whitespace rune.
+//
+// Included:
+//  0x2000, 0x2001, 0x2002, 0x2003, 0x2004, 0x2005, 0x2006,
+//  0x2007, 0x2008, 0x2009, 0x200A,
+//  0x2028, 0x2029, 0x202F, 0x205F, 0x3000,
+//
+// Related Unicode characters property White_Space=no
+// Not included:
+//  0x200B,	0x200C,	0x200D,	0x2060, 0x1680,
+// add the following code to include these.
+//  || r == 0x200B || r == 0x200C || r == 0x200D || r == 0x2060 || r == 0x1680
 func isWhiteSpaceLogicChain(r rune) bool {
     if r < unicode.MaxLatin1 {
 		return r == ' ' || r == '\t' || r == '\n' || r == '\f' || r == '\r' || r == '\v' || r == 0x85 || r == 0xA0
     }
 
-    // 0x2000, 0x2001, 0x2002, 0x2003, 0x2004, 0x2005, 0x2006,
-    // 0x2007, 0x2008, 0x2009, 0x200A,
-    // 0x2028, 0x2029, 0x202F, 0x205F, 0x3000,
+
     return (r >= 0X2000 && r <= 0X200A) || r == 0x2028 || r == 0x2029 || r == 0x202F || r == 0x205F || r == 0x3000
 
-    // Related Unicode characters property White_Space=no
-    // 0x200B,	0x200C,	0x200D,	0x2060, 0x1680,
-    // || r == 0x200B || r == 0x200C || r == 0x200D || r == 0x2060 || r == 0x1680
+
 
 }
-
 
 // UnicodeWhiteSpaceMap provides a mapping from Unicode runes to strings.
 // In computer programming, whitespace is any character or series of
