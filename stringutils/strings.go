@@ -154,23 +154,17 @@ var UnicodeWhiteSpaceMap = map[rune]string{
 // IsAnySpace reports whether the rune is any utf8 whitespace character
 // using the broadest and most complete definition.
 //
-// The speed of this implementation is 1.84 times slower than that of
+// The speed of this implementation ~25% slower than that of
 // IsASCIISpace(c byte) but tests 3.75 times more possible code points.
 //
-// The speed is 28% slower than that of unicode.IsSpace(r rune) from the
-// standard library.
-//
-// IsAnySpace tests nearly twice as many code points as unicode.IsSpace().
+// The speed is ~7% faster than that of unicode.IsSpace(r rune) from the
+// standard library and covers nearly twice as many code points.
 func IsUnicodeWhiteSpace(r rune) bool {
-    if r < utf8.UTFMax
-    if uint32(r) <= unicode.MaxLatin1 {
-		switch r {
-		case ' ', '\t', '\n', '\v', '\f', '\r', 0x85, 0xA0:
-			return true
-		}
-		return false
-	}
-    if _, ok := UnicodeWhiteSpaceMap[r]; ok {
+	if r < unicode.MaxLatin1 {
+		return r == ' ' || r == '\t' || r == '\n' || r == '\f' || r == '\r' || r == '\v' || r == 0x85 || r == 0xA0
+    }
+
+	if _, ok := UnicodeWhiteSpaceMap[r]; ok {
 		return true
 	}
 	return false
@@ -187,14 +181,14 @@ func IsUnicodeWhiteSpace(r rune) bool {
 //
 // IsAnySpace tests nearly twice as many code points as unicode.IsSpace().
 func IsAnySpace(r rune) bool {
-    if uint32(r) <= unicode.MaxLatin1 {
+	if uint32(r) <= unicode.MaxLatin1 {
 		switch r {
 		case '\t', '\n', '\v', '\f', '\r', ' ', 0x85, 0xA0:
 			return true
 		}
 		return false
 	}
-    if _, ok := UnicodeWhiteSpaceMap[r]; ok {
+	if _, ok := UnicodeWhiteSpaceMap[r]; ok {
 		return true
 	}
 	return false
@@ -218,26 +212,6 @@ func isWhiteSpace3(c rune) bool {
 	return unicode.IsSpace(c)
 }
 
-var spaceMap3 = map[rune]string{
-	0x0020: "SPACE",
-	0x00A0: "NO-BREAK SPACE",
-	0x1680: "OGHAM SPACE MARK",
-	0x2000: "EN QUAD",
-	0x2001: "EM QUAD",
-	0x2002: "EN SPACE",
-	0x2003: "EM SPACE",
-	0x2004: "THREE-PER-EM SPACE",
-	0x2005: "FOUR-PER-EM SPACE",
-	0x2006: "SIX-PER-EM SPACE",
-	0x2007: "FIGURE SPACE",
-	0x2008: "PUNCTUATION SPACE",
-	0x2009: "THIN SPACE",
-	0x200A: "HAIR SPACE",
-	0x202F: "NARROW NO-BREAK SPACE",
-	0x205F: "MEDIUM MATHEMATICAL SPACE",
-	0x3000: "IDEOGRAPHIC SPACE",
-}
-
 
 
 func isWhiteSpace4(c rune) bool {
@@ -246,6 +220,8 @@ func isWhiteSpace4(c rune) bool {
 	}
 	return false
 }
+
+const NBSP = 0x00A0
 
 // In computer programming, whitespace is any character or series of
 // characters that represent horizontal or vertical space in typography.
@@ -260,9 +236,11 @@ var spaceMapBool = map[rune]bool{
 	0x000B: true, // LINE TABULATION <VT>
 	0x000C: true, // FORM FEED <FF>
 	0x000D: true, // ASCII CR
-	0x0020: true, // SPACE <SP>
+    0x0020: true, // SPACE <SP>
+    // > utf8.RuneSelf
 	0x00A0: true, // NO-BREAK SPACE <NBSP>
-	0x0085: true, // NEL; Next Line
+    0x0085: true, // NEL; Next Line
+    // > unicode.MaxLatin1
 	0x1680: true, // Ogham space mark, interword separation in Ogham text
 	0x2000: true, // EN QUAD, 0x2002 is preferred
 	0x2001: true, // EM QUAD, mutton quad, 0x2003 is preferred
@@ -294,6 +272,36 @@ func isWhiteSpace5(c rune) bool {
 		return true
 	}
 	return false
+}
+
+func isWhiteSpace6(r rune) bool {
+    if r < unicode.MaxLatin1 {
+		return r == ' ' || r == '\t' || r == '\n' || r == '\f' || r == '\r' || r == '\v' || r == 0x85 || r == 0xA0
+    }
+    if r >
+
+	0x2000
+	0x2001
+	0x2002
+	0x2003
+	0x2004
+	0x2005
+	0x2006
+	0x2007
+	0x2008
+	0x2009
+	0x200A
+	0x2028
+	0x2029
+	0x202F
+	0x205F
+	0x3000
+	// Related Unicode characters property White_Space=no
+	0x200B
+	0x200C
+	0x200D
+	0x2060
+    0x1680
 }
 
 func RuneInfo(c rune) {

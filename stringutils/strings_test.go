@@ -178,6 +178,14 @@ BenchmarkIsWhiteSpace2-8   	12946368	        94.3 ns/op	       3 B/op	       1 a
 BenchmarkIsWhiteSpace3-8   	 8932070	       130 ns/op	      16 B/op	       2 allocs/op
 BenchmarkIsWhiteSpace4-8   	 7197372	       167 ns/op	      16 B/op	       2 allocs/op
 BenchmarkIsWhiteSpace5-8   	 7093136	       166 ns/op	      16 B/op	       2 allocs/op
+
+BenchmarkIsSpace-8               	 9312074	       126 ns/op	      16 B/op	       2 allocs/op
+BenchmarkIsWhiteSpace-8          	13613052	        92.1 ns/op	       3 B/op	       1 allocs/op
+BenchmarkIsWhiteSpace2-8         	12440322	        93.1 ns/op	       3 B/op	       1 allocs/op
+BenchmarkIsWhiteSpace3-8         	 9552418	       127 ns/op	      16 B/op	       2 allocs/op
+BenchmarkIsWhiteSpace4-8         	 7420647	       163 ns/op	      16 B/op	       2 allocs/op
+BenchmarkIsWhiteSpace5-8         	 7419589	       160 ns/op	      16 B/op	       2 allocs/op
+BenchmarkIsUnicodeWhiteSpace-8   	10632638	       118 ns/op	      16 B/op	       2 allocs/op
 */
 
 const (
@@ -229,46 +237,46 @@ func RuneSamples() []rune {
 // 	runeSamples  = RuneSamples
 // )
 
-func BenchmarkIsAlpha(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		for _, c := range ByteSamples() {
-			IsAlpha(c)
-		}
-	}
-}
+// func BenchmarkIsAlpha(b *testing.B) {
+// 	for i := 0; i < b.N; i++ {
+// 		for _, c := range ByteSamples() {
+// 			IsAlpha(c)
+// 		}
+// 	}
+// }
 
-func BenchmarkIsDigit(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		for _, c := range ByteSamples() {
-			IsDigit(c)
-		}
-	}
-}
+// func BenchmarkIsDigit(b *testing.B) {
+// 	for i := 0; i < b.N; i++ {
+// 		for _, c := range ByteSamples() {
+// 			IsDigit(c)
+// 		}
+// 	}
+// }
 
-func BenchmarkIsAlphaSwitch(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		for _, c := range ByteSamples() {
-			IsAlphaSwitch(c)
-		}
-	}
-}
+// func BenchmarkIsAlphaSwitch(b *testing.B) {
+// 	for i := 0; i < b.N; i++ {
+// 		for _, c := range ByteSamples() {
+// 			IsAlphaSwitch(c)
+// 		}
+// 	}
+// }
 
 
-func BenchmarkIsAlphaNum(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		for _, c := range ByteSamples() {
-			IsAlphaNum(c)
-		}
-	}
-}
+// func BenchmarkIsAlphaNum(b *testing.B) {
+// 	for i := 0; i < b.N; i++ {
+// 		for _, c := range ByteSamples() {
+// 			IsAlphaNum(c)
+// 		}
+// 	}
+// }
 
-func BenchmarkIsAlphaNum2(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		for _, c := range ByteSamples() {
-			IsAlphaNum2(c)
-		}
-	}
-}
+// func BenchmarkIsAlphaNum2(b *testing.B) {
+// 	for i := 0; i < b.N; i++ {
+// 		for _, c := range ByteSamples() {
+// 			IsAlphaNum2(c)
+// 		}
+// 	}
+// }
 
 func BenchmarkIsSpace(b *testing.B) {
     for i := 0; i < b.N; i++ {
