@@ -107,8 +107,27 @@ func IsAlphaNum(c byte) bool {
 
 // IsASCIISpace tests for the most common ASCII whitespace characters:
 //  ' ', '\t', '\n', '\f', '\r', '\v', U+0085 (NEL), U+00A0 (NBSP)
+// Most languages only recognize ASCII characters as whitespace, or in some cases Unicode newlines as well, but not most of the characters listed above. The C language defines whitespace characters to be "space, horizontal tab, new-line, vertical tab, and form-feed".
 func IsASCIISpace(c byte) bool {
-	return c == ' ' || c == '\n' || c == '\t' || c == '\r' || c == '\f' || c == '\v' || c == 0x0085 || c == 0x00A0
+    if  c == ' ' || c == '\n' || c == '\t' {
+        return true
+    }
+    return c == '\f' || c == '\r' || c == '\v'
+}
+
+
+func isWhiteSpace(c byte) bool {
+    	return c == ' ' || c == '\n' || c == '\t' || c == '\r' || c == '\f' || c == '\v' || c == 0x0085 || c == 0x00A0
+}
+
+func isWhiteSpace2(c byte) bool {
+	switch c {
+	case ' ':
+		return true
+	case '\t', '\n', '\f', '\r', '\v':
+		return true
+	}
+	return false
 }
 
 // IsUnicodeWhiteSpace reports whether the rune is any utf8 whitespace character
@@ -154,19 +173,6 @@ func IsAnySpace(r rune) bool {
 	return false
 }
 
-func isWhiteSpace(c byte) bool {
-	return c == ' ' || c == '\t' || c == '\n' || c == '\f' || c == '\r' || c == '\v'
-}
-
-func isWhiteSpace2(c byte) bool {
-	switch c {
-	case ' ':
-		return true
-	case '\t', '\n', '\f', '\r', '\v':
-		return true
-	}
-	return false
-}
 
 func isWhiteSpace3(c rune) bool {
 	return unicode.IsSpace(c)

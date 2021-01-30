@@ -376,7 +376,7 @@ func RuneSamples() []rune {
 func BenchmarkIsASCIISpace(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		for _, c := range ByteSamples() {
-			isWhiteSpace(c)
+			IsASCIISpace(c)
 		}
 	}
 }
