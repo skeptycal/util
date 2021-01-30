@@ -141,12 +141,18 @@ func isWhiteSpace4(c rune) bool {
 	return false
 }
 
+// In computer programming, whitespace is any character or series of characters that represent horizontal or vertical space in typography. When rendered, a whitespace character does not correspond to a visible mark, but typically does occupy an area on a page. For example, the common whitespace symbol U+0020   SPACE (also ASCII 32) represents a blank space punctuation character in text, used as a word divider in Western scripts.
 var spaceMap5 = map[rune]bool{
-    0x000A: true,
-	0x0020: true,
-	0x00A0: true,
-	0x1680: true,
-	0x2000: true,
+    0x0009: true, // CHARACTER TABULATION <TAB>
+    0x000A: true, // ASCII LF
+    0x000B: true, // LINE TABULATION <VT>
+    0x000C: true, // FORM FEED <FF>
+    0x000D: true, // ASCII CR
+	0x0020: true, // SPACE <SP>
+    0x00A0: true, // NO-BREAK SPACE <NBSP>
+    0x0085: true, // NEL; Next Line
+	0x1680: true, // ogham space mark
+	0x2000: true, // en quad; 0x2002 is preferred
 	0x2001: true,
 	0x2002: true,
 	0x2003: true,
@@ -159,7 +165,8 @@ var spaceMap5 = map[rune]bool{
 	0x200A: true,
 	0x202F: true,
 	0x205F: true,
-	0x3000: true,
+    0x3000: true,
+    0xFFEF: true, // ZERO WIDTH NO-BREAK SPACE <ZWNBSP>
 }
 
 func isWhiteSpace5(c rune) bool {
