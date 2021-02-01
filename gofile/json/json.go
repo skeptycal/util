@@ -11,36 +11,43 @@ import (
 
 type jsonMap map[string]interface{}
 
-// GetJSONFile loads and returns a JSON structure representing the json file.
-func GetJSONFile(filename string) (JSON, error) {
-	fi, err := gofile.GetRegularFileInfo(filename)
-	if err != nil {
-		return nil, err
-	}
+// Load loads and returns a JSON structure representing the json file.
+func Load(filename string) (JSON, error) {
+	fi := gofile.Stat(filename)
+	if fi == nil {
+		return nil, nil
+    }
 
 	j := &jsonStruct{fi, &jsonMap{}}
-	j.Load()
+	err := j.ReadFile()
 	if err != nil {
 		return nil, err
 	}
-	return j, nil
+	return j, err
 }
 
-// func NewJSONFile(filename string) (*jsonMap, error) {
-// 	f, err := os.Create(filename)
+func New(filename string) (JSON, error) {
+    fi := gofile.Stat(filename)
+	if fi != nil {
+		return nil, os.ErrExist
+    }
 
-// 	j := new(jsonMap)
-
-// }
+	j := &jsonStruct{fi, &jsonMap{}}
+	err := j.ReadFile()
+	if err != nil {
+		return nil, err
+	}
+	return j, err
+}
 
 // JSON describes a JSON file and data structure object.
 type JSON interface {
-	Load() error
+	ReadFile() error
 	Name() string
 	Save() error
-	Size() int64
-	Marshal(v interface{}) ([]byte, error)
-	Unmarshal(data []byte, v interface{}) error
+    Size() int64
+    json.Marshaler
+    json.Unmarshaler
 }
 
 // jsonStruct implements a JSON mapping with os.FileInfo included.
@@ -49,38 +56,54 @@ type jsonStruct struct {
 	v *jsonMap
 }
 
-// Load loads the data from the JSON file
-// note: variable/field names should begin with a uppercase letter
-// of they will not load correctly - similar to the uppercase requirement
-// for exported functions ...
-func (j *jsonStruct) Load() error {
+// Load loads JSON data from the underlying file
+//
+// note: variable/field names should begin with an
+// uppercase letter or they will not load correctly
+func (j *jsonStruct) ReadFile() error {
 	data, err := ioutil.ReadFile(j.Name())
 	if err != nil {
 		return err
 	}
-	return j.Unmarshal(data, j.v)
+	return j.UnmarshalJSON(data)
 }
 
-// Save saves the data to the JSON file
-// note: variable/field names should begin with a uppercase letter
-// of they will not save correctly - similar to the uppercase requirement
-// for exported functions ...
+// Save saves JSON data to the underlying file
+//
+// note: variable/field names should begin with an
+// uppercase letter or they will not load correctly
 func (j *jsonStruct) Save() error {
-	data, err := j.Marshal(j.v)
+    data, err := j. MarshalJSON()
 	if err != nil {
 		return err
 	}
 	return ioutil.WriteFile(j.Name(), data, 0644)
 }
 
-// Unmarshal is only present to satisfy the Unmarshaler interface requirement.
-// If used, v is ignored and the interface{} from the internal structure is used.
-func (j *jsonStruct) Unmarshal(data []byte, v interface{}) error {
+// Unmarshaler is the interface implemented by types
+// that can unmarshal a JSON description of themselves.
+// The input can be assumed to be a valid encoding of
+// a JSON value. UnmarshalJSON must copy the JSON data
+// if it wishes to retain the data after returning.
+//
+// By convention, to approximate the behavior of Unmarshal itself,
+// Unmarshalers implement UnmarshalJSON([]byte("null")) as a no-op.
+func (j *jsonStruct) UnmarshalJSON(data []byte) error {
+    data, err := ioutil.ReadFile(j.Name())
+	if err != nil {
+		return err
+	}
 	return json.Unmarshal(data, j.v)
 }
 
-// Marshal is only present to satisfy the Marshaler interface requirement.
-// If used, v is ignored and the interface{} from the internal structure is used.
-func (j *jsonStruct) Marshal(v interface{}) ([]byte, error) {
-	return json.Marshal(j.v)
+// MarshalJSON implements the json.Marshaler interface and returns the JSON
+// encoding of itself.
+//
+func (j *jsonStruct) MarshalJSON() ([]byte, error) {
+    data, err := json.Marshal(j.v)
+    if err != nil {
+        return nil, err
+    }
+    json.Marshaler
+    return data, nil
 }
