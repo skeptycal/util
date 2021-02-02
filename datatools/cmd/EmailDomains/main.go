@@ -9,6 +9,6 @@ import (
 
 func main() {
     list := strings.Join(os.Args[1:]," ")
-    email.GetDomainNames(list)
+    out := email.GetDomainNames(list)
 
 }
