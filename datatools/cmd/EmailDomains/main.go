@@ -1,14 +1,15 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"strings"
 
-	"github.com/skeptycal/util/datatools/format/email"
+	"github.com/skeptycal/util/datatools/format"
 )
 
 func main() {
     list := strings.Join(os.Args[1:]," ")
-    out := email.GetDomainNames(list)
-
+    out := format.GetDomainNames(list)
+    fmt.Println(out)
 }

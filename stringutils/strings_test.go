@@ -29,7 +29,7 @@ const (
     defaultSamples = 1<<8 - 1
     maxSamples     = 1<<32 - 1
 
-    numSamples = 1<<24
+    numSamples = 1<<4
 )
 
 // Benchmark results
@@ -307,14 +307,28 @@ func init() {
 
 func SmallRuneSamples() []rune {
 	return []rune{
-		'A', '0', 65, 't', 'n', 'f', 'r', 'v', '\t', '\n', '\f', '\r', '\v', 48, 12, ' ', 0x20, 8, 0x2028, 0x3000, 0x1680,
+		'A', '0', 65, 't', 'n', 'f', 'r', 'v', '\t', '\n', '\f', '\r', '\v', 48, 12, ' ', 0x20, 8, 0x1680, 0x2028, 0x3000, 0x1680, 0x200C, 0x2123, 0x3333, 0xFFDF, 0xFFEE,
 	}
 }
 
 func SmallByteSamples() []byte {
 	return []byte{
-		'A', '0', 65, 't', 'n', 'f', 'r', 'v', '\t', '\n', '\f', '\r', '\v', 48, 12, ' ', 0x20, 8,
+		'A', '0', 65, 't', 'n', 'f', 'r', 'v', '\t', '\n', '\f', '\r', '\v', 48, 12, ' ', 0x20, 8, 0xFF,
 	}
+}
+
+func SmallByteStringSamples() (list []string) {
+    for _, c := range SmallByteSamples() {
+        list = append(list, string(c))
+    }
+    return
+}
+
+func SmallRuneStringSamples() (list []string) {
+    for _, r := range SmallRuneSamples() {
+        list = append(list, string(r))
+    }
+    return
 }
 
 func ByteSamples() []byte {
@@ -325,8 +339,10 @@ func ByteSamples() []byte {
 	retval := make([]byte, 0, n)
 	for i := 0; i < n; i++ {
 		retval = append(retval, byte(rand.Intn(126)))
-	}
-	return retval}
+    }
+    retval = append(retval, 0xFF)
+    return retval
+}
 
 func RuneSamples() []rune {
     n := numSamples
@@ -338,6 +354,20 @@ func RuneSamples() []rune {
         retval = append(retval, rune(rand.Intn(0x3000)))
 	}
 	return retval
+}
+
+func byteStringSamples() (list []string) {
+    for _, r := range RuneSamples() {
+        list = append(list, string(r))
+    }
+    return
+}
+
+func runeStringSamples() (list []string) {
+    for _, r := range RuneSamples() {
+        list = append(list, string(r))
+    }
+    return
 }
 
 // This is a horrible idea ... much slower

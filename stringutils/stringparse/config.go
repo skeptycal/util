@@ -1,3 +1,5 @@
+//go:generate go run makeisprint.go -output isprint.go
+
 package stringparse
 
 import (

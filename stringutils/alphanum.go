@@ -1,14 +1,5 @@
 package stringutils
 
-import (
-	"math/rand"
-	"time"
-)
-
-func init() {
-    rand.Seed(time.Now().UnixNano())
-}
-
 func IsDigit(c byte) bool {
 	if c >= '0' && c <= '9' {
 		return true
