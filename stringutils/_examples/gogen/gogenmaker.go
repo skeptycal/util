@@ -15,18 +15,9 @@ package gogen
 
 import (
 	"fmt"
-	"log"
 	"strings"
-	"time"
 )
 
-var defaultUserConfig = &UserConfig{
-	Name:                 "Michael Treanor",
-	Email:                "skeptycal@gmail.com",
-	Username:             "skeptycal",
-	DefaultLicense:       "MIT",
-	DefaultCopyrightYear: fmt.Sprintf("%d", time.Now().Year()),
-}
 
 const (
 	fmtCopyrightHeader = `// Copyright (c) %s %s. All rights reserved.
@@ -44,105 +35,6 @@ const (
 	fmtTableHeader   = "//%s is an automatically generated table.\nvar %s %s = %s{\n"
 )
 
-type UserConfig struct {
-	Name                 string `default:"defaultUserConfig.Name"`
-	Email                string `default:"defaultUserConfig.Email"`
-	Username             string `default:"defaultUserConfig.Username"`
-	DefaultLicense       string `default:"defaultUserConfig.DefaultLicense"`
-	DefaultCopyrightYear string `default:"defaultUserConfig.DefaultCopyrightYear"`
-}
-
-func (c *UserConfig) String() string {
-	sb := strings.Builder{}
-	defer sb.Reset()
-	sb.WriteString("User Config:\n")
-	sb.WriteString("Name: " + c.Name + "\n")
-	sb.WriteString("Email: " + c.Email + "\n")
-	sb.WriteString("Username: " + c.Username + "\n")
-	sb.WriteString("DefaultLicense: " + c.DefaultLicense + "\n")
-	sb.WriteString("DefaultCopyrightYear: " + c.DefaultCopyrightYear + "\n")
-	return sb.String()
-}
-
-type RepoConfig struct {
-	User        *UserConfig
-	name        string
-	license     string `default:""`
-	year        string `default:""`
-	url         string `default:""`
-	downloadURL string `default:""`
-	docURL      string `default:""`
-}
-
-func NewUserConfig(name, email, username, defaultLicense, defaultCopyrightYear string) *UserConfig {
-
-	// if name == "" {
-	//     name = defaultUserConfig.Name
-	// }
-	// if email == "" {
-	//     email = defaultUserConfig.Email
-	// }
-	// if username == "" {
-	//     username = defaultUserConfig.Username
-	// }
-	// if defaultLicense == "" {
-	//     defaultLicense = defaultUserConfig.DefaultLicense
-	// }
-	// if defaultCopyrightYear == "" {
-	//     defaultCopyrightYear = defaultUserConfig.DefaultCopyrightYear
-	// }
-
-	return &UserConfig{
-		Name:                 name,
-		Email:                email,
-		Username:             username,
-		DefaultLicense:       defaultLicense,
-		DefaultCopyrightYear: defaultCopyrightYear,
-	}
-}
-
-func NewRepoConfig(reponame string, user *UserConfig) (rc *RepoConfig) {
-	if user == nil {
-		user = defaultUserConfig
-	}
-	if reponame == "" {
-		log.Fatal("a repo name is required")
-	}
-
-	rc = &RepoConfig{
-		User: user,
-		name: reponame,
-	}
-
-	return
-}
-
-func (r *RepoConfig) DownloadURL() string {
-	if r.name == "" {
-		log.Fatalf("a valid repo name is required")
-	}
-	return fmt.Sprintf("https://github.com/%s/%s", r.User.Username, r.name)
-}
-
-func (r *RepoConfig) DocURL() string {
-	if r.name == "" {
-		log.Fatalf("a valid repo name is required")
-	}
-	if r.docURL == "" {
-		r.docURL = fmt.Sprintf("https://github.com/%s/%s/docs", r.User.Username, r.name)
-	}
-	return r.docURL
-}
-
-func (r *RepoConfig) URL() string {
-	if r.name == "" {
-		log.Fatalf("a valid repo name is required")
-	}
-	if r.url == "" {
-		r.url = fmt.Sprintf("https://%s.github.io/%s", r.User.Name, r.name)
-	}
-	return r.url
-}
 
 func (r *RepoConfig) genPageTemplate() string {
 	sb := strings.Builder{}

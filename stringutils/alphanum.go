@@ -1,41 +1,49 @@
 package stringutils
 
+import (
+	"unicode"
+)
+
+// IsASCIIPrintable checks if s is ascii and printable, aka doesn't include tab, backspace, etc.
+func IsASCIIPrintable(s string) bool {
+	for _, r := range s {
+		if !unicode.IsPrint(r) {
+			return false
+		}
+	}
+	return true
+}
+
 func IsDigit(c byte) bool {
-	if c >= '0' && c <= '9' {
-		return true
-	}
-	return false
+	return '0' <= c && c <= '9'
 }
 
-func IsAlpha(c byte) bool {
-	if (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') {
-		return true
-	}
-	return false
+func IsASCIIAlpha(c byte) bool {
+	return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z')
 }
 
-func IsAlphaSwitch(c byte) bool {
+func IsHex(c byte) bool {
+	return ('0' <= c && c <= '9') || ('a' <= c && c <= 'f') || ('A' <= c && c <= 'F')
+}
+
+func IsAlphaNumSwitch(c byte) bool {
 	switch {
-	case c >= 'a' && c <= 'z':
+	case 'a' <= c && c <= 'z':
 		return true
-	case c >= 'A' && c <= 'Z':
+	case 'A' <= c && c <= 'Z':
 		return true
-	case c >= '0' && c <= '9':
+	case '0' <= c && c <= '9':
 		return true
 	default:
 		return false
 	}
 }
 
-func IsAlphaNum2(c uint8) bool {
-	return 'a' <= c && c <= 'z' || '0' <= c && c <= '9' || 'A' <= c && c <= 'Z' || c == '_'
+func IsAlphaNum2(c byte) bool {
+	return 'a' <= c && c <= 'z' || 'A' <= c && c <= 'Z' || '0' <= c && c <= '9' || c == '_'
 }
 
 // IsAlphaNum reports whether the byte is an ASCII letter, number, or underscore
 func IsAlphaNum(c byte) bool {
-
-	if (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') {
-		return true
-	}
-	return false
+	return 'a' <= c && c <= 'z' || 'A' <= c && c <= 'Z' || '0' <= c && c <= '9'
 }

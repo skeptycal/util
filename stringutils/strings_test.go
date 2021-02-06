@@ -9,27 +9,29 @@
 package stringutils
 
 import (
+	"bytes"
+	"fmt"
 	"math/rand"
+	"reflect"
+	"testing"
 	"time"
 	"unicode"
-	"unicode/utf8"
 )
 
 const (
-    TAB = 0x09  // '\t'
-    LF = 0x0A   // '\n'
-    VT = 0x0B   // '\v'
-    FF = 0x0C   // '\f'
-    CR = 0x0D   // '\r'
-    SPACE = ' '
-    RuneSelf = utf8.RuneSelf
-    NBSP = 0x00A0
-    NEL = 0x0085
+	TAB   = 0x09 // '\t'
+	LF    = 0x0A // '\n'
+	VT    = 0x0B // '\v'
+	FF    = 0x0C // '\f'
+	CR    = 0x0D // '\r'
+	SPACE = ' '
+	NBSP  = 0x00A0
+	NEL   = 0x0085
 
-    defaultSamples = 1<<8 - 1
-    maxSamples     = 1<<32 - 1
+	defaultSamples = 1<<8 - 1
+	maxSamples     = 1<<32 - 1
 
-    numSamples = 1<<4
+	numSamples = 1 << 4
 )
 
 // Benchmark results
@@ -296,14 +298,11 @@ BenchmarkIsAnySpace-8            	       2	 674386516 ns/op	67108864 B/op	      
 BenchmarkUnicode_IsSpace-8       	       2	 714679118 ns/op	67108864 B/op	       1 allocs/op
 */
 
-
 var Want = unicode.IsSpace
 
-
 func init() {
-    rand.Seed(time.Now().UnixNano())
+	rand.Seed(time.Now().UnixNano())
 }
-
 
 func SmallRuneSamples() []rune {
 	return []rune{
@@ -318,56 +317,56 @@ func SmallByteSamples() []byte {
 }
 
 func SmallByteStringSamples() (list []string) {
-    for _, c := range SmallByteSamples() {
-        list = append(list, string(c))
-    }
-    return
+	for _, c := range SmallByteSamples() {
+		list = append(list, string(c))
+	}
+	return
 }
 
 func SmallRuneStringSamples() (list []string) {
-    for _, r := range SmallRuneSamples() {
-        list = append(list, string(r))
-    }
-    return
+	for _, r := range SmallRuneSamples() {
+		list = append(list, string(r))
+	}
+	return
 }
 
 func ByteSamples() []byte {
-    n := numSamples
+	n := numSamples
 	if n < 2 || n > maxSamples {
 		n = defaultSamples
 	}
 	retval := make([]byte, 0, n)
 	for i := 0; i < n; i++ {
 		retval = append(retval, byte(rand.Intn(126)))
-    }
-    retval = append(retval, 0xFF)
-    return retval
+	}
+	retval = append(retval, 0xFF)
+	return retval
 }
 
 func RuneSamples() []rune {
-    n := numSamples
+	n := numSamples
 	if n < 2 || n > maxSamples {
 		n = defaultSamples
 	}
 	retval := make([]rune, 0, n)
 	for i := 0; i < n; i++ {
-        retval = append(retval, rune(rand.Intn(0x3000)))
+		retval = append(retval, rune(rand.Intn(0x3000)))
 	}
 	return retval
 }
 
 func byteStringSamples() (list []string) {
-    for _, r := range RuneSamples() {
-        list = append(list, string(r))
-    }
-    return
+	for _, r := range RuneSamples() {
+		list = append(list, string(r))
+	}
+	return
 }
 
 func runeStringSamples() (list []string) {
-    for _, r := range RuneSamples() {
-        list = append(list, string(r))
-    }
-    return
+	for _, r := range RuneSamples() {
+		list = append(list, string(r))
+	}
+	return
 }
 
 // This is a horrible idea ... much slower
@@ -416,7 +415,6 @@ func runeStringSamples() (list []string) {
 // 	}
 // }
 
-
 // func BenchmarkIsWhiteSpace5(b *testing.B) {
 // 	for i := 0; i < b.N; i++ {
 // 		for _, r := range RuneSamples() {
@@ -432,3 +430,109 @@ func runeStringSamples() (list []string) {
 // 		}
 // 	}
 // }
+
+func TestCount(t *testing.T) {
+	tests := []struct {
+		name string
+		s    []byte
+		sep  []byte
+		want int
+	}{
+		// TODO: Add test cases.
+		{"splitOn8", []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15}, []byte{8}, 1},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := Count(tt.s, tt.sep); got != tt.want {
+				t.Errorf("Count() = %v, want %v", got, tt.want)
+			}
+		})
+		t.Run(tt.name, func(t *testing.T) {
+			if got := bytes.Count(tt.s, tt.sep); got != tt.want {
+				t.Errorf("Count() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func RandBytes(n int) []byte {
+    b := make([]byte, 0,n)
+    buf := bytes.NewBuffer(b)
+    defer buf.Reset()
+    for i := 0; i < n; i++ {
+         buf.WriteByte(byte(rand.Intn(255)))
+    }
+    return buf.Bytes()
+}
+
+// BenchmarkCount Results
+/*
+BenchmarkCount/Benchmark:_Count-8         	    1335	    899136 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCount/Benchmark:_bytes.Count-8   	    1381	    880842 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCount/Benchmark:_bytes.Index-8   	313380223	         3.81 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCount/Benchmark:_bytes.LastIndex-8         	313657178	         3.90 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCount/Benchmark:_bytes.Compare-8           	149328421	         7.92 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCount/Benchmark:_Equal-8                   	283396728	         4.08 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCount/Benchmark:_Contains-8                	173608912	         6.84 ns/op	       0 B/op	       0 allocs/op
+*/
+func BenchmarkCount(b *testing.B) {
+    const maxNum = 2<<16
+    list := RandBytes(maxNum)
+    listsep := RandBytes(0)
+
+	tests := []struct {
+		name string
+		f func([]byte, []byte) int
+	}{
+        // TODO: Add test cases.
+        {"Count",Count},
+        {"bytes.Count",bytes.Count},
+        {"bytes.Index",bytes.Index},
+        {"bytes.LastIndex",bytes.LastIndex},
+        {"bytes.Compare",bytes.Compare},
+        {"Equal",bEqual},
+        {"Contains",bContains},
+	}
+	for _, bb := range tests {
+        name := fmt.Sprintf("Benchmark: %s", bb.name)
+        // sum := 0
+		b.Run(name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+                // sum += bb.f(list, listsep)
+                bb.f(list, listsep)
+			}
+        })
+        // fmt.Printf("Count: %d\n",sum)
+
+		// b.Run(name, func(b *testing.B) {
+		// 	for i := 0; i < b.N; i++ {
+		// 		for b := range ByteSamples() {
+		// 			bytes.Split(ByteSamples(), []byte{byte(b)})
+		// 		}
+		// 	}
+		// })
+	}
+}
+
+func TestSplit(t *testing.T) {
+	tests := []struct {
+		name string
+		s    []byte
+		sep  []byte
+		want [][]byte
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := SplitNoSave(tt.s, tt.sep); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("SplitNoSave() = %v, want %v", got, tt.want)
+			}
+		})
+		t.Run(tt.name, func(t *testing.T) {
+			if got := bytes.Split(tt.s, tt.sep); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("SplitNoSave() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

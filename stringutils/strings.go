@@ -9,11 +9,23 @@
 package stringutils
 
 import (
+	"bytes"
 	"fmt"
 	"math/rand"
 	"regexp"
 	"strconv"
+	"strings"
 	"time"
+	"unicode/utf8"
+	"unsafe"
+)
+
+// Numbers fundamental to the encoding.
+const (
+	RuneError = '\uFFFD'     // the "error" Rune or "Unicode replacement character"
+	RuneSelf  = 0x80         // characters below RuneSelf are represented as themselves in a single byte.
+	MaxRune   = '\U0010FFFF' // Maximum valid Unicode code point.
+	UTFMax    = 4            // maximum number of bytes of a UTF-8 encoded Unicode character.
 )
 
 // const alphanumerics = "0123456789abcdefghijklmnopqrstuvwxyz"
@@ -139,6 +151,144 @@ var (
 
 func init() {
 	rand.Seed(time.Now().UnixNano())
+}
+
+type line []byte // todo ?? use [255]byte or similar?? make it user choosable?
+
+func (l *line) unsafeToStringPtr() string {
+    return *(*string)(unsafe.Pointer(&l))
+}
+
+func (l *line) unsafeMakeFromPtr(s string) {
+    l = (*line)(unsafe.Pointer(&s))
+}
+
+type list struct {
+    buf *[][]byte
+}
+
+func (l list) Len() int { return len(*l.buf) }
+func (l list) Cap() int { return cap(*l.buf) }
+func (l list) Reset(cap int) { *l.buf = make([][]byte,0,cap+1) }
+func (l list) Join() []byte { return bytes.Join(*l.buf, []byte{0x10}) }
+func (l list) Make(s string) [][]byte {
+    l.Reset(len(s))
+    *l.buf = bytes.SplitAfter([]byte(s), []byte{0x10})
+    return *l.buf
+}
+func (l list) Contains(b []byte) bool {
+    for _, s := range *l.buf {
+        if bytes.Index(s, b) == -1 {
+            return false
+        }
+    }
+    return true
+}
+
+// SplitNoSave - modified from standard library generic split:
+// splits after each instance of sep.
+func SplitNoSave(s, sep []byte) [][]byte {
+
+    n := bytes.Count(s, sep) + 1
+    sepSave := 0
+	// if n == 0 {
+	// 	return nil
+	// }
+	// if len(sep) == 0 {
+	// 	return Explode(s, n)
+	// }
+	// if n < 0 {
+	// 	n = bytes.Count(s, sep) + 1
+	// }
+
+	a := make([][]byte, n)
+	n--
+	i := 0
+	for i < n {
+		m := bytes.Index(s, sep)
+		if m < 0 {
+			break
+		}
+		a[i] = s[: m+sepSave : m+sepSave]
+		s = s[m+len(sep):]
+		i++
+	}
+	a[i] = s
+	return a[:i+1]
+}
+
+func bEqual(s, sub []byte) int {
+    if bytes.Equal(s, sub) {
+        return 1
+    }
+    return 0
+}
+
+func bContains(s, sub []byte) int {
+    if bytes.Contains(s, sub) {
+        return 1
+    }
+    return 0
+}
+
+// Count counts the number of non-overlapping instances
+// of sep in s. If sep is an empty slice, Count returns
+// 1 + the number of UTF-8-encoded code points in s.
+// if len(s) == 1, a fast processor specific implementation
+// is used.
+func Count(s, sep []byte) int {
+	// special case
+	if len(sep) == 0 {
+		return utf8.RuneCount(s) + 1
+	}
+	if len(sep) == 1 {
+		return bytes.Count(s, sep)
+	}
+	n := 0
+	for {
+		i := bytes.Index(s, sep)
+		if i == -1 {
+			return n
+		}
+		n++
+		s = s[i+len(sep):]
+	}
+}
+
+// Explode splits s into a slice of UTF-8 sequences, one per Unicode code point (still slices of bytes),
+// up to a maximum of n byte slices. Invalid UTF-8 sequences are chopped into individual bytes.
+func Explode(s []byte, n int) [][]byte {
+	if n <= 0 {
+		n = len(s)
+	}
+	a := make([][]byte, n)
+	var size int
+	na := 0
+	for len(s) > 0 {
+		if na+1 >= n {
+			a[na] = s
+			na++
+			break
+		}
+		_, size = utf8.DecodeRune(s)
+		a[na] = s[0:size:size]
+		s = s[size:]
+		na++
+	}
+	return a[0:na]
+}
+
+
+func Join(list []string) string {
+    return strings.Join(list, "\n")
+}
+
+func TabIt(s string, n int) string {
+    tmp := make([]string,0,strings.Count(s,"\n") + 3)
+    for  _, line := range strings.Fields(s) {
+        tmp = append(tmp, strings.Repeat(" ", n)+line)
+    }
+    return strings.Join(tmp,"\n")
 }
 
 // Contains tells whether a contains x.
