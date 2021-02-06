@@ -40,21 +40,37 @@ func GetDomainNames(s string) (retval string) {
 	return sb.String()[1:] // there is always a leading space from the loop
 }
 
+// FromGmailFilterNames removes the " OR " separators between elements
+// in the gmail filters sender list
+func FromGmailFilterNames(s string) string {
+    return strings.Join(strings.Split(s," OR "), " ")
+}
+
+// ToGmailFilterNames removes the " OR " separators between elements
+// in the gmail filters sender list
+func ToGmailFilterNames(s string) string {
+    return strings.Join(strings.Split(s," "), " OR ")
+}
+
 func GetTopLevelDomains(s string) (retval string) {
 
 	if len(s) < 3 {
 		return s
 	}
 
+    // removes the xxxxxx@ prefix
 	list := strings.Fields(GetDomainNames(s))
+
 	tmp := make([]string, 0, len(list))
+
+
 
 	sb := strings.Builder{}
 
 	for _, s := range list {
 		parts := strings.Split(s, ".")
 
-		if len(parts) > 2 {
+		if len(parts) > 1 {
 			parts = parts[len(parts)-2:]
 		}
 
@@ -65,4 +81,6 @@ func GetTopLevelDomains(s string) (retval string) {
 	sb.WriteString(strings.Join(MakeSet(tmp), "."))
 
 	return strings.TrimSpace(sb.String())
+        return strings.Join(MakeSet(list)," ")
+
 }

@@ -49,7 +49,8 @@ func (g *GitHubRepo) gitIgnore(args string) error {
 	   profile.out
 	*/
 
-	return GitIgnore(g.name, "", "")
+    // func GitIgnore(reponame string, personalItems string, repoSpecific string, args string) error
+	return GitIgnore(g.name, "", "", "")
 
 }
 
@@ -76,7 +77,7 @@ func gitRepoSetup() error {
 	if err != nil {
 		return err
 	}
-	GitIgnore("", "", "")
+	GitIgnore("", "", "", "")
 
 	// todo - stuff
 	return nil

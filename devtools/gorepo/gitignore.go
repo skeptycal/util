@@ -2,6 +2,7 @@ package gorepo
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"reflect"
 	"strings"
@@ -22,7 +23,7 @@ func createGitIgnore(force bool) error {
 
 	if gofile.Exists(".gitignore") {
 		if !force {
-			return fmt.Errorf(".gitignore already exists; use force option to overwrite")
+			return fmt.Errorf(".gitignore already exists; use 'force=true' option to overwrite")
 		}
 	}
 
@@ -30,10 +31,9 @@ func createGitIgnore(force bool) error {
 	if err != nil {
 		return err
 	}
+    defer f.Close()
 
     log.Infof("Creating gitignore file %v", f.Name())
-
-    _, err := f.WriteString()
 
 	return nil
 }
@@ -90,7 +90,7 @@ func GitIgnore(reponame, personalItems, repoSpecific, args string) error {
     }
 
     if repoSpecific == "" {
-        repoSpecific == repoSpecificItems
+        repoSpecific = repoSpecificItems
     }
 
 	var sb strings.Builder
@@ -100,7 +100,8 @@ func GitIgnore(reponame, personalItems, repoSpecific, args string) error {
 
 	sb.WriteString(gifmt)
 
-	return gofile.WriteFile(".gitignore", sb.String())
+    createGitIgnore(true)
+	return ioutil.WriteFile(".gitignore", []byte(sb.String()), 0666)
 }
 
 const ( // for gitignore.go

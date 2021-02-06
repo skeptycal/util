@@ -2,9 +2,6 @@ package semver
 
 import (
 	"fmt"
-
-	"github.com/skeptycal/util/zsh"
-	"golang.org/x/mod/semver"
 )
 
 // Version hold the current repo version.
@@ -53,14 +50,14 @@ func IsValid(v string) bool {
 	return ok
 }
 
-func GetVersionTag(v string) string {
+// func GetVersionTag(v string) string {
 
-	version := zsh.Version()
-	fmt.Println("version: ", version)
-	if version == "" || version[:5] == `/x1b[` || !semver.IsValid(version) {
-		version = "unknown"
-	}
-	v := semver.MajorMinor(version)
-}
+// 	version := zsh.Version()
+// 	fmt.Println("version: ", version)
+// 	if version == "" || version[:5] == `/x1b[` || !semver.IsValid(version) {
+// 		version = "unknown"
+// 	}
+// 	v := semver.MajorMinor(version)
+// }
 
-func GetVersion() {}
+// func GetVersion() {}

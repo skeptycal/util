@@ -86,24 +86,16 @@ func (j *jsonStruct) Save() error {
 // a JSON value. UnmarshalJSON must copy the JSON data
 // if it wishes to retain the data after returning.
 //
-// By convention, to approximate the behavior of Unmarshal itself,
-// Unmarshalers implement UnmarshalJSON([]byte("null")) as a no-op.
+// By convention, to approximate the behavior of Unmarshal,
+// Unmarshalers implement UnmarshalJSON([]byte("null")) as
+// a no-op.
 func (j *jsonStruct) UnmarshalJSON(data []byte) error {
-    data, err := ioutil.ReadFile(j.Name())
-	if err != nil {
-		return err
-	}
 	return json.Unmarshal(data, j.v)
 }
 
-// MarshalJSON implements the json.Marshaler interface and returns the JSON
-// encoding of itself.
+// MarshalJSON implements the json.Marshaler interface
+// and returns the JSON encoding of itself.
 //
 func (j *jsonStruct) MarshalJSON() ([]byte, error) {
-    data, err := json.Marshal(j.v)
-    if err != nil {
-        return nil, err
-    }
-    json.Marshaler
-    return data, nil
+    return json.Marshal(j.v)
 }

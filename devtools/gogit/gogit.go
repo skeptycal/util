@@ -7,7 +7,6 @@ import (
 	"strings"
 	"unicode"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/skeptycal/util/gofile"
 	"github.com/skeptycal/zsh"
 )
@@ -66,7 +65,7 @@ func CommitAll(message string) error {
 //  git init
 //  git add --all
 //  git commit -m 'Initial Commit'
-func Init() error {
+func GitInit() error {
 	if err := Err(zsh.Status("git init")); err != nil {
 		return err
 	}
@@ -79,13 +78,13 @@ func PushTags() error {
 }
 
 func getVersionCommitHash() string {
-	return zsh.Out("git rev-list --tags --max-count=1")
+	return zsh.Sh("git rev-list --tags --max-count=1")
 }
 func VersionTag() string {
-	return zsh.CombinedOutput("git describe --tags $(git rev-list --tags --max-count=1)")
+	return zsh.Sh("git describe --tags $(git rev-list --tags --max-count=1)")
 }
 
-// GitTag create a git tag object signed with GPG
+// Tag create a git tag object signed with GPG
 func Tag(s string) error {
 	// todo check tag with regex
 	if s == "" {
@@ -102,11 +101,7 @@ func Tag(s string) error {
 
 // RemoteName gets the name of the remote branch, usually origin.
 func RemoteName() string {
-	out, err := zsh.Shell("git remote")
-	if err != nil {
-		log.Error(err)
-	}
-	return out
+    return zsh.Sh("git remote")
 }
 
 // Remote returns the remote repository url.
@@ -116,11 +111,8 @@ func RemoteName() string {
 */
 func Remote() string {
 	// todo - this is ... kinda messy
-	remote := RemoteName()
-	out, err := zsh.Shell("git remote -v")
-	if err = gofile.DoOrDie(err); err != nil {
-		return ""
-	}
+	remote := zsh.Sh("git remote")
+	out:= zsh.Sh("git remote -v")
 
 	list := strings.Split(out, "\n")
 	for _, s := range list {
@@ -131,7 +123,7 @@ func Remote() string {
 	}
 	s := ""
 	for _, c := range out {
-		if c > 32 && c < 127 {
+		if  32 < c && c < 127 {
 			s += fmt.Sprintf("%c", c)
 		} else {
 			s += " "
