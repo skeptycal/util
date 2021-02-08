@@ -81,6 +81,6 @@ func GetTopLevelDomains(s string) (retval string) {
 	sb.WriteString(strings.Join(MakeSet(tmp), "."))
 
 	return strings.TrimSpace(sb.String())
-        return strings.Join(MakeSet(list)," ")
+    // return strings.Join(MakeSet(list)," ")
 
 }

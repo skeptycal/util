@@ -16,10 +16,7 @@ func DownloadURL(url, filename string) error {
 	}
 	defer resp.Body.Close()
 
-	f, err := gofile.Create(filename)
-	if err != nil {
-		return err
-	}
+	f := gofile.Create(filename)
 	defer f.Close()
 
 	_, err = io.Copy(f, resp.Body)

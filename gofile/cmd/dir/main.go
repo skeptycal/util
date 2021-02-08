@@ -7,15 +7,15 @@ import (
 	"github.com/skeptycal/zsh"
 )
 
-func DirShellBM(path string) string {
+func Dir(path string) string {
 	command := fmt.Sprintf("ls -R %s", path)
-	result := zsh.Out(command)
+	result := zsh.Sh(command)
 	return result
 }
 
-func DirShellTimerBM(path string) string {
-	command := fmt.Sprintf("time ls -R . %s", path)
-	result := zsh.Out(command)
+func DirTime(args string) string {
+	command := fmt.Sprintf("time ls -R . %s", args)
+	result := zsh.Sh(command)
 	return result
 }
 
@@ -25,5 +25,5 @@ func main() {
 	fmt.Println("Directory Listing Benchmarks:\n ")
 	log.Info("logger started")
 	fmt.Println("")
-	fmt.Println(DirShellBM(testpath))
+	fmt.Println(Dir(testpath))
 }

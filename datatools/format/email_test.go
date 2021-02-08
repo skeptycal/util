@@ -54,7 +54,7 @@ func TestGetTopLevelDomains(t *testing.T) {
 		args       args
 		wantRetval string
 	}{
-		// {"sample", args{sample}, sampleTopLevel},
+		{"sample", args{sample}, sampleTopLevel},
 		{"THIS", args{"THIS"}, "THIS"},
 		{"me@home.com", args{"me@bedroom.home.com me@kitchen.home.com me@garage.home.com"}, "home.com"},
 		{"0", args{"0"}, "0"},
