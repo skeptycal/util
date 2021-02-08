@@ -18,6 +18,8 @@ import (
 	"strings"
 )
 
+type Any interface{}
+type Empty struct{}
 
 const (
 	fmtCopyrightHeader = `// Copyright (c) %s %s. All rights reserved.
@@ -36,7 +38,7 @@ const (
 )
 
 
-func (r *RepoConfig) genPageTemplate() string {
+func (r *repoConfig) genPageTemplate() string {
 	sb := strings.Builder{}
 	defer sb.Reset()
 
@@ -45,28 +47,28 @@ func (r *RepoConfig) genPageTemplate() string {
 	return sb.String()
 }
 
-func (r *RepoConfig) genCopyrightHeader() string {
+func (r *repoConfig) genCopyrightHeader() string {
 	return fmt.Sprintf(fmtCopyrightHeader, r.year, r.User.Name, r.license)
 }
 
-func (r *RepoConfig) genPackage() string {
+func (r *repoConfig) genPackage() string {
 	return fmt.Sprintf(fmtPackage, r.name)
 }
 
-func (r *RepoConfig) genMemo(memo string) string {
+func (r *repoConfig) genMemo(memo string) string {
 	return fmt.Sprintf(fmtMemo, memo)
 }
 
 func genClose() string { return fmtSectionCloser }
 
-func (r *RepoConfig) genFuncHeader(name, args, retvals string) string {
+func (r *repoConfig) genFuncHeader(name, args, retvals string) string {
 	return fmt.Sprintf(fmtFuncHeader, name, name, args, retvals)
 }
 
-func (r *RepoConfig) genStructHeader(name string) string {
+func (r *repoConfig) genStructHeader(name string) string {
 	return fmt.Sprintf(fmtStructHeader, name, name)
 }
 
-func (r *RepoConfig) genTableHeader(name, vartype, value string) string {
+func (r *repoConfig) genTableHeader(name, vartype, value string) string {
 	return fmt.Sprintf(fmtTableHeader, name, name, vartype, value)
 }

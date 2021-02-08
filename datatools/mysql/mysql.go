@@ -7,7 +7,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-// DbConnect returns a new database connection pool (DB) given a
+// New returns a new database connection pool (DB) given a
 // configuration object and a database name.
 // DB is a database handle representing a pool of zero or more
 // underlying connections. It's safe for concurrent use by multiple
@@ -35,7 +35,7 @@ import (
 // Rollback is called on the transaction, that transaction's
 // connection is returned to DB's idle connection pool. The pool size
 // can be controlled with SetMaxIdleConns.
-func NewDbConnect(dbconfig DbConfig, database string) (*sql.DB, error) {
+func New(dbconfig DBConfig, database string) (*sql.DB, error) {
 
 	// Open database connection.
 	db, err := sql.Open("mysql", dbconfig.dsn(database))

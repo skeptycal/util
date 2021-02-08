@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"strings"
 	"time"
-
-	log "github.com/sirupsen/logrus"
 )
 
 // YearRange returns a string representation of the year range
@@ -17,15 +15,15 @@ import (
 // It will contain the given year, a dash, and the current year.
 // If the y parameter is greater than the current year or more
 // than 50 years ago, it is assumed to be an error and the current
-// year is used. An info level log message is generated, but no
-// error is returned.
+// year is used. An info level log message is generated if the
+// logger is set to show INFO level, but no error is returned.
 //
 func YearRange(y int) string {
     now := time.Now().Year()
     // log.Infof("y input: %d", y) // todo remove dev output
     // log.Infof("now: %d", now)   // todo remove dev output
 	if y > now || y < (now-50) {
-        log.Infof("year out of range: %v (older than 50 years or newer than now) ... default current year used", y)
+        // log.Infof("year out of range: %v (older than 50 years or newer than now) ... default current year used", y)
         y = now
     }
 
@@ -42,15 +40,12 @@ func NewUser(name, email, username, defaultLicense string, defaultCopyrightYear 
         if DefaultUserConfig.Name == "" {
 		    return nil, fmt.Errorf("name is invalid: %v", name)
         }
-		name = DefaultUserConfig.Name
+		return DefaultUserConfig, nil
 	}
 	if email == "" {
 		email = DefaultUserConfig.Email
 	}
 	if username == "" {
-        if DefaultUserConfig.Username == "" {
-		    return nil, fmt.Errorf("username is invalid: %v", username)
-        }
 		username = DefaultUserConfig.Username
 	}
 	if defaultLicense == "" {
@@ -70,11 +65,11 @@ func NewUser(name, email, username, defaultLicense string, defaultCopyrightYear 
 }
 
 type UserConfig struct {
-	Name                 string
-	Email                string
-	Username             string
-	DefaultLicense       string
-	DefaultCopyrightYear int
+	Name                 string `json:"name"`
+	Email                string `json:"email,omitempty"`
+	Username             string `json:"username,omitempty"`
+	DefaultLicense       string `json:"default_license,omitempty"`
+	DefaultCopyrightYear int    `json:"default_copyright_year,omitempty"`
 }
 
 func (c *UserConfig) String() string {

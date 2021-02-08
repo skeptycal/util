@@ -1,4 +1,4 @@
-// package mysql
+// Package mysql provides support for persistent database connections.
 //
 // Copyright(C)2020 Micael Treanor
 // github.com/skeptycal/mysql
@@ -7,7 +7,6 @@
 // uses github.com/go-sql-driver/mysql which requires
 // MySQL (4.1+), MariaDB, Percona Server, Google CloudSQL or Sphinx (2.2.3+)
 //
-
 package mysql
 
 import (
@@ -22,22 +21,22 @@ import (
 const (
 	// mySqlUserVariable and mySqlPassword are the names of the environment variables
 	// used to store connection information.
-	mySqlUserNameEnvVar = "MYSQL_USERNAME"
-	mySqlPasswordEnvVar = "MYSQL_PASSWORD"
+	mySQLUserNameEnvVar = "MYSQL_USERNAME"
+	mySQLPasswordEnvVar = "MYSQL_PASSWORD"
 
 	defaultProtocol  = "tcp"
 	defaultMySQLHost = "localhost" // defaults for localhost are most secure
 	defaultMySQLPort = "33060"     // depending on the MySQL version; this may need to be 3306
 
 	// this is the 'driver name' used by helper functions that smooth out connections
-	mySqlDriverName = "mysql"
+	mySQLDriverName = "mysql"
 )
 
-// MySqlNotImplemented returns an error if the method is not yet implemented
-var MySqlNotImplemented error = errors.New("not implemented")
+// ErrMySQLNotImplemented returns an error if the method is not yet implemented
+var ErrMySQLNotImplemented error = errors.New("not implemented")
 
-// DbConfig defines the configuration for the database connection
-type DbConfig interface {
+// DBConfig defines the configuration for the database connection
+type DBConfig interface {
 	Config() string
 	dsn(database string) string
 	Load(file string) error
@@ -75,16 +74,16 @@ type dbConfig struct {
 // The host, port, and protocol are optional and are often set to the defaults.
 // These options cannot be changed once the connection is established. A new
 // connection must be created in place of the old one.
-func NewDBConfig(host, port, protocol string, logging bool) (DbConfig, error) {
+func NewDBConfig(host, port, protocol string, logging bool) (DBConfig, error) {
 
-	username := os.Getenv(mySqlUserNameEnvVar)
+	username := os.Getenv(mySQLUserNameEnvVar)
 	if username == "" {
-		return nil, fmt.Errorf("environment variable %s for MySQL username not found", mySqlUserNameEnvVar)
+		return nil, fmt.Errorf("environment variable %s for MySQL username not found", mySQLUserNameEnvVar)
 	}
 
-	password := os.Getenv(mySqlPasswordEnvVar)
+	password := os.Getenv(mySQLPasswordEnvVar)
 	if password == "" {
-		return nil, fmt.Errorf("environment variable %s for MySQL password not found", mySqlPasswordEnvVar)
+		return nil, fmt.Errorf("environment variable %s for MySQL password not found", mySQLPasswordEnvVar)
 	}
 
 	if host == "" {
@@ -131,7 +130,7 @@ func (db *dbConfig) Config() string {
 //
 // The returned DB is safe for concurrent use by multiple goroutines and maintains its own pool of idle connections. Thus, the Open function should be called just once. It is rarely necessary to close a DB.
 func (db *dbConfig) Connect(dbname string) (*sql.DB, error) {
-	return NewDbConnect(db, dbname)
+	return New(db, dbname)
 }
 
 // DSN returns the entire DSN authentication string including a database name.
@@ -158,7 +157,7 @@ func (db *dbConfig) dsn(dbname string) string {
 // Not Implemented
 func (db *dbConfig) Load(file string) error {
 	// load json config file
-	return MySqlNotImplemented
+	return ErrMySQLNotImplemented
 }
 
 // Load saves the database configuration to a json file
@@ -166,5 +165,5 @@ func (db *dbConfig) Load(file string) error {
 // Not Implemented
 func (db *dbConfig) Save(file string) error {
 	// save json config file
-	return MySqlNotImplemented
+	return ErrMySQLNotImplemented
 }

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/skeptycal/util/stringutils"
 )
 
@@ -14,12 +13,9 @@ const (
 	fmtDownloadURL string = "https://github.com/%s/%s"
 )
 
-func NewRepo(reponame, license string, year int, user *UserConfig) (r *RepoConfig, err error) {
-	if user == nil {
+func NewRepo(reponame, license string, year int, user *UserConfig) (r *repoConfig, err error) {
+	if user == nil || user.Name == "" || !stringutils.IsASCIIPrintable(user.Name){
 		user = DefaultUserConfig
-	}
-	if user.Name == "" || !stringutils.IsASCIIPrintable(user.Name) {
-		return nil, fmt.Errorf("user is invalid: %v", user)
 	}
 	if reponame == "" {
 		return nil, fmt.Errorf("repo name is invalid: %v", reponame)
@@ -33,7 +29,7 @@ func NewRepo(reponame, license string, year int, user *UserConfig) (r *RepoConfi
 
 	repoyear := YearRange(year)
 
-	r = &RepoConfig{
+	r = &repoConfig{
 		User:    user,
 		name:    reponame,
 		license: license,
@@ -57,7 +53,7 @@ func NewRepo(reponame, license string, year int, user *UserConfig) (r *RepoConfi
 // 	DocURL() string
 // }
 
-type RepoConfig struct {
+type repoConfig struct {
 	User        *UserConfig
 	name        string
 	license     string `default:""`
@@ -67,59 +63,40 @@ type RepoConfig struct {
 	docURL      string `default:""`
 }
 
-func (r *RepoConfig) Name() string {
-	if r.name == "" {
-        log.Errorf("repo name is invalid: %v", r.name)
-        return ""
-	}
+func (r *repoConfig) Name() string {
 	return r.name
 }
 
-func (r *RepoConfig) License() string {
-	if r.license == "" {
-		r.license = r.User.DefaultLicense
-	}
+func (r *repoConfig) License() string {
 	return r.license
 }
 
-func (r *RepoConfig) Year() string {
-	if r.year == "" {
-		r.year = YearRange(r.User.DefaultCopyrightYear)
-	}
+func (r *repoConfig) Year() string {
 	return r.year
 }
 
-func (r *RepoConfig) URL() string {
-	if r.User.Username == "" {
-		log.Fatalf("a valid username is required: %v", r.User.Username)
-	}
+func (r *repoConfig) URL() string {
 	if r.url == "" {
 		r.url = fmt.Sprintf(fmtRepoURL, r.User.Username , r.name)
 	}
 	return r.url
 }
 
-func (r *RepoConfig) DownloadURL() string {
-	if r.name == "" {
-		log.Fatalf("a valid repo name is required")
-	}
+func (r *repoConfig) DownloadURL() string {
 	if r.downloadURL == "" {
 		r.downloadURL = fmt.Sprintf(fmtDownloadURL, r.User.Username, r.name)
 	}
 	return r.downloadURL
 }
 
-func (r *RepoConfig) DocURL() string {
-	if r.name == "" {
-		log.Fatalf("a valid repo name is required")
-	}
+func (r *repoConfig) DocURL() string {
 	if r.docURL == "" {
 		r.docURL = fmt.Sprintf(fmtDocURL, r.User.Username, r.name)
 	}
 	return r.docURL
 }
 
-func (r *RepoConfig) String() string {
+func (r *repoConfig) String() string {
 	sb := strings.Builder{}
 	defer sb.Reset()
 	sb.WriteString("Repo Config:\n")

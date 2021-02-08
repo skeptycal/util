@@ -2,10 +2,7 @@
 package format
 
 import (
-	"fmt"
 	"strings"
-
-	"github.com/skeptycal/util/datatools/runebuilder"
 )
 
 type stringWriter struct {
@@ -91,7 +88,8 @@ func Reverse(s string) string {
 	return sb.String()
 }
 
-// Reverse2 Reference: https://stackoverflow.com/questions/1752414/how-to-reverse-a-string-in-go
+// Reverse2 reverses
+// Reference: https://stackoverflow.com/questions/1752414/how-to-reverse-a-string-in-go
 func Reverse2(s string) string {
 	runes := []rune(s)
 	for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
@@ -100,12 +98,13 @@ func Reverse2(s string) string {
 	return string(runes)
 }
 
-// Reverse3 Reference: https://stackoverflow.com/a/1754209
-func Reverse3(input string) string {
+// Reverse3 reverses
+// Reference: https://stackoverflow.com/a/1754209
+func Reverse3(s string) string {
 	// Get Unicode code points.
 	n := 0
-	runes := make([]rune, len(input))
-	for _, r := range input {
+	runes := make([]rune, len(s))
+	for _, r := range s {
 		runes[n] = r
 		n++
 	}
@@ -118,8 +117,8 @@ func Reverse3(input string) string {
 	return string(runes)
 }
 
-// Reverse4 combines the best from SO answers
-// (Reverse2 and Reverse3)
+// Reverse4 reverses
+// combines the best from SO answers (Reverse2 and Reverse3)
 func Reverse4(s string) string {
 	runes := []rune(s)
 	n := len(runes)
@@ -128,26 +127,7 @@ func Reverse4(s string) string {
 		runes[i], runes[n-1-i] = runes[n-1-i], runes[i]
 	}
 	return string(runes)
-
 }
-
-// func Reverse5(s string) string {
-// 	rb := runebuilder.Builder{}
-// 	for i := len(s) - 1; i > -1; i-- {
-// 		rb.WriteRune(r)
-// 	}
-// 	return rb.String()
-// }
-
-// func Reverse6(s string) string {
-// 	rb := runebuilder.Builder{}
-// 	size := utf8.RuneCountInString(s)
-// 	for i := size - 1; i >= 0; i-- {
-// 		utf8.DecodeRuneInString(s)
-// 		rb.WriteRune()
-// 	}
-// 	return rb.String()
-// }
 
 // Reverse5 returns a string with the bytes of s in reverse order.
 func Reverse5(s string) string {
@@ -173,20 +153,38 @@ func ReverseRune(s string) string {
 	return string(res)
 }
 
-func Reverse8(s string) string {
+// func Reverse5(s string) string {
+// 	rb := runebuilder.Builder{}
+// 	for i := len(s) - 1; i > -1; i-- {
+// 		rb.WriteRune(r)
+// 	}
+// 	return rb.String()
+// }
 
-	rb := runebuilder.Builder{}
-	rb.ReSize(len(s))
-	rb.Grow(len(s))
-	fmt.Println("len: ", rb.Len())
+// func Reverse6(s string) string {
+// 	rb := runebuilder.Builder{}
+// 	size := utf8.RuneCountInString(s)
+// 	for i := size - 1; i >= 0; i-- {
+// 		utf8.DecodeRuneInString(s)
+// 		rb.WriteRune()
+// 	}
+// 	return rb.String()
+// }
 
-	size := len(s) - 1
-	for i, r := range s {
-		// fmt.Printf("i: %d    r: %v", i, r)
-		rb.Put(r, size-i)
-	}
-	return rb.String()
-}
+// func Reverse8(s string) string {
+
+// 	rb := runebuilder.Builder{}
+// 	rb.ReSize(len(s))
+// 	rb.Grow(len(s))
+// 	fmt.Println("len: ", rb.Len())
+
+// 	size := len(s) - 1
+// 	for i, r := range s {
+// 		// fmt.Printf("i: %d    r: %v", i, r)
+// 		rb.Put(r, size-i)
+// 	}
+// 	return rb.String()
+// }
 
 // NumSpace formats numeric values for readability by adding
 // spaces every three digits.
@@ -214,15 +212,15 @@ func NumSpace(s string) string {
 
 }
 
-/* python version
-# Take a very large number and pretty print it in triplets of 3 digits, each triplet separated by a space.
+// python version
+/* # Take a very large number and pretty print it in triplets of 3 digits, each triplet separated by a space.
 def pnum_spc(n): print(' '.join([''.join(list(str(n))[::-1][i:i+3]) for i in range(0, len(str(n)), 3)][::-1]))
 # >>> pnum_spc(32 ** 13)
 # 36 893 488 147 419 103 232
 */
 
-/* python version
-# Print numbers as 32-bit binary numbers w/ spaces giving 4-bit words
+// python version
+/* # Print numbers as 32-bit binary numbers w/ spaces giving 4-bit words
 def pbin_spc(n): print(' '.join([''.join(list(f'{n:032b}')[::-1][i:i+4][::-1]) for i in range(0, len(f'{n:032b}'), 4)][::-1]))
 # >>> "{0:032b}".format(1234)
 # '00000000000000000000010011010010'

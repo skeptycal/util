@@ -10,7 +10,6 @@ import (
 
 	log "github.com/sirupsen/logrus"
 	"github.com/skeptycal/util/devtools/gogit"
-	"github.com/skeptycal/util/gofile"
 	"github.com/skeptycal/zsh"
 )
 
@@ -73,7 +72,7 @@ func Setup() error {
 // gitRepoSetup initializes the repo, prompts as needed, creates the
 // github.com repository, and pushes the initial commit.
 func gitRepoSetup() error {
-	err := gogit.Init()
+	err := gogit.GitInit()
 	if err != nil {
 		return err
 	}
@@ -106,7 +105,7 @@ func createAutomatedFiles() error {
 
 // GoTestSh creates the go.test.sh script.
 func GoTestSh() error {
-	gofile.WriteFile("go.test.sh", goTestTemplate)
+	zsh.WriteFile("go.test.sh", goTestTemplate)
 	return nil
 }
 

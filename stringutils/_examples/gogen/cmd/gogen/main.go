@@ -4,11 +4,12 @@ import (
 	"fmt"
 
 	log "github.com/sirupsen/logrus"
+	"github.com/skeptycal/util/stringutils"
 	"github.com/skeptycal/util/stringutils/_examples/gogen"
 )
 
-func main() {
-	u, err := gogen.NewUser("", "", "", "", 0)
+func RepoAndUserExamples() {
+    u, err := gogen.NewUser("", "", "", "", 0)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -27,4 +28,9 @@ func main() {
 	fmt.Printf("repo URL: %s\n", r.URL())
 	fmt.Printf("repo Download URL: %s\n", r.DownloadURL())
 	fmt.Printf("repo Documentation: %s\n", r.DocURL())
+}
+
+func main() {
+    gogen.ErrTest("name",15, false, nil)
+
 }

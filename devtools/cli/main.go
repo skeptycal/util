@@ -4,29 +4,50 @@ import (
 	"bufio"
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
+	"strings"
 
 	"github.com/skeptycal/util/gofile"
-	"github.com/skeptycal/util/zsh"
 )
 
 func main() {
 	var (
-		cmd                *exec.Cmd
-		background         = context.Background()
-		app, args, command string
-		promptString       string = gofile.PWD() + "\n➜ "
+		cmd          *exec.Cmd
+		background   context.Context = context.Background()
+		app          string
+		args         []string
+		promptString string = gofile.PWD() + "\n➜ "
 	)
 
 	for {
-		reader := bufio.NewReader(os.Stdin)
+		rin := bufio.NewReader(os.Stdin)
 		fmt.Print(promptString)
-		text, _ := reader.ReadString('\n')
+		text, _ := rin.ReadString('\n')
 		fmt.Println(text)
 
-		app, args = zsh.AppArgs(command)
-		cmd = exec.CommandContext(background, app, args)
-		zsh.GetStdin(cmd)
+		arglist := strings.Fields(text)
+
+		app = arglist[0]
+		if len(arglist) > 1 {
+			args = arglist[1:]
+		} else {
+			args = []string{""}
+		}
+
+		cmd = exec.CommandContext(background, app, args...)
+
+		err := cmd.Start()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		err = cmd.Wait()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		fmt.Println(cmd.Stdout)
 	}
 }

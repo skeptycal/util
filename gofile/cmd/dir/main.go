@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	log "github.com/sirupsen/logrus"
-	"github.com/skeptycal/util/zsh"
+	"github.com/skeptycal/zsh"
 )
 
 func DirShellBM(path string) string {

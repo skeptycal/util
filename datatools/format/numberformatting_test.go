@@ -1,9 +1,57 @@
 // Package format contains functions that format numeric values.
 package format
 
+import (
+	"fmt"
+	"testing"
+)
+
 const (
 	input = "The quick brown 狐 jumped over the lazy 犬"
 )
+
+func ExampleReverseRune() {
+    fmt.Println(input)
+    fmt.Println(ReverseRune(input))
+    // Output:
+    // The quick brown 狐 jumped over the lazy 犬
+    // 犬 yzal eht revo depmuj 狐 nworb kciuq ehT
+}
+
+type Any interface{}
+
+type AnyFunc func(args ...Any) Any
+
+type FuncType func(s string) string
+
+type BenchMark struct {
+    name string
+    f FuncType
+}
+
+func (b *BenchMark) Name() string {
+    return fmt.Sprintf("Benchmark: %s: %v", b.name, b.f)
+}
+
+// func (b *BenchMark) Run(args ...Any) Any {
+
+// }
+
+type BenchMarkSet []*BenchMark
+
+func BenchmarkReverse(b *testing.B) {
+    benchmarksReverse := BenchMarkSet{
+        {"",Reverse},
+    }
+
+    for _, bb := range benchmarksReverse {
+        for i := 0; i < b.N; i++ {
+            bb.f(bb.name)
+        }
+    }
+}
+
+
 
 // func TestNumSpace(t *testing.T) {
 // 	type args struct {
