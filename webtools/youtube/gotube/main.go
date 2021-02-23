@@ -1,3 +1,4 @@
+// Package gotube
 /**
  * Copyright (c) 2020, Jimmy Yang <codingexpert123@gmail.com>
  * All rights reserved.
@@ -32,7 +33,6 @@
  * REQUIRES: ffmpeg
  * WARNING: The download process might be very slow and will destroy your computer if it happens. (LOL)
  */
-
 package main
 
 import (
@@ -490,10 +490,14 @@ func main() {
 
 	var debug bool
 
+    /// verbose = true   MT - default was false
+    /// debug = true   MT - default was false
+    /// audio = true   MT - default was false
+
 	flag.StringVar(&outputDirectory, "outdir", ".", "Directory where you want the video to be downloaded")
-	flag.BoolVar(&verbose, "v", false, "If true, GoTube will display detailed download process")
-	flag.BoolVar(&debug, "d", false, "Turn on debug logging")
-	flag.BoolVar(&audio, "a", false, "If true, GoTube will download video's audio as well")
+	flag.BoolVar(&verbose, "v", true, "If true, GoTube will display detailed download process")
+	flag.BoolVar(&debug, "d", true, "Turn on debug logging")
+	flag.BoolVar(&audio, "a", true, "If true, GoTube will download video's audio as well")
 
 	flag.Parse()
 	args := flag.Args()
@@ -512,4 +516,26 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+    fmt.Println("if error ... brew install ffmpeg")
 }
+
+/*
+To enable PHP in Apache add the following to httpd.conf and restart Apache:
+    LoadModule php_module /usr/local/opt/php/lib/httpd/modules/libphp.so
+
+    <FilesMatch \.php$>
+        SetHandler application/x-httpd-php
+    </FilesMatch>
+
+Finally, check DirectoryIndex includes index.php
+    DirectoryIndex index.php index.html
+
+The php.ini and php-fpm.ini file can be found in:
+    /usr/local/etc/php/8.0/
+
+To have launchd start php now and restart at login:
+  brew services start php
+Or, if you don't want/need a background service you can just run:
+  php-fpm
+*/

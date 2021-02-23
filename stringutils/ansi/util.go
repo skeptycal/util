@@ -116,15 +116,3 @@ func BuildAnsi(b ...ansiColor) string {
 	}
 	return sb.String()
 }
-
-func encodeAnsi(fb fbType, ef, c ansiColor) string {
-	if fb != foreground && fb != background {
-		fb = foreground
-	}
-	if  ef > 74 {
-		ef = 0
-    }
-
-    // todo - fixme
-    return ""
-}

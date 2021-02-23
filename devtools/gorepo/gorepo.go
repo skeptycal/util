@@ -10,6 +10,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 	"github.com/skeptycal/util/devtools/gogit"
+	gofile "github.com/skeptycal/util/gofile/bak"
 	"github.com/skeptycal/zsh"
 )
 
@@ -105,7 +106,7 @@ func createAutomatedFiles() error {
 
 // GoTestSh creates the go.test.sh script.
 func GoTestSh() error {
-	zsh.WriteFile("go.test.sh", goTestTemplate)
+	gofile.WriteFile("go.test.sh", goTestTemplate)
 	return nil
 }
 

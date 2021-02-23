@@ -306,14 +306,21 @@ func init() {
 
 func SmallRuneSamples() []rune {
 	return []rune{
-		'A', '0', 65, 't', 'n', 'f', 'r', 'v', '\t', '\n', '\f', '\r', '\v', 48, 12, ' ', 0x20, 8, 0x1680, 0x2028, 0x3000, 0x1680, 0x200C, 0x2123, 0x3333, 0xFFDF, 0xFFEE,
+		'A', '0', '5', 65, 't', 'n', 'f', 'r', 'v', '\t', '\n', '\f', '\r', '\v', 48, 12, ' ', 0x20, 8, 0x1680, 0x2028, 0x3000, 0x1680, 0x200C, 0x2123, 0x3333, 0xFFDF, 0xFFEE,
 	}
 }
 
 func SmallByteSamples() []byte {
-	return []byte{
-		'A', '0', 65, 't', 'n', 'f', 'r', 'v', '\t', '\n', '\f', '\r', '\v', 48, 12, ' ', 0x20, 8, 0xFF,
+	buf := make([]byte, 0, 256)
+	for i := 0; i < 256; i++ {
+		if i != 95 { // underscore is not tested here because some "alphanumeric type functions" include it
+			buf = append(buf, byte(i))
+		}
 	}
+	return buf
+	// return []byte{
+	// 	'A', '=', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 't', 'n', 'f', 'r', 'v', '\t', '\n', '\f', '\r', '\v', 48, 12, ' ', 0x20, 8, 0xFF,
+	// }
 }
 
 func SmallByteStringSamples() (list []string) {
@@ -456,13 +463,13 @@ func TestCount(t *testing.T) {
 }
 
 func RandBytes(n int) []byte {
-    b := make([]byte, 0,n)
-    buf := bytes.NewBuffer(b)
-    defer buf.Reset()
-    for i := 0; i < n; i++ {
-         buf.WriteByte(byte(rand.Intn(255)))
-    }
-    return buf.Bytes()
+	b := make([]byte, 0, n)
+	buf := bytes.NewBuffer(b)
+	defer buf.Reset()
+	for i := 0; i < n; i++ {
+		buf.WriteByte(byte(rand.Intn(255)))
+	}
+	return buf.Bytes()
 }
 
 // BenchmarkCount Results
@@ -476,33 +483,33 @@ BenchmarkCount/Benchmark:_Equal-8                   	283396728	         4.08 ns/
 BenchmarkCount/Benchmark:_Contains-8                	173608912	         6.84 ns/op	       0 B/op	       0 allocs/op
 */
 func BenchmarkCount(b *testing.B) {
-    const maxNum = 2<<16
-    list := RandBytes(maxNum)
-    listsep := RandBytes(0)
+	const maxNum = 2 << 16
+	list := RandBytes(maxNum)
+	listsep := RandBytes(0)
 
 	tests := []struct {
 		name string
-		f func([]byte, []byte) int
+		f    func([]byte, []byte) int
 	}{
-        // TODO: Add test cases.
-        {"Count",Count},
-        {"bytes.Count",bytes.Count},
-        {"bytes.Index",bytes.Index},
-        {"bytes.LastIndex",bytes.LastIndex},
-        {"bytes.Compare",bytes.Compare},
-        {"Equal",bEqual},
-        {"Contains",bContains},
+		// TODO: Add test cases.
+		{"Count", Count},
+		{"bytes.Count", bytes.Count},
+		{"bytes.Index", bytes.Index},
+		{"bytes.LastIndex", bytes.LastIndex},
+		{"bytes.Compare", bytes.Compare},
+		{"Equal", bEqual},
+		{"Contains", bContains},
 	}
 	for _, bb := range tests {
-        name := fmt.Sprintf("Benchmark: %s", bb.name)
-        // sum := 0
+		name := fmt.Sprintf("Benchmark: %s", bb.name)
+		// sum := 0
 		b.Run(name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-                // sum += bb.f(list, listsep)
-                bb.f(list, listsep)
+				// sum += bb.f(list, listsep)
+				bb.f(list, listsep)
 			}
-        })
-        // fmt.Printf("Count: %d\n",sum)
+		})
+		// fmt.Printf("Count: %d\n",sum)
 
 		// b.Run(name, func(b *testing.B) {
 		// 	for i := 0; i < b.N; i++ {

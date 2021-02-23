@@ -8,31 +8,96 @@ import (
 //// ======================= best performing functions ... so far
 
 // IsASCIISpace tests for the most common ASCII whitespace characters:
-//  ' ', '\t', '\n', '\f', '\r', '\v', U+0085 (NEL), U+00A0 (NBSP)
+//  ' ', '\t', '\n', '\f', '\r', '\v'
 //
-// This includes all Unicode code points that are one byte in length
-// and leaves out the unicode code points above 0xFF.
+// This excludes all Unicode code points above 0x007F.
 //
 // The C language defines whitespace characters to be "space,
 // horizontal tab, new-line, vertical tab, and form-feed."
 func IsASCIISpace(c byte) bool {
 
-    return c == 32 || (c > 8 && c < 14)
+	return c == 0x20 || (9 <= c && c <= 13)
 
-    /*
+	/*
 
-    0x09    0b00001001
-    0x0a    0b00001010
-    0x0b    0b00001011
-    0x0c    0b00001100
-    0x0d    0b00001101
+	   0x09    0b00001001
+	   0x0a    0b00001010
+	   0x0b    0b00001011
+	   0x0c    0b00001100
+	   0x0d    0b00001101
 
-    */
+	*/
 }
 
-// DedupeWhitespace removes any duplicate whitespace from the string.
-func DedupeWhitespace(s string) string {
-	return reWhitespace.ReplaceAllString(strings.TrimSpace(s), " ")
+const (
+	spaceMask byte = 0x20 // 0b00100000
+	eightMask byte = 0x08 // 0b00001000
+	sevenMask byte = 0x07 // 0b00000111
+
+    // 07	00000111	BEL
+    // 08	00001000	BS
+    // 09	00001001	HT
+    // 0A	00001010	LF
+    // 0B	00001011	VT
+    // 0C	00001100	FF
+    // 0D	00001101	CR
+
+    // 41	01000001	A
+    // 61	01100001	a
+)
+
+func IsSpaceMask(c byte) bool {
+	c &= spaceMask
+	c &= eightMask
+	c &= sevenMask
+	return c == 0
+}
+
+var (
+	seen, doit bool
+)
+
+// DedupeWhitespace removes any duplicate whitespace from the string and
+// replaces it with a single space. If ignoreNewlines == true then \n is ignored.
+func DedupeWhitespace(s string, ignoreNewlines bool) string {
+	var sb strings.Builder
+	seen = false
+    doit = true
+	for _, r := range s {
+        if !ignoreNewlines && (r != '\n') {
+            seen =  unicode.IsSpace(r)
+        }
+        if seen {
+            if doit {
+                sb.WriteRune(' ')
+                doit = false
+            } else {
+                // stuff
+            }
+        } else {
+                sb.WriteRune(r)
+            }
+        }
+        return sb.String()
+    }
+
+
+
+
+func dedupeWhitespaceRegex(s string) string {
+    return reWhitespace.ReplaceAllString(strings.TrimSpace(s), " ")
+}
+
+// isWhiteSpace is a sample implementation of a whitespace
+// test function that mirrors the unicode.IsSpace function.
+func unicodeIsSpace(c byte) bool {
+	return c == ' ' || c == '\n' || c == '\t' || c == '\r' || c == '\f' || c == '\v' || c == 0x0085 || c == 0x00A0
+}
+
+// isWhiteSpace is a sample implementation of a whitespace
+// test function that mirrors the unicode.IsSpace function.
+func unicodeIsSpaceRune(r rune) bool {
+	return r == ' ' || r == '\n' || r == '\t' || r == '\r' || r == '\f' || r == '\v' || r == 85 || r == 0x00A0
 }
 
 //// ======================= benchmark samples
@@ -50,18 +115,23 @@ func isWhiteSpaceRegexByte(c byte) bool {
 // isWhiteSpace is a sample implementation of a whitespace
 // test function used for benchmark comparisons.
 func isWhiteSpace(c byte) bool {
-	return c == ' ' || c == '\n' || c == '\t' || c == '\r' || c == '\f' || c == '\v' || c == 0x0085 || c == 0x00A0
+	return c == ' ' || c == '\n' || c == '\t' || c == '\r' || c == '\f' || c == '\v' // || c == 0x0085 || c == 0x00A0
 }
 
 // isWhiteSpace2 is a sample implementation of a whitespace
 // test function used for benchmark comparisons.
 func isWhiteSpace2(c byte) bool {
 	switch c {
-	case ' ': return true
-    case '\n': return true
-    case '\t': return true
-    case '\f', '\r', '\v': return true
-    default: return false
+	case ' ':
+		return true
+	case '\n':
+		return true
+	case '\t':
+		return true
+	case '\f', '\r', '\v':
+		return true
+	default:
+		return false
 	}
 	// return false
 }
@@ -69,7 +139,7 @@ func isWhiteSpace2(c byte) bool {
 // isWhiteSpaceStringSliceBytes a sample implementation of a whitespace
 // test function used for benchmark comparisons.
 func isWhiteSpaceStringSliceBytes(c byte) bool {
-	for _, v := range shortByteList {
+	for _, v := range shortASCIIList {
 		if c == v {
 			return true
 		}
@@ -203,7 +273,7 @@ func isWhiteSpaceStringSlice(r rune) bool {
 // isWhiteSpaceIndexByte a sample implementation of a whitespace
 // test function used for benchmark comparisons.
 func isWhiteSpaceIndexByte(s string) bool {
-	return strings.Index(shortByteListString, s) >= 0
+	return strings.Index(shortByteListString, s) > -1 // Index > -1 is 3x faster than contains for most use cases
 }
 
 // isWhiteSpaceContainsByte a sample implementation of a whitespace
@@ -215,7 +285,7 @@ func isWhiteSpaceContainsByte(s string) bool {
 // isWhiteSpaceIndexRune a sample implementation of a whitespace
 // test function used for benchmark comparisons.
 func isWhiteSpaceIndexRune(s string) bool {
-	return strings.Index(longRuneListString, s) >= 0
+	return strings.Index(longRuneListString, s) > -1 // Index > -1 is 3x faster than contains for most use cases
 }
 
 // isWhiteSpaceContainsRune a sample implementation of a whitespace

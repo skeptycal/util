@@ -147,8 +147,8 @@ func unescape(b []byte, attribute bool) []byte {
 	return b
 }
 
-// HTML_Escape_ToLower lower-cases the A-Z bytes in b in-place, so that "aBc" becomes "abc".
-func HTML_Escape_ToLower(b []byte) []byte {
+// HTMLEscapeToLower lower-cases the A-Z bytes in b in-place, so that "aBc" becomes "abc".
+func HTMLEscapeToLower(b []byte) []byte {
 	for i, c := range b {
 		if 'A' <= c && c <= 'Z' {
 			b[i] = c + 'a' - 'A'
@@ -230,11 +230,11 @@ func escape(w writer, s string) error {
 // UnescapeString(EscapeString(s)) == s always holds, but the converse isn't
 // always true.
 func EscapeString(s string) string {
-	if strings.IndexAny(s, escapedChars) == -1 {
+	if strings.IndexAny(s, escapedChars) < 0 {
 		return s
 	}
 	var buf bytes.Buffer
-	escape(&buf, s)
+	_ = escape(&buf, s)
 	return buf.String()
 }
 

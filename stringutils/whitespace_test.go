@@ -4,56 +4,59 @@ import (
 	"fmt"
 	"testing"
 	"unicode"
-	"unicode/utf8"
 )
 
 var (
 	testBytes = []struct {
 		name string
 		f    func(c byte) bool
+		want func(c byte) bool
 	}{
 		// TODO: Add test cases.
-		{"IsASCIISpace", IsASCIISpace},
-		{"isWhiteSpace", isWhiteSpace},
-		{"isWhiteSpace2", isWhiteSpace2},
-		{"isWhiteSpaceStringSliceBytes", isWhiteSpaceStringSliceBytes},
-		{"isWhiteSpaceRegexByte", isWhiteSpaceRegexByte},
+		{"IsASCIISpace", IsASCIISpace, IsASCIISpace},
+		{"isWhiteSpace", isWhiteSpace, IsASCIISpace},
+		{"isWhiteSpace2", isWhiteSpace2, IsASCIISpace},
+		{"isWhiteSpaceStringSliceBytes", isWhiteSpaceStringSliceBytes, IsASCIISpace},
+		{"isWhiteSpaceRegexByte", isWhiteSpaceRegexByte, IsASCIISpace},
 	}
 
 	testRunes = []struct {
 		name string
 		f    func(r rune) bool
+		want func(r rune) bool
 	}{
-        // TODO: Add test cases.
-		{"isWhiteSpaceLogicChainNoCheck", isWhiteSpaceLogicChainNoCheck},
-		{"isWhiteSpaceLogicChain", isWhiteSpaceLogicChain},
-		{"isWhiteRuneSlice", isWhiteSpaceRuneSlice},
-		{"isWhiteSpaceBoolMap", isWhiteSpaceBoolMap},
-		{"IsUnicodeWhiteSpaceMap", IsUnicodeWhiteSpaceMap},
-		{"IsUnicodeWhiteSpaceMapSwitch", isUnicodeWhiteSpaceMapSwitch},
-		{"isWhiteSpaceStringMap", isWhiteSpaceStringMap},
-		{"isWhiteSpaceStringSlice", isWhiteSpaceStringSlice},
-		{"(stlib) unicode.IsSpace", unicode.IsSpace},
+		// TODO: Add test cases.
+		{"isWhiteSpaceLogicChainNoCheck", isWhiteSpaceLogicChainNoCheck, unicode.IsSpace},
+		{"isWhiteSpaceLogicChain", isWhiteSpaceLogicChain, unicode.IsSpace},
+		{"isWhiteRuneSlice", isWhiteSpaceRuneSlice, unicode.IsSpace},
+		{"isWhiteSpaceBoolMap", isWhiteSpaceBoolMap, unicode.IsSpace},
+		{"IsUnicodeWhiteSpaceMap", IsUnicodeWhiteSpaceMap, unicode.IsSpace},
+		{"IsUnicodeWhiteSpaceMapSwitch", isUnicodeWhiteSpaceMapSwitch, unicode.IsSpace},
+		{"isWhiteSpaceStringMap", isWhiteSpaceStringMap, unicode.IsSpace},
+		{"isWhiteSpaceStringSlice", isWhiteSpaceStringSlice, unicode.IsSpace},
+		{"(stlib) unicode.IsSpace", unicode.IsSpace, unicode.IsSpace},
 	}
 
 	testByteStrings = []struct {
 		name string
 		f    func(s string) bool
+		want func(c byte) bool
 	}{
 		// TODO: Add test cases.
-		{"isWhiteSpaceContainsByte", isWhiteSpaceContainsByte},
-		{"isWhiteSpaceIndexByte", isWhiteSpaceIndexByte},
-		{"isWhiteSpaceIndexByte", isWhiteSpaceIndexByte},
-		{"isWhiteSpaceTrim", isWhiteSpaceTrim},
+		{"isWhiteSpaceContainsByte", isWhiteSpaceContainsByte, IsASCIISpace},
+		{"isWhiteSpaceIndexByte", isWhiteSpaceIndexByte, IsASCIISpace},
+		{"isWhiteSpaceIndexByte", isWhiteSpaceIndexByte, IsASCIISpace},
+		// {"isWhiteSpaceTrim", isWhiteSpaceTrim, unicodeIsSpace}, // erratic results
 	}
 
 	testRuneStrings = []struct {
 		name string
 		f    func(s string) bool
+        want func(c byte) bool
 	}{
 		// TODO: Add test cases.
-		{"isWhiteSpaceIndexRune", isWhiteSpaceIndexRune},
-		{"isWhiteSpaceContainsRune", isWhiteSpaceContainsRune},
+		{"isWhiteSpaceIndexRune", isWhiteSpaceIndexRune, nil},
+		{"isWhiteSpaceContainsRune", isWhiteSpaceContainsRune, nil},
 	}
 )
 
@@ -117,7 +120,8 @@ func TestWhiteSpaceBytes(t *testing.T) {
 	tests := testBytes
 	for _, tt := range tests {
 		for _, c := range SmallByteSamples() {
-			want := unicode.IsSpace(rune(c)) // standard library
+			// want := unicode.IsSpace(rune(c)) // standard library
+			want := tt.want(c)
 			name := fmt.Sprintf("Whitespace check(%q): %s", c, tt.name)
 			t.Run(name, func(t *testing.T) {
 				got := tt.f(c)
@@ -149,14 +153,17 @@ func TestWhiteSpaceStringsByte(t *testing.T) {
 	tests := testByteStrings
 	for _, tt := range tests {
 		for _, s := range SmallByteStringSamples() {
-			want := unicode.IsSpace(rune(s[0])) // standard library
-			name := fmt.Sprintf("Whitespace check(%q): %s", s, tt.name)
-			t.Run(name, func(t *testing.T) {
-				got := tt.f(s)
-				if got != want {
-					t.Errorf("%s = %v, want %v", name, got, want)
-				}
-			})
+			// want := unicode.IsSpace(rune(s[0])) // standard library
+			for _, r := range []byte(s) {
+				want := tt.want(r)
+				name := fmt.Sprintf("Testing %s(0x%x)",  tt.name, r)
+				t.Run(name, func(t *testing.T) {
+					got := tt.f(s)
+					if got != want {
+						t.Errorf("%s = %t, want %t", name, got, want)
+					}
+				})
+			}
 		}
 	}
 }
@@ -165,34 +172,34 @@ func TestWhiteSpaceStringsRune(t *testing.T) {
 	tests := testRuneStrings
 	for _, tt := range tests {
 		for _, s := range SmallRuneStringSamples() {
-			r, _ := utf8.DecodeRuneInString(s)
-			want := unicode.IsSpace(r) // standard library
-			name := fmt.Sprintf("Whitespace check(%q): %s", s, tt.name)
+            for _, r := range s {
+			// r, _ := utf8.DecodeRuneInString(s)
+			want := unicode.IsSpace(r) // standard library "is this rune a whitespace rune"
+			name := fmt.Sprintf("Whitespace check(%q): %s", r, tt.name)
 			t.Run(name, func(t *testing.T) {
 				got := tt.f(s)
 				if got != want {
 					t.Errorf("%s = %v, want %v", name, got, want)
 				}
 			})
+        }
 		}
 	}
 }
 
 func TestDedupeWhitespace(t *testing.T) {
-	type args struct {
-		s string
-	}
 	tests := []struct {
 		name string
-		args args
+		arg string
 		want string
 	}{
 		// TODO: Add test cases.
+        {"double space", "  ", " "},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := DedupeWhitespace(tt.args.s); got != tt.want {
-				t.Errorf("DedupeWhitespace() = %v, want %v", got, tt.want)
+			if got := DedupeWhitespace(tt.arg, true); got != tt.want {
+				t.Errorf("DedupeWhitespace() = %X, want %X", got, tt.want)
 			}
 		})
 	}

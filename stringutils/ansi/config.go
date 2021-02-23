@@ -2,7 +2,6 @@ package ansi
 
 import (
 	"fmt"
-	"os"
 	"strings"
 	"sync"
 )
@@ -23,11 +22,12 @@ import (
 // Reference: /go/src/sync/rwmutex.go (go standard library)
 type ioMutex = sync.RWMutex
 
-var defaultconfig ConfigMap = ConfigMap{
-    "name": "ansi",
-    "enabled": true,
-    "defaultWriter": os.Stdout,
-}
+// var defaultconfig ConfigMap = ConfigMap{
+//     "name": "ansi",
+//     "enabled": true,
+//     "defaultWriter": os.Stdout,
+// }
+
 var (
     DefaultAnsiSet  = NewAnsiSet(StyleNormal, White, Black,Normal)
 )

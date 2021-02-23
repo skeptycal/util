@@ -19,8 +19,8 @@ func main() {
 
 
 
-    w.WriteString("WriteString tests\n")
-    w.Write([]byte("Write Text\n"))
+    _, _ = w.WriteString("WriteString tests\n")
+    _, _ = w.Write([]byte("Write Text\n"))
 
    s :=  w.String()
    fmt.Println(s)

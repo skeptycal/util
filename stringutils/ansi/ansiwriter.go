@@ -19,34 +19,33 @@ func NewWriter(w io.Writer) *AnsiWriter {
 	// if w is nil, use the default
 	if w == nil {
 		w = os.Stdout
-    }
+	}
 
-    // if w is an AnsiWriter writer, reuse it
+	// if w is an AnsiWriter writer, reuse it
 	if wr, ok := w.(*AnsiWriter); ok {
 		return wr
 	}
 
-
-    // otherwise, create a new AnsiWriter from w
+	// otherwise, create a new AnsiWriter from w
 	return &AnsiWriter{
-        *bufio.NewWriter(w),
-        Config{},
-    }
+		*bufio.NewWriter(w),
+		Config{},
+	}
 }
 
 type ANSI interface {
-    Write([]byte) (int, error)
-    WriteString(string) (int, error)
-    Build(b ...byte)
-    SetColors(s AnsiSet)
+	Write([]byte) (int, error)
+	WriteString(string) (int, error)
+	Build(b ...byte)
+	SetColors(s AnsiSet)
 	Flush() error
 	Wrap(s string)
 	String() string
 }
 
 type AnsiWriter struct {
-    bufio.Writer
-    config Config
+	bufio.Writer
+	config Config
 }
 
 func (a *AnsiWriter) SetColors(s AnsiSet) {
@@ -63,14 +62,14 @@ func (a *AnsiWriter) String() string {
 func (a *AnsiWriter) Wrap(s string) {
 	defer a.Writer.Flush()
 
-    a.WriteString(a.config.ansi.String())
-    a.WriteString(s)
-	a.WriteString(DefaultAll)
+	_, _ = a.WriteString(a.config.ansi.String())
+	_, _ = a.WriteString(s)
+	_, _ = a.WriteString(DefaultAll)
 }
 
 // Build encodes a variadic list of bytes into ANSI codes
 // and writes them to the AnsiWriter.
 func (a *AnsiWriter) Build(b ...byte) {
 	defer a.Writer.Flush()
-	a.WriteString(BuildAnsi(b...))
+	_, _ = a.WriteString(BuildAnsi(b...))
 }

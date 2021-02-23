@@ -51,11 +51,11 @@ func ToString(any interface{}) string {
 }
 
 var (
-	reWhitespace = regexp.MustCompile(`[\s\v]+`)
+	reWhitespace = regexp.MustCompile(`[\s\v]+`) // note: 0x0B is not considered whitespace by regex
 
-	shortByteList       = []byte{0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x20, 0x85, 0xA0}
+	shortASCIIList       = []byte{0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x20} //, 0x85, 0xA0}
 	longRuneList        = []rune{0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x20, 0x85, 0xA0, 0x2000, 0x200A, 0x2028, 0x2029, 0x202F, 0x205F, 0x3000, 0xFFEF, 0x1680}
-	shortByteListString = string(shortByteList)
+	shortByteListString = string(shortASCIIList)
 	longRuneListString  = string(longRuneList)
 
 	// UnicodeWhiteSpaceMap provides a mapping from Unicode runes to strings.
@@ -159,7 +159,7 @@ func (l *line) unsafeToStringPtr() string {
     return *(*string)(unsafe.Pointer(&l))
 }
 
-func (l *line) unsafeMakeFromPtr(s string) {
+func (l *line) unsafeFromStringPtr(s string) {
     l = (*line)(unsafe.Pointer(&s))
 }
 

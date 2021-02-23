@@ -22,8 +22,10 @@ var (
 		// TODO: Add test cases.
 		{"IsASCIIAlpha", IsASCIIAlpha, unicodeIsASCIIAlpha},
 		{"IsDigit", IsDigit, unicode.IsDigit},
+		{"IsDigitSingleOP", IsDigitSingleOP, unicode.IsDigit},
+		{"IsDigitSingleOPCompare", IsDigitSingleOPCompare, unicode.IsDigit},
 		{"IsHex", IsHex, unicodeIsHex},
-		{"IsAlphaNum2", IsAlphaNum2, unicodeIsAlphaNum},
+		{"IsAlphaNumUnder", IsAlphaNumUnder, unicodeIsAlphaNum},
 		{"IsAlphaNum", IsAlphaNum, unicodeIsAlphaNum},
         {"IsAlphaNumSwitch", IsAlphaNumSwitch, unicodeIsAlphaNum},
         // {"IsASCIIPrintable", IsASCIIPrintable},
@@ -52,16 +54,18 @@ var (
 )
 
 // unicodeIsAlphaNum uses the standard library unicode to test
-// functionality of byte, rune, and string functions.
+// functionality of byte functions. Alphanumeric runes that are
+// not valid ascii characters return false.
 func unicodeIsAlphaNum(r rune) bool {
-	if r > unicode.MaxASCII {
+    if r > unicode.MaxASCII {
 		return false
 	}
 	return unicode.IsLetter(r) || unicode.IsDigit(r)
 }
 
 // unicodeIsASCIIAlpha uses the standard library unicode to test
-// functionality of byte, rune, and string functions.
+// functionality of byte functions. Alphabetic runes that are
+// not valid ascii characters return false.
 func unicodeIsASCIIAlpha(r rune) bool {
 	if r > unicode.MaxASCII {
 		return false
@@ -115,7 +119,7 @@ func TestAlphaNumBytes(t *testing.T) {
 
 func TestIsAlphaNum2Underscore (t *testing.T) {
     		t.Run("underscore_test", func(t *testing.T) {
-			if ok := IsAlphaNum2('_'); !ok {
+			if ok := IsAlphaNumUnder('_'); !ok {
 				t.Errorf("IsASCIIPrintable(%v) = %v, want %v", "_",ok, true)
 			}
 		})

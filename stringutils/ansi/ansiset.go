@@ -76,7 +76,12 @@ type ansiSetType struct {
 func (a ansiSetType) BG() string     { return fmt.Sprintf(a.format,background,a.bg) }
 func (a ansiSetType) FG() string     { return fmt.Sprintf(a.format,foreground,a.fg) }
 func (a ansiSetType) Info() string {  return fmt.Sprintf("fg: %q;bg: %q; ef: %q",  a.fg, a.bg,a.ef) }
-func (a ansiSetType) Output() string { return fmt.Sprintf("%v;%v;%v", a.ef, a.fg, a.bg) }
+func (a ansiSetType) Output() string {
+    if a.out == "" {
+        a.out = fmt.Sprintf("%v;%v;%v", a.ef, a.fg, a.bg)
+    }
+    return a.out
+}
 func (a ansiSetType) SetColors(fg, bg, ef ansiColor) {
     a.fg = fg
     a.bg = bg
