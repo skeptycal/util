@@ -2,7 +2,13 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package stringutils implements additional functions to support the go library:
+// Package stringutils implements additional functions to
+// support the go standard library strings module.
+//
+// The algorithms chosen are based on benchmarks from
+// the stringbenchmarks module. ymmv...
+//
+// The current implementation at the start of this project was
 // .../go/1.15.3/libexec/src/strings/strings.go
 //
 // For information about UTF-8 strings in Go, see https://blog.golang.org/strings.
@@ -22,10 +28,10 @@ import (
 
 // Numbers fundamental to the encoding.
 const (
-	RuneError = '\uFFFD'     // the "error" Rune or "Unicode replacement character"
-	RuneSelf  = 0x80         // characters below RuneSelf are represented as themselves in a single byte.
-	MaxRune   = '\U0010FFFF' // Maximum valid Unicode code point.
-	UTFMax    = 4            // maximum number of bytes of a UTF-8 encoded Unicode character.
+	RuneError = utf8.RuneError // '\uFFFD'       // the "error" Rune or "Unicode replacement character"
+	RuneSelf  = utf8.RuneSelf  // 0x80           // characters below RuneSelf are represented as themselves in a single byte.
+	MaxRune   = utf8.MaxRune   // '\U0010FFFF'   // Maximum valid Unicode code point.
+	UTFMax    = utf8.UTFMax    // 4              // maximum number of bytes of a UTF-8 encoded Unicode character.
 )
 
 // const alphanumerics = "0123456789abcdefghijklmnopqrstuvwxyz"
@@ -51,21 +57,36 @@ func ToString(any interface{}) string {
 }
 
 var (
-	reWhitespace = regexp.MustCompile(`[\s\v]+`) // note: 0x0B is not considered whitespace by regex
+	// note: 0x0B is not considered whitespace by regex so an alternative
+	// solution must be considered if 0x0B detection is required.
+	//
+	// regex is the slowest solution (by far!) so this is likely moot.
+	reWhitespace = regexp.MustCompile(`[\s\v]+`)
 
-	shortASCIIList       = []byte{0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x20} //, 0x85, 0xA0}
-	longRuneList        = []rune{0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x20, 0x85, 0xA0, 0x2000, 0x200A, 0x2028, 0x2029, 0x202F, 0x205F, 0x3000, 0xFFEF, 0x1680}
-	shortByteListString = string(shortASCIIList)
-	longRuneListString  = string(longRuneList)
+	// leaves out 0x85, 0xA0
+	shortASCIIList = []byte{0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x20}
 
-	// UnicodeWhiteSpaceMap provides a mapping from Unicode runes to strings.
+	// all whitespace code points that are one byte long
+	shortByteList = []byte{0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x20, 0x85, 0xA0}
+
+	// most common unicode whitespace code points
+	longRuneList = []rune{0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x20, 0x85, 0xA0, 0x2000, 0x200A, 0x2028, 0x2029, 0x202F, 0x205F, 0x3000, 0xFFEF, 0x1680}
+
+	// byte lists transformed to strings
+	shortASCIIListString = string(shortASCIIList)
+	shortByteListString  = string(shortByteList)
+	longRuneListString   = string(longRuneList)
+
+	// UnicodeWhiteSpaceMap provides a mapping from Unicode runes to strings
+	// with descriptions of each. It is marginally slower than the bool map.
+	//
 	// In computer programming, whitespace is any character or series of
 	// characters that represent horizontal or vertical space in typography.
 	// When rendered, a whitespace character does not correspond to a visible
 	// mark, but typically does occupy an area on a page. For example, the
-	// common whitespace symbol U+0020 SPACE (also ASCII 32) represents a
-	// blank space punctuation character in text, used as a word divider in
-	// Western scripts.
+	// common whitespace symbol SPACE (unicode: U+0020 ASCII: 32 decimal 0x20
+	// hex) represents a blank space punctuation character in text, used as a
+	// word divider in Western scripts.
 	//
 	// Reference: https://en.wikipedia.org/wiki/Whitespace_character
 	UnicodeWhiteSpaceMap = map[rune]string{
@@ -156,41 +177,41 @@ func init() {
 type line []byte // todo ?? use [255]byte or similar?? make it user choosable?
 
 func (l *line) unsafeToStringPtr() string {
-    return *(*string)(unsafe.Pointer(&l))
+	return *(*string)(unsafe.Pointer(&l))
 }
 
 func (l *line) unsafeFromStringPtr(s string) {
-    l = (*line)(unsafe.Pointer(&s))
+	l = (*line)(unsafe.Pointer(&s))
 }
 
 type list struct {
-    buf *[][]byte
+	buf *[][]byte
 }
 
-func (l list) Len() int { return len(*l.buf) }
-func (l list) Cap() int { return cap(*l.buf) }
-func (l list) Reset(cap int) { *l.buf = make([][]byte,0,cap+1) }
-func (l list) Join() []byte { return bytes.Join(*l.buf, []byte{0x10}) }
+func (l list) Len() int      { return len(*l.buf) }
+func (l list) Cap() int      { return cap(*l.buf) }
+func (l list) Reset(cap int) { *l.buf = make([][]byte, 0, cap+1) }
+func (l list) Join() []byte  { return bytes.Join(*l.buf, []byte{0x10}) }
 func (l list) Make(s string) [][]byte {
-    l.Reset(len(s))
-    *l.buf = bytes.SplitAfter([]byte(s), []byte{0x10})
-    return *l.buf
+	l.Reset(len(s))
+	*l.buf = bytes.SplitAfter([]byte(s), []byte{0x10})
+	return *l.buf
 }
 func (l list) Contains(b []byte) bool {
-    for _, s := range *l.buf {
-        if bytes.Index(s, b) == -1 {
-            return false
-        }
-    }
-    return true
+	for _, s := range *l.buf {
+		if bytes.Index(s, b) == -1 {
+			return false
+		}
+	}
+	return true
 }
 
 // SplitNoSave - modified from standard library generic split:
 // splits after each instance of sep.
 func SplitNoSave(s, sep []byte) [][]byte {
 
-    n := bytes.Count(s, sep) + 1
-    sepSave := 0
+	n := bytes.Count(s, sep) + 1
+	sepSave := 0
 	// if n == 0 {
 	// 	return nil
 	// }
@@ -218,17 +239,17 @@ func SplitNoSave(s, sep []byte) [][]byte {
 }
 
 func bEqual(s, sub []byte) int {
-    if bytes.Equal(s, sub) {
-        return 1
-    }
-    return 0
+	if bytes.Equal(s, sub) {
+		return 1
+	}
+	return 0
 }
 
 func bContains(s, sub []byte) int {
-    if bytes.Contains(s, sub) {
-        return 1
-    }
-    return 0
+	if bytes.Contains(s, sub) {
+		return 1
+	}
+	return 0
 }
 
 // Count counts the number of non-overlapping instances
@@ -278,17 +299,16 @@ func Explode(s []byte, n int) [][]byte {
 	return a[0:na]
 }
 
-
 func Join(list []string) string {
-    return strings.Join(list, "\n")
+	return strings.Join(list, "\n")
 }
 
 func TabIt(s string, n int) string {
-    tmp := make([]string,0,strings.Count(s,"\n") + 3)
-    for  _, line := range strings.Fields(s) {
-        tmp = append(tmp, strings.Repeat(" ", n)+line)
-    }
-    return strings.Join(tmp,"\n")
+	tmp := make([]string, 0, strings.Count(s, "\n")+3)
+	for _, line := range strings.Fields(s) {
+		tmp = append(tmp, strings.Repeat(" ", n)+line)
+	}
+	return strings.Join(tmp, "\n")
 }
 
 // Contains tells whether a contains x.

@@ -1,4 +1,4 @@
-// Package diffuser implements a service that streams and interprets text.
+// Package diffuser implements a stream and interprets text.
 //
 // Diffuse (verb) spread or cause to spread over a wide area or among a large number of people.
 // Diffuse (adj) spread out over a large area; not concentrated.
@@ -11,41 +11,40 @@ import (
 )
 
 var (
-    // mu sync.Mutex                // for loopBad
-    cond sync.Cond               // for loopGood
+	// mu sync.Mutex                // for loopBad
+	cond sync.Cond // for loopGood
 
-    mutex = &sync.Mutex{} // from medium article
+	mutex = &sync.Mutex{} // from medium article
 )
 
 type stringMutex struct {
-    list []string
-    mu sync.Mutex
+	list []string
+	mu   sync.Mutex
 }
 
 type builders struct {
-    pool []*builder
-    mu sync.Mutex
+	pool []*builder
+	mu   sync.Mutex
 }
 
 func (b *builders) add(sb *builder) {
-    b.mu.Lock()
-    defer b.mu.Unlock()
+	b.mu.Lock()
+	defer b.mu.Unlock()
 
-    b.pool = append(b.pool, sb)
+	b.pool = append(b.pool, sb)
 }
 
 type builder struct {
-    sb *strings.Builder
+	sb *strings.Builder
 }
 
-
 func mediumUpdate(item string) {
-    mutex.Lock()
-    // Update shared variable (e.g. slice, pointer on a structure, etc.)
-    if item == "" {
-        item = "item"+fmt.Sprintf("%v",&item)
-    }
-    mutex.Unlock()
+	mutex.Lock()
+	// Update shared variable (e.g. slice, pointer on a structure, etc.)
+	if item == "" {
+		item = "item" + fmt.Sprintf("%v", &item)
+	}
+	mutex.Unlock()
 }
 
 // loopBad is an example of a loop that uses a mutex with
@@ -61,12 +60,12 @@ func mediumUpdate(item string) {
 //
 // That's why sync.Cond is almost always called in a loop. Imagine we have some goroutines that are processing a slice of items, and in another goroutine, we want to take some action when len(items) == 0. We could write a spin-loop:
 func loopBad(smu *stringMutex) {
-    for done := false; !done; {
-        smu.mu.Lock()
-        // process 'items' ...
-        done = len(smu.list) == 0
-        smu.mu.Unlock()
-    }
+	for done := false; !done; {
+		smu.mu.Lock()
+		// process 'items' ...
+		done = len(smu.list) == 0
+		smu.mu.Unlock()
+	}
 }
 
 // loopGood is an example of a loop that uses cond.
@@ -78,58 +77,55 @@ func loopBad(smu *stringMutex) {
 // cond.Signal(). This way, we can ensure that this loop only
 // runs when the condition might be satisfied.
 func loopGood(smu *stringMutex) {
-    cond.L.Lock()
-    for len(smu.list) != 0 {
-        cond.Wait()
-        cond.Signal()
-    }
-    cond.L.Unlock()
+	cond.L.Lock()
+	for len(smu.list) != 0 {
+		cond.Wait()
+		cond.Signal()
+	}
+	cond.L.Unlock()
 }
-
 
 func makeItems(n int) (string, []string) {
-    var itemValue = "foo"
-    var item  =  itemValue
+	var itemValue = "foo"
+	var item = itemValue
 
-    var items = make([]string,n)
+	var items = make([]string, n)
 
-    // Create slice of pointers to strings
-    for i := 0; i < n; i++ {
-         tmp := fmt.Sprintf("%v-%d", item, i)
-        items = append(items, tmp)
-    }
+	// Create slice of pointers to strings
+	for i := 0; i < n; i++ {
+		tmp := fmt.Sprintf("%v-%d", item, i)
+		items = append(items, tmp)
+	}
 
-    return item, items
+	return item, items
 }
 
-func makeStrings(n int) (*stringMutex) {
+func makeStrings(n int) *stringMutex {
 
-    smu := stringMutex{}
-    smu.mu.Lock()
-    smu.list = make([]string,n)
-    smu.mu.Unlock()
+	smu := stringMutex{}
+	smu.mu.Lock()
+	smu.list = make([]string, n)
+	smu.mu.Unlock()
 
-    return &smu
+	return &smu
 }
 
-func Tryout(){
+func Tryout() {
 
-    bs := builders{}
-    bs .add(&builder{&strings.Builder{}})
+	bs := builders{}
+	bs.add(&builder{&strings.Builder{}})
 
-    item, _ := makeItems(8)
+	item, _ := makeItems(8)
 
-    mediumUpdate(item)
+	mediumUpdate(item)
 
-    items := makeStrings(8)
+	items := makeStrings(8)
 
-    loopBad(items)
+	loopBad(items)
 
-    loopGood(items)
+	loopGood(items)
 
 }
-
-
 
 /*
 
