@@ -1,6 +1,9 @@
+// Package redlogger implements logging to an io.Writer (default stderr)
+// with text wrapped in ANSI escape codes
 package redlogger
 
 import (
+	"bufio"
 	"io"
 	"os"
 
@@ -21,39 +24,53 @@ func init() {
 	log.Info("RedLogger enabled...")
 }
 
-func New(w io.Writer) *ansi.AnsiWriter {
+func New(w io.Writer) *RedLogger {
 	if w == nil {
-		w = os.Stdout
+		w = os.Stderr
 	}
-	a := ansi.NewWriter(w)
-	a.SetColors(
-		ansi.NewAnsiSet(
-			ansi.Bold,
-			ansi.Black,
-			ansi.RedBackground,
-			ansi.Bold,
-		))
+	a := &RedLogger{bufio.NewWriter(w)}
 	return a
 }
 
-type redLogger ansi.AnsiWriter
+// RedLogger implements buffering for an io.Writer object that
+// always wraps output in an ANSI color.
+//
+// If an error occurs writing to a Writer, no more data will be
+// accepted and all subsequent writes, and Flush, will return the error.
+// After all data has been written, the client should call the
+// Flush method to guarantee all data has been forwarded to
+// the underlying io.Writer.
+type RedLogger struct {
+	color ansi.AnsiCode() // Color(83)
+	*bufio.Writer
+}
 
 // Write wraps p with Ansi color codes and writes the result to the buffer.
-func (l *redLogger) Write(p []byte) (n int, err error) {
-	n, err = l.Writer.WriteString("--> redlogger Write()")
+func (l *RedLogger) Write(p []byte) (n int, err error) {
+	nn, err := l.Writer.WriteString("--> redlogger Write()") // test
+	nn, err := l.Writer.WriteString(l.color) // test
 	if err != nil {
-		return
+		return 0, err
 	}
 
-	n, err = l.Writer.Write(p)
+	n += nn
+
+	nn, err = l.Writer.Write(p)
 	if err != nil {
-		return
+		return n, err
 	}
 
-	return l.Writer.WriteString(ansi.Reset)
+	n += nn
+
+	nn, err = l.Writer.WriteString(ansi.Reset)
+	if err != nil {
+		return n, err
+	}
+
+	return n + nn, nil
 }
 
 // WriteString wraps p with Ansi color codes and writes the result to the buffer.
-func (l *redLogger) WriteString(s string) (n int, err error) {
-    return l.Write([]byte(s))
+func (l *RedLogger) WriteString(s string) (n int, err error) {
+	return l.Write([]byte(s))
 }

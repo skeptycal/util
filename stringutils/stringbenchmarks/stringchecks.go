@@ -59,5 +59,5 @@ func IsAlphaNumUnder(c byte) bool {
 
 // IsAlphaNum reports whether the byte is an ASCII letter, number, or underscore
 func IsAlphaNum(c byte) bool {
-	return 'a' <= c && c <= 'z' || 'A' <= c && c <= 'Z' || '0' <= c && c <= '9'
+	return c == '_' || 'a' <= c && c <= 'z' || 'A' <= c && c <= 'Z' || '0' <= c && c <= '9'
 }

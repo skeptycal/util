@@ -7,9 +7,14 @@ package ansi
 
 import (
 	"fmt"
+	"strings"
+
+	"github.com/skeptycal/util/stringutils"
 )
 
 const (
+	// Clear screen
+	ansiCLS = "\033[2J"
 	// Character used for HR function
 	HrChar string = "="
 	// Mask to return only final nibble
@@ -18,24 +23,68 @@ const (
 	MSNibbleMask byte = 0xF0
 )
 
+type ansiCode struct {
+	effect     byte
+	foreground byte
+	background byte
+}
+
+// set ANSI 8-bit (256 color) foreground and background color with leading effect
 const (
-	ansiEncode = "\033[38;5;%dm" // set ANSI foreground color to code %d using printf
-	ansiReset  = "\033[39;49;0m" // reset ANSI terminal output to default foreground and background colors
-	// PrintColor = "\033[38;5;%dm%s\033[39;49m\n" // wraps text %s in a color %d
+	ansiFmtPrefix = "\033["
+	ansiFmtDelim  = ";"
+	ansiFmtSuffix = "m"
+	ansiEncode    = "\033[%d;38;5;%d;48;5;%dm"
+	ansiFgEncode  = "\033[38;5;%dm"
 )
 
-func ansiString(i int) string {
-	return fmt.Sprintf(ansiEncode, i)
+func (c *ansiCode) String() string {
+	sb := strings.Builder{}
+	defer sb.Reset()
+
+	sb.WriteString(ansiFmtPrefix)
+
+	if c.effect != 0 {
+		sb.WriteByte(c.effect + 65)
+	}
+	return fmt.Sprintf(ansiEncode, c.effect, c.foreground, c.background)
 }
 
-func Cprint(i int, args ...interface{}) {
-	fmt.Print(ansiString(i))
-	fmt.Print(args...)
-	fmt.Print(ansiReset)
+func ByteToNum(c byte) byte {
+	if stringutils.IsDigit(c) {
+
+	}
+	return c
 }
 
-func Cprintln(i int, args ...interface{}) {
+func AnsiCode(e, f, b byte) fmt.Stringer {
+	return &ansiCode{
+		effect:     e,
+		foreground: f,
+		background: b,
+	}
+}
+
+type AnsiString struct {
+	color ansiCode
+	string
+}
+
+func (s AnsiString) String() string {
+	return fmt.Sprintf("%d%s%d")
+}
+
+// Print wraps args in an ANSI 8-bit color (256 color codes)
+func Print(i ansiByte, args ...interface{}) {
+	fmt.Print(ansiString(i, args...))
+	fmt.Print(args...)
+	fmt.Print(Reset)
+}
+
+// Println wraps args in an ANSI 8-bit color (256 color codes)
+// and adds a newline character
+func Println(i ansiByte, args ...interface{}) {
 	fmt.Print(ansiString(i))
 	fmt.Print(args...)
-	fmt.Println(ansiReset)
+	fmt.Println(Reset)
 }

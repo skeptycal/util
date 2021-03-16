@@ -203,15 +203,15 @@ BenchmarkIsWhiteSpace5-8   	 7252981	       166 ns/op	      16 B/op	       2 all
 
 ================================================================
 using bytes instead of runes for (1) and (2)
-BenchmarkIsWhiteSpace-8    	13707632	        90.0 ns/op	       3 B/op	       1 allocs/op
-BenchmarkIsWhiteSpace2-8   	12946368	        94.3 ns/op	       3 B/op	       1 allocs/op
+BenchmarkIsWhiteSpace-8    	13707632	      90.0 ns/op	       3 B/op	       1 allocs/op
+BenchmarkIsWhiteSpace2-8   	12946368	      94.3 ns/op	       3 B/op	       1 allocs/op
 BenchmarkIsWhiteSpace3-8   	 8932070	       130 ns/op	      16 B/op	       2 allocs/op
 BenchmarkIsWhiteSpace4-8   	 7197372	       167 ns/op	      16 B/op	       2 allocs/op
 BenchmarkIsWhiteSpace5-8   	 7093136	       166 ns/op	      16 B/op	       2 allocs/op
 
 BenchmarkIsSpace-8               	 9312074	       126 ns/op	      16 B/op	       2 allocs/op
-BenchmarkIsWhiteSpace-8          	13613052	        92.1 ns/op	       3 B/op	       1 allocs/op
-BenchmarkIsWhiteSpace2-8         	12440322	        93.1 ns/op	       3 B/op	       1 allocs/op
+BenchmarkIsWhiteSpace-8          	13613052	      92.1 ns/op	       3 B/op	       1 allocs/op
+BenchmarkIsWhiteSpace2-8         	12440322	      93.1 ns/op	       3 B/op	       1 allocs/op
 BenchmarkIsWhiteSpace3-8         	 9552418	       127 ns/op	      16 B/op	       2 allocs/op
 BenchmarkIsWhiteSpace4-8         	 7420647	       163 ns/op	      16 B/op	       2 allocs/op
 BenchmarkIsWhiteSpace5-8         	 7419589	       160 ns/op	      16 B/op	       2 allocs/op

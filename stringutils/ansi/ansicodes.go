@@ -8,6 +8,7 @@ const (
 )
 
 // premade ANSI basic 3 bit color codes
+//
 // Reference: https://en.wikipedia.org/wiki/ANSI_escape_code
 const (
 	BlackText          string = "\033[30m"
@@ -52,7 +53,19 @@ const (
 	FaintWhiteText   string = "\033[2;37m"
 )
 
-// ANSI escape codes
+// ANSI escape codes for text effects
+//
+// These are the most commonly used. ANSI codes above 9 are very
+// rare and many are not fully implemented.
+//  Normal      = 0
+//  Bold        = 1
+//  Faint       = 2
+//  Italics     = 3
+//  Underline   = 4
+//  Inverse     = 7
+//  Conceal     = 8
+//  Strikeout   = 9
+//
 const (
 	Normal byte = iota
 	Bold        // bold or increased intensity
@@ -64,6 +77,7 @@ const (
 	Inverse
 	Conceal
 	Strikeout
+	// ANSI codes above 9 are very rare and many are not fully implemented.
 	PrimaryFont
 	AltFont1
 	AltFont2
