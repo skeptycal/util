@@ -3,37 +3,27 @@ package main
 import (
 	"bufio"
 	"flag"
-	"log"
 	"os"
-	"strings"
+
+	log "github.com/sirupsen/logrus"
 )
 
 type giFile struct {
 	bufio.ReadWriter
 	filename string
-	flag     int
-	file     *os.File
-	force    bool
-	skip     bool
 }
 
-func NewGitIgnore(force bool, skip bool) (*os.File, error) {
+// NewGitIgnore creates a new empty .gitignore file and returns a file
+// descriptor. If 'force' is true, any previous .gitignore file will be
+// overwritten.
+func NewGitIgnore(force bool) (*os.File, error) {
 
 	gitFileFlag := os.O_RDWR
 	if force {
 		gitFileFlag |= os.O_CREATE
 	}
 
-	file, err := os.OpenFile(".gitignore", gitFileFlag, 0644)
-	if err != nil {
-		return nil, err
-	}
-
-	return &giFile{
-		filename: ".gitignore",
-		force:    force,
-		skip:     skip,
-	}, nil
+	return os.OpenFile(".gitignore", gitFileFlag, 0644)
 }
 
 func main() {
@@ -45,11 +35,15 @@ func main() {
 
 	flag.Parse()
 
-	giFile, err := NewGitIgnore(*flagForced, *flagSkip)
+	// get file handle
+	giFile, err := NewGitIgnore(*flagForced)
 	if err != nil {
 		log.Fatal(err)
 	}
-	rw := bufio.NewReadWriter(giFile)
+
+	// create .gitignore file contents
+
+	// write .gitignore contents to file
 
 }
 
@@ -62,13 +56,13 @@ func main() {
 func gi(args string) string {
 
 	if len(args) == 0 {
-		args = []string{"macos linux windows ssh vscode go zsh node vue nuxt python django"}
+		args = "macos linux windows ssh vscode go zsh node vue nuxt python django"
 	}
 
-	command := "curl -fLw '\n' https://www.gitignore.io/api/\"${(j:,:)@}\" "
-	command += strings.Join(args, " ")
+	command := `curl -fLw '\n' https://www.gitignore.io/api/\"${(j:,:)@}\" `
+	command += args
 
-	return Shell(command)
+	return gofile.Shell(command)
 }
 
 var (

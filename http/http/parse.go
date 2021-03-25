@@ -5,8 +5,6 @@ import (
 	"net/http"
 	"os"
 	"strings"
-
-	"golang.org/x/net/html"
 )
 
 // Crawl - Extract all http** links from a given webpage

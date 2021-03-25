@@ -1,7 +1,7 @@
 package http
 
 import (
-	"ideas/scargo/fileutils"
+	"fileutils"
 	"io"
 	"net/http"
 )

@@ -37,7 +37,7 @@ func TestMakeQueryURL(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			result := MakeQueryURL(tc.params, tc.prefix, tc.sep)
+			result := MakeGoogleQueryURL(tc.params, tc.prefix, tc.sep)
 			if result != tc.expected {
 				t.Errorf("expected value <%s> does not match result: %v", tc.expected, result)
 			}

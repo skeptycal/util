@@ -1,8 +1,8 @@
 package http
 
 import (
-	"ideas/scargo/errorutils"
-	"ideas/scargo/fileutils"
+	"errorutils"
+	"fileutils"
 )
 
 func fileCreateChecks() {
