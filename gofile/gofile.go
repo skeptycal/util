@@ -5,6 +5,7 @@ import (
 	"os"
 
 	log "github.com/sirupsen/logrus"
+	"github.com/skeptycal/zsh"
 )
 
 // PWD returns a rooted path name corresponding to the
@@ -20,3 +21,5 @@ func PWD() string {
 	}
 	return dir
 }
+
+var Err func(e error) error = zsh.Err

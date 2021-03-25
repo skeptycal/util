@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
-	"unicode"
 
 	"github.com/skeptycal/util/gofile"
+	"github.com/skeptycal/util/stringutils"
 	"github.com/skeptycal/zsh"
 )
 
@@ -23,12 +23,7 @@ func IsHash(s string) bool {
 }
 
 func IsAlphaNum(s string) bool {
-	for _, r := range strings.ToLower(s) {
-		if !unicode.IsLower(r) && !unicode.IsDigit(r) {
-			return false
-		}
-	}
-	return true
+	return stringutils.IsAlphaNum(s)
 }
 
 func AddAll() error {
@@ -36,10 +31,8 @@ func AddAll() error {
 }
 
 func Add(s ...string) error {
-	command := "git add"
-	for _, a := range s {
-		command += fmt.Sprintf(" %q", a)
-	}
+	command := fmt.Sprintf("git add %s", strings.Join(s, " "))
+
 	if err := Err(zsh.Status(command)); err != nil {
 		return fmt.Errorf("error during command: %v", command)
 	}
@@ -101,7 +94,7 @@ func Tag(s string) error {
 
 // RemoteName gets the name of the remote branch, usually origin.
 func RemoteName() string {
-    return zsh.Sh("git remote")
+	return zsh.Sh("git remote")
 }
 
 // Remote returns the remote repository url.
@@ -112,7 +105,7 @@ func RemoteName() string {
 func Remote() string {
 	// todo - this is ... kinda messy
 	remote := zsh.Sh("git remote")
-	out:= zsh.Sh("git remote -v")
+	out := zsh.Sh("git remote -v")
 
 	list := strings.Split(out, "\n")
 	for _, s := range list {
@@ -123,7 +116,7 @@ func Remote() string {
 	}
 	s := ""
 	for _, c := range out {
-		if  32 < c && c < 127 {
+		if 32 < c && c < 127 {
 			s += fmt.Sprintf("%c", c)
 		} else {
 			s += " "
@@ -137,5 +130,5 @@ func Remote() string {
 
 // Err calls error handling and logging routines
 func Err(err error) error {
-	return gofile.DoOrDie(err)
+	return gofile.Err(err)
 }

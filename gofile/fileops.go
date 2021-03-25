@@ -13,7 +13,7 @@ import (
 func Stat(file string) os.FileInfo {
 	fi, err := os.Stat(file)
 	if err != nil {
-        Err(err)
+		Err(err)
 		return nil
 	}
 	return fi
@@ -80,12 +80,12 @@ func Mode(file string) os.FileMode { return Stat(file).Mode() }
 //
 // If the file does not exist, nil is returned.
 // Errors are logged if Err is active.
-func Create(filename string) io.ReadWriteCloser{
+func Create(filename string) io.ReadWriteCloser {
 
-    // OpenFile is the generalized open call; most users will use Open or Create instead. It opens the named file with specified flag (O_RDONLY etc.). If the file does not exist, and the O_CREATE flag is passed, it is created with mode perm (before umask). If successful, methods on the returned File can be used for I/O. If there is an error, it will be of type *PathError.
-    f, err := os.OpenFile(filename, os.O_RDWR | os.O_CREATE | os.O_TRUNC, 0666)
-    if err != nil {
-        Err(err)
+	// OpenFile is the generalized open call; most users will use Open or Create instead. It opens the named file with specified flag (O_RDONLY etc.). If the file does not exist, and the O_CREATE flag is passed, it is created with mode perm (before umask). If successful, methods on the returned File can be used for I/O. If there is an error, it will be of type *PathError.
+	f, err := os.OpenFile(filename, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0666)
+	if err != nil {
+		Err(err)
 		return nil
 	}
 
@@ -105,10 +105,10 @@ func Create(filename string) io.ReadWriteCloser{
 // will be of type *PathError.
 //
 func CreateSafe(filename string) io.ReadWriteCloser {
-    f, err := os.OpenFile(filename, os.O_RDWR | os.O_CREATE | os.O_APPEND, 0666)
-    if err != nil {
-        Err(fmt.Errorf("file already exists (%s): %v", filename, err))
-        return nil
+	f, err := os.OpenFile(filename, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	if err != nil {
+		Err(fmt.Errorf("file already exists (%s): %v", filename, err))
+		return nil
 	}
 	return f
 }
