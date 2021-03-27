@@ -2,13 +2,23 @@ package stringutils
 
 import "fmt"
 
+type (
+	SetMap = map[Any]bool
+
+	// Set is a hashable version of a list with unique items.
+	Set struct {
+		name string
+		data SetMap
+	}
+)
+
 // NewSet returns a new Set from the given List
-func NewSet(data *List) *Set {
-	var s Set
-	s.name = data.name
-	s.data = make(SetMap, len(data.list))
-	for k, v := range data.list {
-		s.data[v] = k
+func NewSet(name string, data []Any) *Set {
+	s := Set{}
+	s.name = name
+	s.data = make(SetMap, len(data))
+	for _, v := range data {
+		s.data[v] = true
 	}
 	return &s
 }
@@ -17,26 +27,16 @@ func NewSet(data *List) *Set {
 // Duplicates are not allowed.
 func (s *Set) Add(item Any) error {
 	if _, ok := s.data[item]; !ok {
-		s.data[item] = s.Len() + 1
-		return nil
+		return fmt.Errorf("item %v could not be added to Set %v", item, s.name)
 	}
-	return fmt.Errorf("item %v could not be added to Set %v", item, s.name)
-}
-
-// Get returns the sequence number of item.
-func (s *Set) Get(item Any) (Any, error) {
-	if v, ok := s.data[item]; ok {
-		return v, nil
-	}
-	return nil, fmt.Errorf("item %v not found in Set %v", item, s.name)
+	s.data[item] = true
+	return nil
 }
 
 // Contains returns true if the Set contains item.
 func (s *Set) Contains(item Any) bool {
-	if _, ok := s.data[item]; ok {
-		return true
-	}
-	return false
+	// if _, ok := s.data[item]; ok {
+	return s.data[item]
 }
 
 // Len returns of elements in the Set

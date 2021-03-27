@@ -9,7 +9,7 @@ import (
 var (
 	tempSlice []Any = []Any{"this", 1, nil, 0, 3.14, '\t'}
 	tempList  *List = NewList("tempList", tempSlice)
-	tempSet   *Set  = NewSet(tempList)
+	tempSet   *Set  = NewSet("tempSet", tempSlice)
 )
 
 func TestNewList(t *testing.T) {
@@ -43,7 +43,7 @@ func TestList_ToSlice(t *testing.T) {
 func TestList_ToSet(t *testing.T) {
 	t.Run(tempList.name, func(t *testing.T) {
 		got := tempList.ToSet()
-		want := NewSet(tempList)
+		want := NewSet("tempSet", tempSlice)
 		if !reflect.DeepEqual(got, want) {
 			t.Errorf("Got: %v Want: %v", got, want)
 		}
@@ -51,8 +51,6 @@ func TestList_ToSet(t *testing.T) {
 }
 
 func ExampleList() {
-	// List.Get()
-	fmt.Println(tempList.Get(3.14))
 	// List.Contains()
 	fmt.Println(tempList.Contains(3.14))
 	fmt.Println(tempList.Contains(42))
@@ -63,9 +61,9 @@ func ExampleList() {
 	// List.Name()
 	fmt.Println(tempList.Name())
 	// List.Add()
-	fmt.Println(tempList.Get("fake"))
+	fmt.Println(tempList.Contains("fake"))
 	tempList.Add("fake")
-	fmt.Println(tempList.Get("fake"))
+	fmt.Println(tempList.Contains("fake"))
 
 	// output:
 	// 3.14

@@ -24,8 +24,6 @@ func TestSet_ToSlice(t *testing.T) {
 }
 
 func ExampleSet() {
-	// Set.Get()
-	fmt.Println(tempSet.Get(3.14))
 	// Set.Contains()
 	fmt.Println(tempSet.Contains(3.14))
 	fmt.Println(tempSet.Contains(42))
@@ -36,9 +34,9 @@ func ExampleSet() {
 	// Set.Name()
 	fmt.Println(tempSet.Name())
 	// Set.Add()
-	fmt.Println(tempSet.Get("fake"))
+	fmt.Println(tempSet.Contains("fake"))
 	_ = tempSet.Add("fake")
-	fmt.Println(tempSet.Get("fake"))
+	fmt.Println(tempSet.Contains("fake"))
 
 	// output:
 	// 4 <nil>

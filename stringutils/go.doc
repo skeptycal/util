@@ -1,0 +1,37 @@
+package stringutils // import "github.com/skeptycal/util/stringutils"
+
+Package stringutils implements additional functions to support the go
+standard library strings module.
+
+The algorithms chosen are based on benchmarks from the stringbenchmarks
+module. ymmv...
+
+The current implementation at the start of this project was
+.../go/1.15.3/libexec/src/strings/strings.go
+
+For information about UTF-8 strings in Go, see
+https://blog.golang.org/strings.
+
+const RuneError = utf8.RuneError ...
+var UnicodeWhiteSpaceMap ...
+func Contains(a []string, x string) bool
+func Count(s, sep []byte) int
+func EscapeString(s string) string
+func Explode(s []byte, n int) [][]byte
+func HTMLEscapeToLower(b []byte) []byte
+func IsDigit(c byte) bool
+func Join(list []string) string
+func RuneInfo(c rune)
+func SplitNoSave(s, sep []byte) [][]byte
+func Strings_ToLower(s string) string
+func TabIt(s string, n int) string
+func ToString(any interface{}) string
+func UnescapeString(s string) string
+func Valid(p []byte) bool
+type Any interface{}
+type List struct{ ... }
+    func NewList(name string, data []Any) *List
+type Set struct{ ... }
+    func NewSet(data *List) *Set
+type SetMap map[Any]int
+type Stringer interface{ ... }

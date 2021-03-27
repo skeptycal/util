@@ -3,14 +3,7 @@ package stringutils
 // Any is used to store data when the type cannot be
 // determined ahead of time.
 type (
-	Any    interface{}
-	SetMap map[Any]int
-
-	// Set is a hashable version of a list with unique keys.
-	Set struct {
-		name string
-		data SetMap
-	}
+	Any interface{}
 )
 
 // List is a wrapper around a slice of items. It offers
@@ -25,20 +18,10 @@ func NewList(name string, data []Any) *List {
 	return &List{name, data}
 }
 
-// Get gets item a from the List or nil if not present.
-func (v *List) Get(item Any) Any {
-	for _, n := range v.list {
-		if n == item {
-			return item
-		}
-	}
-	return nil
-}
-
 // Contains tells whether a contains x.
 func (v *List) Contains(item Any) bool {
-	for _, n := range v.list {
-		if n == item {
+	for i := range v.list {
+		if i == item {
 			return true
 		}
 	}
@@ -74,5 +57,5 @@ func (v *List) ToSlice() []Any {
 
 // ToSet returns the underlying data as a Set.
 func (v *List) ToSet() *Set {
-	return NewSet(v)
+	return NewSet(v.name, v.list)
 }

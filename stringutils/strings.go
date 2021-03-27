@@ -11,7 +11,8 @@
 // The current implementation at the start of this project was
 // .../go/1.15.3/libexec/src/strings/strings.go
 //
-// For information about UTF-8 strings in Go, see https://blog.golang.org/strings.
+// For information about UTF-8 strings in Go,
+// see https://blog.golang.org/strings.
 package stringutils
 
 import (
@@ -24,6 +25,8 @@ import (
 	"time"
 	"unicode/utf8"
 	"unsafe"
+
+	"golang.org/x/sys/cpu"
 )
 
 // Numbers fundamental to the encoding.
@@ -34,11 +37,31 @@ const (
 	UTFMax    = utf8.UTFMax    // 4              // maximum number of bytes of a UTF-8 encoded Unicode character.
 )
 
+var MaxLen int
+
 // const alphanumerics = "0123456789abcdefghijklmnopqrstuvwxyz"
 
 // Stringer implements the fmt.Stringer interface (for clarity)
 type Stringer interface {
 	String() string
+}
+
+func init() {
+	_ = cpu.ARM64.HasAES
+	if cpu.X86.HasAVX2 {
+		MaxLen = 63
+	} else {
+		MaxLen = 31
+	}
+}
+
+// Cutover reports the number of failures of IndexByte we should tolerate
+// before switching over to Index.
+// n is the number of bytes processed so far.
+// See the bytes.Index implementation for details.
+func Cutover(n int) int {
+	// 1 error per 8 characters, plus a few slop to start.
+	return (n + 16) / 8
 }
 
 // ToString implements Stringer directly as a function call
@@ -180,8 +203,9 @@ func (l *line) unsafeToStringPtr() string {
 	return *(*string)(unsafe.Pointer(&l))
 }
 
-func (l *line) unsafeFromStringPtr(s string) {
+func (l *line) unsafeFromStringPtr(s string) []byte {
 	l = (*line)(unsafe.Pointer(&s))
+	return *l
 }
 
 type list struct {
@@ -198,12 +222,115 @@ func (l list) Make(s string) [][]byte {
 	return *l.buf
 }
 func (l list) Contains(b []byte) bool {
+	// for some reason, bytes.Index is several times faster than
+	// bytes.Contains (see Index below for improvement)
 	for _, s := range *l.buf {
-		if bytes.Index(s, b) == -1 {
+		if bytes.Index(s, b) < 0 {
 			return false
 		}
 	}
 	return true
+}
+
+func Sindex(s string, sep string) int {
+	return strings.Index(s, sep)
+}
+
+func benStringIndex(s, substr string) int {
+	return strings.Index(s, substr)
+}
+
+func benBytesIndex(a, b []byte) int {
+	return bytes.Index(a, b)
+}
+
+// Index returns the index of the first instance of sep in s, or -1 if sep is not present in s.
+func Index(s, sep []byte) int {
+	n := len(sep)
+	ns := len(s)
+	switch {
+	case n == 0:
+		return 0
+	case n == 1:
+		return bytealg.IndexByte(s, sep[0])
+	case n == ns:
+		if string(sep) == string(s) {
+			return 0
+		}
+		return -1
+	case n > ns:
+		return -1
+	case n <= MaxLen:
+		// Use brute force when s and sep both are small
+		if ns <= bytealg.MaxBruteForce {
+			return bytealg.Index(s, sep)
+		}
+		c0 := sep[0]
+		c1 := sep[1]
+		i := 0
+		t := ns - n + 1
+		fails := 0
+		for i < t {
+			if s[i] != c0 {
+				// IndexByte is faster than bytealg.Index, so use it as long as
+				// we're not getting lots of false positives.
+				o := bytealg.IndexByte(s[i+1:t], c0)
+				if o < 0 {
+					return -1
+				}
+				i += o + 1
+			}
+			if s[i+1] == c1 && bytes.Equal(s[i:i+n], sep) {
+				return i
+			}
+			fails++
+			i++
+			// Switch to bytealg.Index when IndexByte produces too many false positives.
+			if fails > bytealg.Cutover(i) {
+				r := bytealg.Index(s[i:], sep)
+				if r >= 0 {
+					return r + i
+				}
+				return -1
+			}
+		}
+		return -1
+	}
+	c0 := sep[0]
+	c1 := sep[1]
+	i := 0
+	fails := 0
+	t := len(s) - n + 1
+	for i < t {
+		if s[i] != c0 {
+			o := IndexByte(s[i+1:t], c0)
+			if o < 0 {
+				break
+			}
+			i += o + 1
+		}
+		if s[i+1] == c1 && Equal(s[i:i+n], sep) {
+			return i
+		}
+		i++
+		fails++
+		if fails >= 4+i>>4 && i < t {
+			// Give up on IndexByte, it isn't skipping ahead
+			// far enough to be better than Rabin-Karp.
+			// Experiments (using IndexPeriodic) suggest
+			// the cutover is about 16 byte skips.
+			// TODO: if large prefixes of sep are matching
+			// we should cutover at even larger average skips,
+			// because Equal becomes that much more expensive.
+			// This code does not take that effect into account.
+			j := bytealg.IndexRabinKarpBytes(s[i:], sep)
+			if j < 0 {
+				return -1
+			}
+			return i + j
+		}
+	}
+	return -1
 }
 
 // SplitNoSave - modified from standard library generic split:
