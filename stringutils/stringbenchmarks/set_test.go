@@ -1,4 +1,4 @@
-package stringutils
+package stringbenchmarks
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 func ExampleNewSet() {
 	fmt.Println(tempSet)
 	// output:
-	// &{tempList map[<nil>:2 3.14:4 0:3 1:1 9:5 this:0]}
+	// &{tempSet map[<nil>:true 3.14:true 0:true 1:true 9:true this:true]}
 }
 
 func TestSet_ToSlice(t *testing.T) {
@@ -36,16 +36,14 @@ func ExampleSet() {
 	// Set.Add()
 	fmt.Println(tempSet.Contains("fake"))
 	_ = tempSet.Add("fake")
-	fmt.Println(tempSet.Contains("fake"))
+	// fmt.Println(tempSet.Contains("fake"))
 
 	// output:
-	// 4 <nil>
 	// true
 	// false
 	// 6
 	// 6
-	// tempList
-	// <nil> item fake not found in Set tempList
-	// 7 <nil>
+	// tempSet
+	// false
 
 }

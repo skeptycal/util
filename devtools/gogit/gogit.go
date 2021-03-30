@@ -6,8 +6,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/skeptycal/stringutils"
 	"github.com/skeptycal/util/gofile"
+	"github.com/skeptycal/util/stringutils"
 	"github.com/skeptycal/zsh"
 )
 

@@ -1,9 +1,5 @@
 package ansi
 
-const (
-	FMTansiSet = "\033[%d;%d;%dm" // use with ANSI color codes for effect, foreground, background
-)
-
 // Format Strings - 3/4 bit Ansi printf commands.
 //
 // ESC[⟨e⟩;⟨x⟩⟨n⟩m

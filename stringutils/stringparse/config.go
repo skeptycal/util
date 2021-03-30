@@ -3,6 +3,7 @@
 package stringparse
 
 import (
+	"errors"
 	"fmt"
 	"path"
 	"reflect"
@@ -26,7 +27,7 @@ func Configure(fileName string, v interface{}) (err error) {
 	if configType.Kind() != reflect.Ptr || configType.Elem().Kind() != reflect.Struct {
 		return fmt.Errorf("v must be a pointer to a struct type, got: %v", configType)
 	}
-	return nil
+	return errors.New("not implemented")
 	// todo
 	// return LoadJSON(fileName, v)
 }
@@ -35,10 +36,13 @@ func Configure(fileName string, v interface{}) (err error) {
 // e.g. path/to/my_program.go would return path/to/my_program.json
 func ConfigFileName() string {
 
-	_, pathName, _, _ := runtime.Caller(0)
+	_, pathName, _, ok := runtime.Caller(0)
+	if !ok {
+		return ""
+	}
 
-	filePath, fileName := path.Split(pathName)
+	parentPath, fileName := path.Split(pathName)
 	baseName := strings.Split(fileName, ".")[0] + ".json"
 
-	return path.Join(filePath, baseName)
+	return path.Join(parentPath, baseName)
 }

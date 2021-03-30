@@ -1,4 +1,4 @@
-package stringutils
+package stringbenchmarks
 
 // Any is used to store data when the type cannot be
 // determined ahead of time.

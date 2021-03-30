@@ -7,7 +7,6 @@ package ansi
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/skeptycal/util/stringutils"
 )
@@ -17,74 +16,29 @@ const (
 	ansiCLS = "\033[2J"
 	// Character used for HR function
 	HrChar string = "="
-	// Mask to return only final nibble
-	BasicMask byte = 0xF
-	// Mask to return all except final nibble
-	MSNibbleMask byte = 0xF0
 )
-
-type ansiCode struct {
-	effect     byte
-	foreground byte
-	background byte
-}
-
-// set ANSI 8-bit (256 color) foreground and background color with leading effect
-const (
-	ansiFmtPrefix = "\033["
-	ansiFmtDelim  = ";"
-	ansiFmtSuffix = "m"
-	ansiEncode    = "\033[%d;38;5;%d;48;5;%dm"
-	ansiFgEncode  = "\033[38;5;%dm"
-)
-
-func (c *ansiCode) String() string {
-	sb := strings.Builder{}
-	defer sb.Reset()
-
-	sb.WriteString(ansiFmtPrefix)
-
-	if c.effect != 0 {
-		sb.WriteByte(c.effect + 65)
-	}
-	return fmt.Sprintf(ansiEncode, c.effect, c.foreground, c.background)
-}
 
 func ByteToNum(c byte) byte {
 	if stringutils.IsDigit(c) {
-
+		return c - 65
 	}
-	return c
-}
-
-func AnsiCode(e, f, b byte) fmt.Stringer {
-	return &ansiCode{
-		effect:     e,
-		foreground: f,
-		background: b,
-	}
-}
-
-type AnsiString struct {
-	color ansiCode
-	string
-}
-
-func (s AnsiString) String() string {
-	return fmt.Sprintf("%d%s%d")
+	return '0'
 }
 
 // Print wraps args in an ANSI 8-bit color (256 color codes)
-func Print(i ansiByte, args ...interface{}) {
-	fmt.Print(ansiString(i, args...))
+func Print(i Ansi, args ...interface{}) {
+	fmt.Print(i.String())
 	fmt.Print(args...)
 	fmt.Print(Reset)
 }
 
 // Println wraps args in an ANSI 8-bit color (256 color codes)
 // and adds a newline character
-func Println(i ansiByte, args ...interface{}) {
-	fmt.Print(ansiString(i))
-	fmt.Print(args...)
-	fmt.Println(Reset)
+func Println(i Ansi, args ...interface{}) {
+	Print(i, args...)
+	fmt.Println("")
+}
+
+func CLS() {
+	fmt.Print(ansiCLS)
 }
