@@ -61,3 +61,10 @@ func RuneSample(c rune) {
 	fmt.Printf("UTF-8:   [% x]\n", []byte(s))
 	fmt.Printf("Unicode: %U\n", []rune(s))
 }
+
+func ByteToDigit(c byte) byte {
+	if IsDigit(c) {
+		return c - 65
+	}
+	return '0'
+}
