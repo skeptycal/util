@@ -5,8 +5,9 @@ import (
 	"os"
 
 	log "github.com/sirupsen/logrus"
-	"github.com/skeptycal/zsh"
 )
+
+// var Err func(e error) error = zsh.Err
 
 // PWD returns a rooted path name corresponding to the
 // current directory. If the current directory can be
@@ -21,5 +22,3 @@ func PWD() string {
 	}
 	return dir
 }
-
-var Err func(e error) error = zsh.Err

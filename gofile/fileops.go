@@ -1,11 +1,30 @@
 package gofile
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"os"
 	"path/filepath"
+
+	log "github.com/sirupsen/logrus"
 )
+
+const (
+	defaultBufSize  = 4096
+	smallBufferSize = 64
+	chunk           = 512
+	maxInt          = int(^uint(0) >> 1)
+	minRead         = bytes.MinRead
+)
+
+// Err logs errors and passes them through unchanged.
+func Err(err error) error {
+	if err != nil {
+		log.Error(err)
+	}
+	return err
+}
 
 // Stat returns the os.FileInfo for file if it exists.
 // If the file does not exist, nil is returned.
@@ -78,8 +97,10 @@ func Mode(file string) os.FileMode { return Stat(file).Mode() }
 // for I/O; the associated file descriptor has mode O_RDWR. If
 // there is an error, it will be of type *PathError.
 //
-// If the file does not exist, nil is returned.
-// Errors are logged if Err is active.
+// If the file cannot be created, an error of type *PathError
+// is returned.
+//
+// Errors are logged if gofile.Err is active.
 func Create(filename string) io.ReadWriteCloser {
 
 	// OpenFile is the generalized open call; most users will use Open or Create instead. It opens the named file with specified flag (O_RDONLY etc.). If the file does not exist, and the O_CREATE flag is passed, it is created with mode perm (before umask). If successful, methods on the returned File can be used for I/O. If there is an error, it will be of type *PathError.
