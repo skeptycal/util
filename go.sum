@@ -6,6 +6,8 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/sirupsen/logrus v1.8.1 h1:dJKuHgqk1NNQlqoA6BTlM1Wf9DOH3NBjQyu0h9+AZZE=
 github.com/sirupsen/logrus v1.8.1/go.mod h1:yWOB1SBYBC5VeMP7gHvWumXLIWorT60ONWic61uBYv0=
+github.com/skeptycal/ansi v0.3.3 h1:u0gFDk7tCPT0jTC29F7HAh9YwXvXQtbjGRKCWOWxB30=
+github.com/skeptycal/ansi v0.3.3/go.mod h1:4pC8No7lBVb6nW+9VjZFFBDv9E+KEyEYYQinHn3bFx4=
 github.com/skeptycal/util/stringutils v0.0.0-20210327131358-3c9cdad9bb2e h1:IxrcSYZJF9Cwy55yoA+SQaN6HyhpiddXWrj+6Lv5+i0=
 github.com/skeptycal/util/stringutils v0.0.0-20210327131358-3c9cdad9bb2e/go.mod h1:KyL1YI+MkVKpm+IkH4YUOc1NDoBIGMr6Eq4Slqd8RfA=
 github.com/skeptycal/zsh v0.3.0 h1:E5EeY4o5j/64/38YY0kXSDFPD30zp8gHXjXUSGux/1s=

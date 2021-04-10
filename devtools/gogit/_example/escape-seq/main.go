@@ -1,13 +1,16 @@
 package main
 
 import (
-	"anansi"
 	"fmt"
+
+	ansi "github.com/skeptycal/ansi"
 )
 
 func main() {
 	// stdOut := bufio.NewWriter(colorable.NewColorableStdout())
-	stdOut := anansi.Output
+	s := ansi.Output
+	stdOut := ansi.Output
+	ansi.NewStdout(w io.Writer)
 	defer stdOut.Flush() // Write buffered writes before exiting
 
 	fmt.Fprint(stdOut, "\x1B[3GMove to 3rd Column\n")

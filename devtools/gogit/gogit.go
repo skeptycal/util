@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+	"unicode"
 
 	"github.com/skeptycal/util/gofile"
-	"github.com/skeptycal/util/stringutils"
 	"github.com/skeptycal/zsh"
 )
 
@@ -23,7 +23,12 @@ func IsHash(s string) bool {
 }
 
 func IsAlphaNum(s string) bool {
-	return stringutils.IsAlphaNum(s)
+	for _, r := range s {
+		if !unicode.IsLetter(r) && !unicode.IsDigit(r) {
+			return false
+		}
+	}
+	return true
 }
 
 func AddAll() error {

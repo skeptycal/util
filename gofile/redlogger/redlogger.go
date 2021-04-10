@@ -8,28 +8,44 @@ import (
 	"os"
 
 	"github.com/sirupsen/logrus"
-	"github.com/skeptycal/util/stringutils/ansi"
+	ansi "github.com/skeptycal/ansi"
+)
+
+var (
+	defaultRedLogColor  ansi.Ansi      = ansi.NewColor(ansi.Red, ansi.BlackBackground, ansi.Bold)
+	defaultLogLevel     logrus.Level   = logrus.InfoLevel
+	defaultRedLogOutput ansi.CLI       = ansi.NewStderr(os.Stderr)
+	log                 *logrus.Logger = &logrus.Logger{
+		Out: New(defaultRedLogOutput, defaultRedLogColor),
+	}
 )
 
 func init() {
+
+	l := logrus.New()
 	var log = &logrus.Logger{
-		Out:       New(os.Stderr),
+		Out:       New(nil, defaultRedLogColor),
 		Formatter: new(logrus.TextFormatter),
 		Hooks:     make(logrus.LevelHooks),
 		Level:     logrus.InfoLevel,
 	}
 	// log.SetFormatter(new(logrus.TextFormatter))
-	log.SetLevel(logrus.InfoLevel)
+	log.SetLevel(defaultLogLevel)
 
 	log.Info("RedLogger enabled...")
 }
 
-func New(w io.Writer) *RedLogger {
-	if w == nil {
-		w = os.Stderr
+func New(w io.Writer, color ansi.Ansi) *RedLogger {
+
+	if color == nil {
+		color = defaultRedLogColor
 	}
-	a := &RedLogger{bufio.NewWriter(w)}
-	return a
+
+	r := ansi.NewStderr(w)
+	r.SetColor(color)
+	r.DevMode(false)
+
+	return &RedLogger{color, bufio.NewWriter(w)}
 }
 
 // RedLogger implements buffering for an io.Writer object that
@@ -41,14 +57,14 @@ func New(w io.Writer) *RedLogger {
 // Flush method to guarantee all data has been forwarded to
 // the underlying io.Writer.
 type RedLogger struct {
-	color ansi.AnsiCode() // Color(83)
+	color ansi.Ansi // Color(83)
 	*bufio.Writer
 }
 
 // Write wraps p with Ansi color codes and writes the result to the buffer.
 func (l *RedLogger) Write(p []byte) (n int, err error) {
 	nn, err := l.Writer.WriteString("--> redlogger Write()") // test
-	nn, err := l.Writer.WriteString(l.color) // test
+	nn, err := l.Writer.WriteString(l.color)                 // test
 	if err != nil {
 		return 0, err
 	}
